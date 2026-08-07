@@ -1,0 +1,48 @@
+{
+  "name": "@hauddy/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Electron shell for the hauddy local app: macOS menu-bar tray, compact popover, expandable full window. UI is @hauddy/app-ui.",
+  "main": "dist/main.js",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "icons": "node scripts/make-icons.mjs",
+    "build": "npm run build -w @hauddy/app-ui && node scripts/make-icons.mjs && tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "dist": "npm run build && electron-builder --mac dir"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.0",
+    "electron": "33.4.11",
+    "electron-builder": "^25.1.8",
+    "sharp": "^0.33.5",
+    "typescript": "~5.5.4"
+  },
+  "build": {
+    "appId": "dev.hauddy.app",
+    "productName": "hauddy",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**",
+      "assets/**",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../app/dist",
+        "to": "app"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.utilities",
+      "icon": "assets/icon.png",
+      "target": [
+        "dir"
+      ]
+    },
+    "asar": true,
+    "npmRebuild": false
+  }
+}

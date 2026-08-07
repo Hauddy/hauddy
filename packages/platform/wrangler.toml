@@ -1,0 +1,31 @@
+# Hauddy platform hub — Cloudflare Worker + Durable Object (SQLite) + R2.
+# See docs/cloudflare-platform-port-plan.md §6.
+name = "hauddy-platform"
+main = "src/worker.ts"
+compatibility_date = "2026-01-01"
+# NOTE: deliberately NO `nodejs_compat` — the Worker is pure WebCrypto with no node:
+# imports (plan §10 decision: aim to drop it). Add back only if a dep forces it.
+
+[[durable_objects.bindings]]
+name = "HUB"
+class_name = "HubDO"
+
+# SQLite-backed Durable Object (ctx.storage.sql). Required for the message/call schema.
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["HubDO"]
+
+[[r2_buckets]]
+binding = "FILES"
+bucket_name = "hauddy-files"
+
+[vars]
+CORS_ORIGIN = "https://app.hauddy.com"
+
+# Secrets (set with `wrangler secret put`): ADMIN_TOKEN (invite admin endpoint).
+
+# Custom domain — applies on `wrangler deploy`. A Custom Domain is the bare
+# hostname (no wildcard, no path); it routes ALL paths on that host to this Worker.
+[[routes]]
+pattern = "api.hauddy.com"
+custom_domain = true

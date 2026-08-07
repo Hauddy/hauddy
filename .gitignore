@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+release/
+*.tsbuildinfo
+
+# Local data & runtime state
+data/
+.hauddy-platform-data/
+.wrangler/
+
+# Secrets & keys
+*.key
+.env
+.env.*
+.dev.vars
+.dev.vars.*
+
+# Logs
+*.log
+
+# OS / editor
+.DS_Store
+
+# Design-tool scratch exports (not part of the buildable project)
+*.dc.html
+support.js

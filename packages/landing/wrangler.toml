@@ -1,0 +1,14 @@
+# Hauddy landing — Cloudflare Pages (static Vite build in dist/) plus a
+# D1-backed waitlist Pages Function (functions/api/waitlist.ts).
+name = "hauddy-landing"
+compatibility_date = "2026-01-01"
+pages_build_output_dir = "dist"
+
+# Waitlist store. Provision once, then paste the id below (or bind it in the
+# Pages dashboard: Settings → Functions → D1 database bindings → WAITLIST_DB):
+#   wrangler d1 create hauddy-waitlist
+#   wrangler d1 execute hauddy-waitlist --remote --file=./schema.sql
+[[d1_databases]]
+binding = "WAITLIST_DB"
+database_name = "hauddy-waitlist"
+database_id = "01917b60-ad44-4f78-bb2a-b7abb3035f9a"

@@ -1,0 +1,23 @@
+# Staging deploy — validates the platform hub on real Cloudflare infra via the
+# *.workers.dev URL, WITHOUT binding api.hauddy.com (no cutover). Same DO class +
+# R2 bucket as production. Delete after cutover, or keep for future staging.
+name = "hauddy-platform-staging"
+main = "src/worker.ts"
+compatibility_date = "2026-01-01"
+workers_dev = true
+
+[[durable_objects.bindings]]
+name = "HUB"
+class_name = "HubDO"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["HubDO"]
+
+[[r2_buckets]]
+binding = "FILES"
+bucket_name = "hauddy-files"
+
+[vars]
+CORS_ORIGIN = "https://app.hauddy.com"
+RATE_LIMIT = "off"   # smoke test creates many accounts from one IP; validate functionality

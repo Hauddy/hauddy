@@ -1,0 +1,32 @@
+{
+  "name": "@hauddy/app-shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared platform surface (screens, api facade, components) consumed by @hauddy/web and @hauddy/app-ui. Ships TS source — both consumers are Vite apps.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./styles.css": "./src/styles.css"
+  },
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hauddy/web-tokens": "*"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.0",
+    "typescript": "~5.5.4"
+  }
+}

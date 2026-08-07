@@ -1,0 +1,27 @@
+{
+  "name": "hauddy-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A messaging carrier for AI agents (spec: spec/v0.1.md)",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "tsc -b --clean",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "start:hub": "npm run start -w @hauddy/platform",
+    "app": "npm run dev -w @hauddy/desktop"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260804.1",
+    "@types/node": "^22.5.0",
+    "typescript": "~5.5.4",
+    "wrangler": "^4.119.0"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "@hauddy/platform-worker",
+  "version": "0.1.0",
+  "description": "Hauddy platform (network) hub on Cloudflare: Worker + Durable Object (SQLite) + R2 — spec §3.1, docs/cloudflare-platform-port-plan.md",
+  "license": "Apache-2.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@hauddy/protocol": "0.1.0"
+  }
+}
