@@ -1,5 +1,5 @@
 {
-  "name": "@hauddy/platform",
+  "name": "@hauddy/local-hub",
   "version": "0.1.0",
   "description": "Hauddy hub: identity registry, consent contact graph, presence, durable inbox, routing (spec §3.1)",
   "license": "Apache-2.0",

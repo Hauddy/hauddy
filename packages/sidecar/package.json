@@ -21,7 +21,7 @@
     "postinstall": "node scripts/fix-node-pty.mjs"
   },
   "dependencies": {
-    "@hauddy/platform": "0.1.0",
+    "@hauddy/local-hub": "0.1.0",
     "@hauddy/protocol": "0.1.0",
     "@modelcontextprotocol/sdk": "^1.13.0",
     "node-pty": "^1.0.0",

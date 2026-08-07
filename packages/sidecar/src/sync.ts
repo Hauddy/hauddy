@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import type { CallRow, HubHistory, MessageRow } from "@hauddy/platform";
+import type { CallRow, HubHistory, MessageRow } from "@hauddy/local-hub";
 
 /**
  * Per-tick view of who + where we can mirror to. The daemon rebuilds this each

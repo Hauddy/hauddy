@@ -15,7 +15,7 @@
     "build": "tsc -b",
     "clean": "tsc -b --clean",
     "test": "npm run build && node --test test/*.test.mjs",
-    "start:hub": "npm run start -w @hauddy/platform",
+    "start:hub": "npm run start -w @hauddy/local-hub",
     "app": "npm run dev -w @hauddy/desktop"
   },
   "devDependencies": {

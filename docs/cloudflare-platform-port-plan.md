@@ -28,9 +28,9 @@ it. Read it top to bottom before starting.
   Worker is a **second implementation** of the same protocol for the platform tier.
   Behavior parity between the two is guarded by a shared conformance test (see §8).
 
-**Naming:** new package **`packages/platform`** (`@hauddy/platform-worker`). Leave
-`packages/hub` as-is (its package name is confusingly `@hauddy/platform` today — rename
-its `package.json` name to `@hauddy/local-hub` while here, dir stays `packages/hub`).
+**Naming:** the network hub is **`packages/platform`** (`@hauddy/platform`); the local hub
+stays at **`packages/hub`**, renamed to **`@hauddy/local-hub`** (2026-08-07) so the two are
+no longer confusable. Dirs unchanged.
 
 ---
 
@@ -349,7 +349,7 @@ Invite management ("from the backend manually"): `POST /admin/invites {email}` g
 
 ```
 packages/platform/
-  package.json            @hauddy/platform-worker
+  package.json            @hauddy/platform
   wrangler.toml
   tsconfig.json
   src/
@@ -388,15 +388,16 @@ packages/platform/
 
 ## 9. Phased execution (checklist for the fresh session)
 
-- [x] **P0 Scaffold** ✅ (2026-08-05): `packages/platform` (`@hauddy/platform-worker`) +
+- [x] **P0 Scaffold** ✅ (2026-08-05): `packages/platform` (`@hauddy/platform`) +
       wrangler.toml + `HubDO` stub (schema DDL applied on init, WS accept, auto-response
       heartbeat) + `db.ts`/`schema.ts` (full §2 schema) + `crypto.ts` (Ed25519/PBKDF2/
       random) + `protocol/ulid.ts` fixed (global `crypto.getRandomValues`). `wrangler dev`
       serves `GET /agents` → `{agents:[]}`, `GET /health`, and CORS preflight. Typecheck
       green; protocol still builds under Node. Deps added: `wrangler`, `@cloudflare/workers-types`.
-      **DEFERRED (small follow-up):** the `@hauddy/platform` → `@hauddy/local-hub` rename
-      (§0) — it touches `sidecar/daemon.ts` + the lockfile, orthogonal to the port; do it
-      as its own step so it doesn't destabilize the daemon build.
+      **DONE 2026-08-07:** the local hub was renamed `@hauddy/platform` → `@hauddy/local-hub`,
+      and the network hub reclaimed the clean `@hauddy/platform` (was `@hauddy/platform-worker`).
+      Touched `sidecar/{daemon,sync}.ts`, both `package.json` names, the root `start:hub`
+      script, and the lockfile.
 - [x] **P1 HTTP control API** ✅ (2026-08-05): full `db.ts` (SQL-backed, mirrors `store.ts`
       method-for-method; passwords now async PBKDF2) + all routes in `hub-do.ts`: signup
       (invite gate + PBKDF2), login, rotate/revoke/me/claims, register, agents,

@@ -13,7 +13,7 @@ end-user machines. Set `HAUDDY_PLATFORM` / `VITE_HAUDDY_PLATFORM` only for local
 
 > **The platform hub is now Cloudflare-native** (ported 2026-08-05). It's a Worker + a
 > single Durable Object (`HubDO`, SQLite storage) + an R2 bucket, in `packages/platform`
-> (`@hauddy/platform-worker`). The old always-on-box + `cloudflared` tunnel + `launchd`
+> (`@hauddy/platform`). The old always-on-box + `cloudflared` tunnel + `launchd`
 > Node hub is **retired**. Full port record: `docs/cloudflare-platform-port-plan.md`.
 > The Node hub (`packages/hub`) still exists but is now **local-hub only** (embedded in the
 > daemon for same-machine agent↔agent).

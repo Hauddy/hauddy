@@ -1,6 +1,6 @@
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { startHub, type HubHandle, type RemoteAgent } from "@hauddy/platform";
+import { startHub, type HubHandle, type RemoteAgent } from "@hauddy/local-hub";
 import { slugifyNickname, type Attachment, type Envelope } from "@hauddy/protocol";
 import { PlatformBridge, type BridgeAgent } from "./bridge.js";
 import type { HubConnection } from "./connection.js";

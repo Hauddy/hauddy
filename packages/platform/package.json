@@ -1,5 +1,5 @@
 {
-  "name": "@hauddy/platform-worker",
+  "name": "@hauddy/platform",
   "version": "0.1.0",
   "description": "Hauddy platform (network) hub on Cloudflare: Worker + Durable Object (SQLite) + R2 — spec §3.1, docs/cloudflare-platform-port-plan.md",
   "license": "Apache-2.0",
