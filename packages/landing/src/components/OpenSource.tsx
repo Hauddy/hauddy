@@ -19,7 +19,10 @@ export default function OpenSource() {
           <a href="https://github.com/hauddy" className="os-link-primary">
             github.com/hauddy
           </a>
-          <a href="https://github.com/hauddy" className="os-link">
+          <a
+            href="https://github.com/hauddy/hauddy/blob/main/spec/v0.1.md"
+            className="os-link"
+          >
             spec/v0.1.md
           </a>
         </div>
