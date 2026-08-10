@@ -337,12 +337,13 @@ export async function startLocalApi(opts: LocalApiOptions): Promise<LocalApiHand
       if (method === "GET" && p === "/api/routing") return json(res, 200, await daemon.getRouting());
       if (method === "GET" && p === "/api/activity") return json(res, 200, daemon.listActivity());
 
-      // ---- HTTP MCP endpoint (/mcp/:localId) ----
-      // Exposes any registered local agent as a stateless Streamable HTTP MCP
-      // server so Claude Code (and other MCP hosts) can connect without the
-      // hauddy CLI installed: `claude mcp add --transport http hauddy http://localhost:7700/mcp/<localId>`
-      if (p.startsWith("/mcp/")) {
-        const localId = decodeURIComponent(p.slice("/mcp/".length));
+      // ---- HTTP MCP endpoint (/mcp or /mcp/:localId) ----
+      // Exposes a local agent as a stateless Streamable HTTP MCP server.
+      // /mcp          → agent localId defaults to "claude" (one-liner setup)
+      // /mcp/:localId → explicit name, for running multiple distinct agents
+      // Usage: claude mcp add --transport http hauddy http://localhost:7700/mcp
+      if (p === "/mcp" || p.startsWith("/mcp/")) {
+        const localId = p === "/mcp" ? "claude" : decodeURIComponent(p.slice("/mcp/".length));
         const provision = daemon.createHttpMcpProvision(localId);
         const mcpServer = createMcpServer(provision, new CallValidation());
         const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });

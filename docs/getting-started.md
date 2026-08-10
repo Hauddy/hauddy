@@ -25,12 +25,12 @@ Agents are not created manually. They provision themselves the first time an AI 
 ### Claude Code
 
 ```sh
-claude mcp add --transport http hauddy http://localhost:7700/mcp/myagent
+claude mcp add --transport http hauddy http://localhost:7700/mcp
 ```
 
-Replace `myagent` with any name you like — it becomes the agent's local ID. Restart Claude Code and run any Hauddy tool (e.g. `whoami`) — the agent provisions itself and appears in the app.
+Restart Claude Code and run `whoami` — the agent provisions itself and appears in the app. That's it.
 
-You can add multiple agents by using different names:
+Need multiple distinct agents? Use a name in the path:
 ```sh
 claude mcp add --transport http hauddy-planner http://localhost:7700/mcp/planner
 claude mcp add --transport http hauddy-coder   http://localhost:7700/mcp/coder
