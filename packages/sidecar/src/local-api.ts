@@ -1,6 +1,9 @@
 import http from "node:http";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { MAX_ATTACHMENTS_BYTES, type Attachment } from "@hauddy/protocol";
 import type { Daemon } from "./daemon.js";
+import { createMcpServer } from "./mcp.js";
+import { CallValidation } from "./wake.js";
 
 const CORS = {
   "access-control-allow-origin": "*",
@@ -65,6 +68,12 @@ export async function startLocalApi(opts: LocalApiOptions): Promise<LocalApiHand
     const description = p.match(/^\/api\/agents\/([^/]+)\/description$/);
     const del = p.match(/^\/api\/agents\/([^/]+)\/delete$/);
     const agentLog = p.match(/^\/api\/agents\/([^/]+)\/log$/);
+    const netAgentRemove = p.match(/^\/api\/platform\/agents\/([^/]+)\/remove$/);
+    const netAgentNick = p.match(/^\/api\/platform\/agents\/([^/]+)\/nickname$/);
+    const netAgentSettings = p.match(/^\/api\/platform\/agents\/([^/]+)\/settings$/);
+    const netAgentBook = p.match(/^\/api\/platform\/agents\/([^/]+)\/book$/);
+    const netAgentBookRemove = p.match(/^\/api\/platform\/agents\/([^/]+)\/book\/remove$/);
+    const netAgent = p.match(/^\/api\/platform\/agents\/([^/]+)$/);
     const humanFile = p.match(/^\/api\/human\/file\/([^/]+)$/);
     const humanThread = p.match(/^\/api\/human\/thread\/([^/]+)$/);
     try {
@@ -123,6 +132,36 @@ export async function startLocalApi(opts: LocalApiOptions): Promise<LocalApiHand
       }
       if (method === "POST" && p === "/api/platform/rotate") return json(res, 200, await daemon.rotatePlatformKey());
       if (method === "GET" && p === "/api/platform/exposure") return json(res, 200, await daemon.listExposure());
+      // The account's platform-only agents (connectors + agents exposed elsewhere).
+      if (method === "GET" && p === "/api/platform/agents") return json(res, 200, await daemon.listNetworkAgents());
+      if (method === "POST" && netAgentRemove) {
+        return json(res, 200, await daemon.removeNetworkAgent(decodeURIComponent(netAgentRemove[1]!)));
+      }
+      if (method === "POST" && netAgentNick) {
+        const body = await readBody(req);
+        return json(res, 200, await daemon.setNetworkAgentNickname(decodeURIComponent(netAgentNick[1]!), String(body.nickname ?? "")));
+      }
+      if (method === "POST" && netAgentSettings) {
+        const body = await readBody(req);
+        const patch: { bio?: string; listed?: boolean } = {};
+        if (typeof body.bio === "string") patch.bio = body.bio;
+        if (typeof body.listed === "boolean") patch.listed = body.listed;
+        return json(res, 200, await daemon.setNetworkAgentSettings(decodeURIComponent(netAgentSettings[1]!), patch));
+      }
+      if (method === "GET" && netAgentBook) {
+        return json(res, 200, await daemon.networkAgentBook(decodeURIComponent(netAgentBook[1]!)));
+      }
+      if (method === "POST" && netAgentBookRemove) {
+        const body = await readBody(req);
+        return json(res, 200, await daemon.removeNetworkAgentContact(decodeURIComponent(netAgentBookRemove[1]!), String(body.handle ?? "")));
+      }
+      if (method === "POST" && netAgentBook) {
+        const body = await readBody(req);
+        return json(res, 200, await daemon.addNetworkAgentContact(decodeURIComponent(netAgentBook[1]!), String(body.handle ?? "")));
+      }
+      if (method === "GET" && netAgent) {
+        return json(res, 200, await daemon.getNetworkAgent(decodeURIComponent(netAgent[1]!)));
+      }
       if (method === "POST" && p === "/api/platform/expose") {
         const body = await readBody(req);
         return json(res, 200, await daemon.expose(String(body.localId ?? "")));
@@ -297,6 +336,21 @@ export async function startLocalApi(opts: LocalApiOptions): Promise<LocalApiHand
       // ---- diagnostics ----
       if (method === "GET" && p === "/api/routing") return json(res, 200, await daemon.getRouting());
       if (method === "GET" && p === "/api/activity") return json(res, 200, daemon.listActivity());
+
+      // ---- HTTP MCP endpoint (/mcp/:localId) ----
+      // Exposes any registered local agent as a stateless Streamable HTTP MCP
+      // server so Claude Code (and other MCP hosts) can connect without the
+      // hauddy CLI installed: `claude mcp add --transport http hauddy http://localhost:7700/mcp/<localId>`
+      if (p.startsWith("/mcp/")) {
+        const localId = decodeURIComponent(p.slice("/mcp/".length));
+        const provision = daemon.createHttpMcpProvision(localId);
+        const mcpServer = createMcpServer(provision, new CallValidation());
+        const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
+        await mcpServer.connect(transport);
+        const body = method === "POST" ? await readBody(req) : undefined;
+        await transport.handleRequest(req, res, body);
+        return;
+      }
 
       json(res, 404, { error: "not found" });
     } catch (err) {

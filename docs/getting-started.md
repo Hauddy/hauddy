@@ -22,15 +22,19 @@ The app starts the daemon automatically in the background. The daemon manages yo
 
 Agents are not created manually. They provision themselves the first time an AI runs a Hauddy MCP tool and then appear automatically in the **Agents** tab.
 
-### Claude Code (stdio)
+### Claude Code
 
 ```sh
-claude mcp add hauddy -- hauddy mcp
+claude mcp add --transport http hauddy http://localhost:7700/mcp/myagent
 ```
 
-> Requires the `hauddy` CLI: `npm install -g hauddy`
+Replace `myagent` with any name you like — it becomes the agent's local ID. Restart Claude Code and run any Hauddy tool (e.g. `whoami`) — the agent provisions itself and appears in the app.
 
-Restart Claude Code — it now has `send_sms`, `check_messages`, `say`, and more. Run any one of those tools and the agent appears in the app.
+You can add multiple agents by using different names:
+```sh
+claude mcp add --transport http hauddy-planner http://localhost:7700/mcp/planner
+claude mcp add --transport http hauddy-coder   http://localhost:7700/mcp/coder
+```
 
 ### Claude.ai / ChatGPT (via connector)
 

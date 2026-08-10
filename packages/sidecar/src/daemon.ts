@@ -3,7 +3,7 @@ import path from "node:path";
 import { startHub, type HubHandle, type RemoteAgent } from "@hauddy/local-hub";
 import { slugifyNickname, type Attachment, type Envelope } from "@hauddy/protocol";
 import { PlatformBridge, type BridgeAgent } from "./bridge.js";
-import type { HubConnection } from "./connection.js";
+import { HubConnection } from "./connection.js";
 import { keyPathFor, loadOrCreateKeypair } from "./keys.js";
 import { loadRegistry, saveRegistry } from "./registry.js";
 import { ActivityLog, type ActivityEntry } from "./activity.js";
@@ -16,7 +16,9 @@ import {
   type PoolContact,
 } from "./books.js";
 import * as hub from "./hub-api.js";
+import { loadIdentity, writeIdentity } from "./identity.js";
 import { InjectionBus } from "./inject.js";
+import type { Provision, Provisioned } from "./mcp.js";
 import { SyncEngine, type SyncContext } from "./sync.js";
 
 export const DEFAULT_HUB_PORT = Number(process.env.HAUDDY_HUB_PORT ?? 8787);
@@ -53,6 +55,19 @@ export interface ExposureRow {
   platformOnline: boolean;
 }
 export type PlatformActionResult = { ok: true; nickname?: string | null } | { ok: false; error: string };
+/** An agent that lives only on the platform (no local runtime on this machine) —
+ *  a connector, or an agent exposed from another machine under this account. */
+export interface NetworkAgent {
+  /** The agent's id on the platform (agt_…) — used to remove it. */
+  agentId: string;
+  /** Its @handle on the network, or null if unnamed. */
+  handle: string | null;
+  kind: "connector" | "agent";
+  online: boolean;
+  description: string | null;
+  /** Discoverable by other accounts (connectors default false). */
+  listed: boolean;
+}
 export interface ClaimRow {
   nickname: string;
   claimedBy: string | null;
@@ -103,12 +118,17 @@ export class Daemon {
   private syncTimer: ReturnType<typeof setInterval> | null = null;
   /** The account's human agent_id on the platform (stable; cached per link). */
   private platformHumanIdCache: string | null = null;
+  /** The owner's bio (platform human `description`), mirrored to the local human
+   *  and used to tag relayed console→agent messages ("your human owner" default). */
+  private ownerBio: string | null = null;
   /** Discovery published to ~/.hauddy/daemon.json for the MCP + wrappers. */
   private discovery: { hub_url: string | null; http_url: string | null; local_api_url: string | null } = {
     hub_url: null,
     http_url: null,
     local_api_url: null,
   };
+  /** Cached provisions for agents connected via the HTTP MCP endpoint. */
+  private httpMcpProvisions = new Map<string, Provision>();
 
   private get endpoint(): string {
     return this.hubHandle?.wsUrl ?? `ws://127.0.0.1:${DEFAULT_HUB_PORT}`;
@@ -213,6 +233,7 @@ export class Daemon {
       if (this.syncTimer) clearInterval(this.syncTimer);
       this.syncTimer = null;
       this.platformHumanIdCache = null;
+      this.ownerBio = null;
       this.bridge?.stopAll();
       this.bridge = null;
       this.ownPlatformIds.clear();
@@ -250,6 +271,9 @@ export class Daemon {
       this.remoteTimer = null;
     }
     await this.pollRemotes(cfg.endpoint);
+    // Mirror the owner's platform bio onto the local human so a local console→
+    // agent message shows the real bio (else the "your human owner" default).
+    await this.refreshOwnerIdentity();
     // Cross-hub history mirror: kick a pass now (backfills on reconnect) and keep
     // a gentle periodic mirror running while connected.
     if (!this.syncTimer) {
@@ -266,6 +290,20 @@ export class Daemon {
     const id = (await this.platformConsole("GET", "/identity").catch(() => null))?.agent_id;
     if (typeof id === "string") this.platformHumanIdCache = id;
     return this.platformHumanIdCache;
+  }
+
+  /** Fetch the account's human identity from the platform → cache its id + bio,
+   *  and mirror the bio onto the LOCAL human agent so a local console→agent
+   *  message carries the owner's real bio (empty ⇒ "your human owner"). Cheap:
+   *  one GET, only on connect / exposure change (not a poll loop). */
+  private async refreshOwnerIdentity(): Promise<void> {
+    const view = await this.platformConsole("GET", "/identity").catch(() => null);
+    if (!view) return;
+    if (typeof view.agent_id === "string") this.platformHumanIdCache = view.agent_id;
+    this.ownerBio = typeof view.description === "string" ? view.description : null;
+    if (this.localHumanId && this.hubHandle) {
+      this.hubHandle.store.setAgentProfile(this.localHumanId, { description: this.ownerBio ?? "" });
+    }
   }
 
   /** Build the per-tick sync view: the account link + the local↔platform id map
@@ -344,6 +382,12 @@ export class Daemon {
   private async injectInboundWithFiles(localAgentId: string, envelope: Envelope): Promise<void> {
     const sender = this.remoteDir.get(envelope.from);
     let payload = envelope.payload as Record<string, unknown>;
+    // Owner tag: the account's own human (web/app console) → this exposed agent,
+    // relayed down. Mark it so the agent sees "your human owner" (or the bio),
+    // mirroring the local-hub tagging for same-machine sends.
+    if (this.platformHumanIdCache && envelope.from === this.platformHumanIdCache) {
+      payload = { ...payload, from_kind: "human", from_description: this.ownerBio || "your human owner" };
+    }
     const atts = payload.attachments as Attachment[] | undefined;
     if (Array.isArray(atts) && atts.length > 0 && this.hubHandle) {
       // The bytes are on the platform store; re-host them on this machine's local
@@ -354,7 +398,10 @@ export class Daemon {
         try {
           const dl = await hub.downloadFile(cfg?.endpoint ?? this.platformUrl, a.file_id, cfg?.api_key);
           const put = this.hubHandle.files.put(dl.bytes, {
-            name: a.name,
+            // The reference name can arrive undefined; fall back to the platform's
+            // x-hauddy-filename (dl.name, defaults to "file") so the receiver never
+            // saves to `.../undefined`.
+            name: a.name || dl.name || "file",
             // Prefer the reference's mime, fall back to the downloaded content-type,
             // then a safe default — never store an undefined mime (breaks download).
             mime: a.mime || dl.mime || "application/octet-stream",
@@ -435,6 +482,61 @@ export class Daemon {
           description: a.description ?? null,
         };
       });
+  }
+
+  /** Return (and cache) a Provision for a registered agent by localId, for use
+   *  by the HTTP MCP endpoint. Creates a HubConnection the first time; reuses it
+   *  on subsequent requests so the agent stays online between tool calls. */
+  createHttpMcpProvision(localId: string): Provision {
+    const cached = this.httpMcpProvisions.get(localId);
+    if (cached) return cached;
+
+    let provisioned: Provisioned | null = null;
+    let inflight: Promise<Provisioned> | null = null;
+
+    const provision: Provision = () => {
+      if (provisioned) return Promise.resolve(provisioned);
+      if (inflight) return inflight;
+      inflight = (async () => {
+        const entry = loadRegistry().agents.find((a) => a.local_id === localId);
+        if (!entry) throw new Error(`No agent "${localId}" registered on this machine`);
+        const identity = loadIdentity(entry.identity_file);
+        const keypair = loadOrCreateKeypair(entry.grant_scope_id);
+        const reg = await hub.registerAgent(this.endpoint, {
+          grant_scope_id: entry.grant_scope_id,
+          public_key: keypair.publicKeyPem,
+          local_id: entry.local_id,
+          nickname: identity.nickname,
+        });
+        identity.agent_id = reg.agent_id;
+        writeIdentity(entry.identity_file, identity);
+        const connection = new HubConnection({
+          endpoint: this.endpoint,
+          agentId: reg.agent_id,
+          grantScopeId: entry.grant_scope_id,
+          privateKey: keypair.privateKey,
+          nickname: identity.nickname,
+        });
+        connection.on("socket_error", () => {});
+        connection.start();
+        provisioned = {
+          endpoint: this.endpoint,
+          agentId: reg.agent_id,
+          connection,
+          activity: new ActivityLog(),
+          persistNickname: (bare) => {
+            identity.nickname = bare;
+            writeIdentity(entry.identity_file, identity);
+          },
+        };
+        return provisioned;
+      })();
+      inflight.catch(() => { inflight = null; });
+      return inflight;
+    };
+
+    this.httpMcpProvisions.set(localId, provision);
+    return provision;
   }
 
   /** Every local nickname currently bound on this machine. */
@@ -713,6 +815,108 @@ export class Daemon {
       this.activity.push("platform.unexpose", localId);
       await this.refreshBridges();
       return { ok: true };
+    } catch (err) {
+      return { ok: false, error: err instanceof Error ? err.message : String(err) };
+    }
+  }
+
+  /** The account's agents that live only on the platform — connectors (external
+   *  AIs / scripts) and agents exposed from another machine — i.e. those with no
+   *  local runtime on THIS machine. Exposed local agents are excluded (they
+   *  already appear in `listAgents`). Empty when not connected to a platform, so
+   *  the app naturally shows nothing while offline. */
+  async listNetworkAgents(): Promise<NetworkAgent[]> {
+    const cfg = loadAccount();
+    if (!cfg?.api_key) return [];
+    const [onPlatform, locals] = await Promise.all([this.platformAgents(cfg), this.agents()]);
+    const localScopes = new Set(locals.map((a) => a.grant_scope_id));
+    return onPlatform
+      .filter((a) => a.kind !== "human" && !localScopes.has(a.grant_scope_id))
+      .map((a) => this.toNetworkAgent(a));
+  }
+
+  private toNetworkAgent(a: hub.AgentView): NetworkAgent {
+    return {
+      agentId: a.agent_id,
+      handle: a.nickname,
+      kind: a.kind === "connector" ? "connector" : "agent",
+      online: a.attached,
+      description: a.description,
+      listed: a.listed ?? true,
+    };
+  }
+
+  /** One of the account's platform-only agents by id, for the detail page. */
+  async getNetworkAgent(agentId: string): Promise<NetworkAgent | null> {
+    const cfg = loadAccount();
+    if (!cfg?.api_key) return null;
+    const [onPlatform, locals] = await Promise.all([this.platformAgents(cfg), this.agents()]);
+    const localScopes = new Set(locals.map((a) => a.grant_scope_id));
+    const a = onPlatform.find(
+      (p) => p.agent_id === agentId && p.kind !== "human" && !localScopes.has(p.grant_scope_id),
+    );
+    return a ? this.toNetworkAgent(a) : null;
+  }
+
+  /** Rename a platform-only agent's @handle (owner-scoped, proxied). */
+  async setNetworkAgentNickname(agentId: string, nickname: string): Promise<hub.NicknameOutcome> {
+    const cfg = loadAccount();
+    if (!cfg?.api_key) return { ok: false, reason: "invalid" };
+    try {
+      const r = await hub.setAgentNickname(cfg.endpoint, agentId, nickname, cfg.api_key);
+      await this.refreshBridges();
+      return r;
+    } catch {
+      return { ok: false, reason: "invalid" };
+    }
+  }
+
+  /** Edit a platform-only agent's bio and/or network visibility (owner-scoped). */
+  async setNetworkAgentSettings(
+    agentId: string,
+    patch: { bio?: string; listed?: boolean },
+  ): Promise<{ ok: boolean; error?: string }> {
+    const cfg = loadAccount();
+    if (!cfg?.api_key) return { ok: false, error: "not connected to a platform" };
+    try {
+      return await hub.setAgentSettings(cfg.endpoint, agentId, patch, cfg.api_key);
+    } catch (err) {
+      return { ok: false, error: err instanceof Error ? err.message : String(err) };
+    }
+  }
+
+  /** A platform-only agent's curated contact book + reachable candidates. */
+  async networkAgentBook(agentId: string): Promise<{ book: hub.BookContactView[]; bookable: hub.BookContactView[] }> {
+    const cfg = loadAccount();
+    if (!cfg?.api_key) return { book: [], bookable: [] };
+    return hub.getAgentBook(cfg.endpoint, agentId, cfg.api_key).catch(() => ({ book: [], bookable: [] }));
+  }
+  async addNetworkAgentContact(agentId: string, handle: string): Promise<{ ok: boolean; error?: string }> {
+    const cfg = loadAccount();
+    if (!cfg?.api_key) return { ok: false, error: "not connected to a platform" };
+    try {
+      return await hub.addBookContact(cfg.endpoint, agentId, handle, cfg.api_key);
+    } catch (err) {
+      return { ok: false, error: err instanceof Error ? err.message : String(err) };
+    }
+  }
+  async removeNetworkAgentContact(agentId: string, handle: string): Promise<{ ok: boolean }> {
+    const cfg = loadAccount();
+    if (!cfg?.api_key) return { ok: false };
+    return hub.removeBookContact(cfg.endpoint, agentId, handle, cfg.api_key).catch(() => ({ ok: false }));
+  }
+
+  /** Remove one of the account's platform-only agents from the network. For a
+   *  connector this fully retires it (the platform drops its token + OAuth creds
+   *  + @handle); for a remotely-exposed agent it unexposes it. */
+  async removeNetworkAgent(agentId: string): Promise<{ ok: boolean; error?: string }> {
+    const cfg = loadAccount();
+    if (!cfg?.api_key) return { ok: false, error: "not connected to a platform" };
+    try {
+      const res = await hub.unexposeAgent(cfg.endpoint, agentId, cfg.api_key);
+      this.activity.push("platform.remove-agent", agentId);
+      await this.refreshBridges();
+      return { ok: !!res.ok };
     } catch (err) {
       return { ok: false, error: err instanceof Error ? err.message : String(err) };
     }
