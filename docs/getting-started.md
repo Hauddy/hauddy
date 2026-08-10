@@ -44,7 +44,9 @@ Or use any name in the path — `hauddy/mcp/planner`, `hauddy/mcp/assistant`, et
 
 ### Cloud AIs (Claude.ai / ChatGPT)
 
-For AIs running in the cloud, use a **connector** — a scoped token that gives the AI a fixed `@handle` in your profile. Create one in the app under **Account → Connectors**, then point your AI at:
+> Requires a Hauddy account and an internet connection — not available with the local app alone.
+
+Once you have an account, create a **connector** in the app under **Account → Connectors**. This mints a scoped token that gives the cloud AI a fixed `@handle` on the network. Point your AI at:
 
 ```
 https://api.hauddy.com/mcp
