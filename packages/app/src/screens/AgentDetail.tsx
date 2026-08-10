@@ -41,7 +41,7 @@ export default function AgentDetail() {
             <Link to="/">← Agents</Link>
           </p>
           <h1 className="page-title">
-            <PresenceDot state={STATUS_DOT[agent.status]} /> <code>{agent.localId}</code>
+            <PresenceDot state={STATUS_DOT[agent.status]} /> <code>{agent.nicknames[0] ?? agent.localId}</code>
           </h1>
           <div className="agent-detail-meta">
             <span className="agent-enrolled-status">{STATUS_LABEL[agent.status]}</span>
@@ -111,7 +111,7 @@ function ExposePanel({ agent }: { agent: EnrolledAgent }) {
         <div className="detail-row">
           <span className="detail-label">platform</span>
           <span className="agent-enrolled-none">
-            Not linked — <Link to="/platform">connect the app</Link> to expose this agent.
+            Not linked — <Link to="/account">connect the app</Link> to expose this agent.
           </span>
         </div>
       </section>

@@ -29,7 +29,7 @@ export default {
     }
     const url = new URL(request.url);
     // Reject a truly oversized upload before buffering it into memory.
-    if (url.pathname === "/files" && request.method === "POST") {
+    if ((url.pathname === "/files" || url.pathname === "/v1/files") && request.method === "POST") {
       if (Number(request.headers.get("content-length") ?? 0) > UPLOAD_HARD_CAP) {
         return new Response(JSON.stringify({ error: "file exceeds the 10485760-byte limit" }), {
           status: 413,
@@ -38,17 +38,36 @@ export default {
       }
     }
 
+    // Public app download — served directly from R2, no auth required.
+    if (url.pathname === "/download/mac") {
+      const obj = await env.RELEASES.get("downloads/mac-arm64-latest.dmg");
+      if (!obj) return new Response("Not found", { status: 404 });
+      return new Response(obj.body, {
+        headers: {
+          "content-type": "application/octet-stream",
+          "content-disposition": 'attachment; filename="hauddy.dmg"',
+          "content-length": String(obj.size),
+          "cache-control": "no-cache, no-store, must-revalidate",
+          ...corsHeaders(env),
+        },
+      });
+    }
+
     const stub = env.HUB.get(env.HUB.idFromName("global"));
     const isWs = request.headers.get("upgrade")?.toLowerCase() === "websocket";
     if (isWs || request.method === "GET" || request.method === "HEAD") {
       return stub.fetch(request);
     }
-    // Buffer the body, then forward a self-contained request.
+    // Buffer the body, then forward a self-contained request. `redirect: "manual"`
+    // so a 3xx from the DO (the OAuth authorize → callback redirect) is passed
+    // through verbatim instead of being followed here (which would chase the
+    // external callback URL and return ITS status).
     const body = await request.arrayBuffer();
     const forwarded = new Request(url.toString(), {
       method: request.method,
       headers: request.headers,
       body: body.byteLength ? body : undefined,
+      redirect: "manual",
     });
     return stub.fetch(forwarded);
   },

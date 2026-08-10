@@ -5,7 +5,7 @@ import { slugifyNickname, type Attachment, type Envelope } from "@hauddy/protoco
 import { PlatformBridge, type BridgeAgent } from "./bridge.js";
 import { HubConnection } from "./connection.js";
 import { keyPathFor, loadOrCreateKeypair } from "./keys.js";
-import { loadRegistry, saveRegistry } from "./registry.js";
+import { loadRegistry, saveRegistry, upsertAgent } from "./registry.js";
 import { ActivityLog, type ActivityEntry } from "./activity.js";
 import { clearAccount, hauddyHome, loadAccount, maskKey, saveAccount } from "./account.js";
 import {
@@ -498,8 +498,15 @@ export class Daemon {
       if (provisioned) return Promise.resolve(provisioned);
       if (inflight) return inflight;
       inflight = (async () => {
-        const entry = loadRegistry().agents.find((a) => a.local_id === localId);
-        if (!entry) throw new Error(`No agent "${localId}" registered on this machine`);
+        let entry = loadRegistry().agents.find((a) => a.local_id === localId);
+        if (!entry) {
+          // First time this HTTP MCP session is used — auto-enroll it.
+          const grantScopeId = `mcp:${localId}`;
+          const identityFile = path.join(hauddyHome(), "agents", localId, "identity.toml");
+          writeIdentity(identityFile, { grant_scope_id: grantScopeId, endpoint: this.endpoint, local_id: localId });
+          entry = { grant_scope_id: grantScopeId, local_id: localId, identity_file: identityFile };
+          upsertAgent(entry);
+        }
         const identity = loadIdentity(entry.identity_file);
         const keypair = loadOrCreateKeypair(entry.grant_scope_id);
         const reg = await hub.registerAgent(this.endpoint, {

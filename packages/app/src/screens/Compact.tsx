@@ -69,15 +69,9 @@ export default function Compact() {
               }}
             >
               <PresenceDot state={AGENT_PRESENCE[a.status]} />
-              <code className="compact-id">{a.localId}</code>
+              <code className="compact-id">{a.nicknames[0] ?? a.localId}</code>
               <span className="compact-nicks">
-                {a.nicknames.length > 0 ? (
-                  a.nicknames.map((n) => (
-                    <span className="nick-chip" key={n}>
-                      {n}
-                    </span>
-                  ))
-                ) : (
+                {a.nicknames.length === 0 && (
                   <span className="compact-unlinked">no nickname</span>
                 )}
               </span>

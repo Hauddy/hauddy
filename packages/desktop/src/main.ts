@@ -37,6 +37,8 @@ function startDaemon(): void {
     stdio: 'pipe',
     env: { ...process.env, HAUDDY_EMBEDDED: '1' },
   });
+  daemon.stdout?.on('data', (d: Buffer) => console.log('[daemon]', d.toString().trimEnd()));
+  daemon.stderr?.on('data', (d: Buffer) => console.error('[daemon]', d.toString().trimEnd()));
   daemon.on('exit', (code) => {
     // Don't restart — if the daemon crashes the app UI will show disconnected.
     // The user can quit and reopen. Avoids restart loops during alpha.

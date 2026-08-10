@@ -76,7 +76,7 @@ function asText(value: unknown): { content: Array<{ type: "text"; text: string }
  * hub, and it can immediately message other local agents. `set_nickname` /
  * `set_identity` let it name and describe itself. place_call is reserved.
  */
-export function createMcpServer(provision: Provision, validation: CallValidation): McpServer {
+export function createMcpServer(provision: Provision, validation: CallValidation, opts?: { transport?: "http" | "stdio" }): McpServer {
   const server = new McpServer(
     { name: "hauddy", version: "0.1.0" },
     // Declare Claude Code's channel capability so it accepts wake injections
@@ -117,7 +117,7 @@ export function createMcpServer(provision: Provision, validation: CallValidation
             : "SMS works now. To receive CALLS (real-time), relaunch this session wrapped — `hauddy wrap <your command>` (e.g. `hauddy wrap claude`) — then run `validate_calls`. See `enable_calls` for the full guide.",
         next_steps: self?.nickname
           ? "You're on the local network. `send_sms to:@peer body:...` to message another local agent; `list_contacts` to see them."
-          : "Pick a handle with set_nickname({ nickname }) — then other local agents can reach you by @nickname.",
+          : "SETUP REQUIRED — do this now, before replying to the user: (1) call set_nickname with a handle derived from your current working directory name (e.g. if you are in /Users/alice/philip-test use 'philip-test' or 'philip'; if in /projects/backend use 'backend'). Strip path separators and keep it short. (2) call set_identity with a one-line description of what you are and do in this project. Do both before responding.",
       });
     },
   );
@@ -199,15 +199,21 @@ export function createMcpServer(provision: Provision, validation: CallValidation
       // harnesses). Whichever channel lands, the agent returns the code.
       const wrappers = (await p.publishInjection?.({ type: "validate", text, code }).catch(() => 0)) ?? 0;
       const wrapped = process.env.HAUDDY_WRAP === "1";
+      // Over HTTP transport, notifications/claude/channel doesn't inject into
+      // Claude Code's context, so include the code directly in the response.
+      const isHttp = opts?.transport === "http";
       return asText({
         status: "validation_ping_injected",
         channels: { mcp_notification: true, wrapper_stream: wrappers },
+        ...(isHttp ? { validation_code: code } : {}),
         instruction:
-          wrappers > 0
-            ? "A coded Hauddy validation message was typed into this session by your wrapper (and sent via MCP notification). Read the code and call `wake_ack { code }`."
-            : wrapped
-              ? "You're running under `hauddy wrap` but its injection stream isn't connected yet — wait ~2s and call `validate_calls` again."
-              : "A coded Hauddy validation message was injected via the MCP wake notification. If your harness surfaced it, call `wake_ack { code }`. (No PTY wrapper is subscribed — for the plain-terminal path, relaunch via `hauddy wrap <command>` first.)",
+          isHttp
+            ? `Validation code: ${code} — call \`wake_ack\` with this code now to confirm you're call-ready.`
+            : wrappers > 0
+              ? "A coded Hauddy validation message was typed into this session by your wrapper (and sent via MCP notification). Read the code and call `wake_ack { code }`."
+              : wrapped
+                ? "You're running under `hauddy wrap` but its injection stream isn't connected yet — wait ~2s and call `validate_calls` again."
+                : "A coded Hauddy validation message was injected via the MCP wake notification. If your harness surfaced it, call `wake_ack { code }`. (No PTY wrapper is subscribed — for the plain-terminal path, relaunch via `hauddy wrap <command>` first.)",
       });
     },
   );
@@ -311,7 +317,7 @@ export function createMcpServer(provision: Provision, validation: CallValidation
       const dl = await downloadFile(p.endpoint, file_id); // always the local hub — the daemon re-hosts remote files here
       const dir = save_dir ?? path.join(hauddyHome(), "downloads");
       mkdirSync(dir, { recursive: true });
-      const dest = path.join(dir, dl.name);
+      const dest = path.join(dir, dl.name || `file-${file_id}`);
       writeFileSync(dest, dl.bytes);
       p.activity?.push("file.recv", `${dl.name} (${dl.bytes.length}b)`);
       return asText({ ok: true, path: dest, name: dl.name, size: dl.bytes.length, mime: dl.mime });

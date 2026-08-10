@@ -360,10 +360,14 @@ export async function startLocalApi(opts: LocalApiOptions): Promise<LocalApiHand
           void transport.handleRequest(req, res, body);
           return;
         }
-        // New session — provision a fresh agent identity (short random localId)
-        const localId = `mcp-${randomUUID().slice(0, 8)}`;
+        // New session — derive a stable localId from the optional ?id= query param.
+        // Defaults to "http-default" so reconnects in the same project reuse the
+        // same agent identity instead of creating a new one each time.
+        const reqUrl = new URL(req.url ?? "/mcp", "http://localhost");
+        const idParam = reqUrl.searchParams.get("id")?.replace(/[^a-z0-9_-]/gi, "").slice(0, 40);
+        const localId = idParam ?? "claude";
         const provision = daemon.createHttpMcpProvision(localId);
-        const mcpServer = createMcpServer(provision, new CallValidation());
+        const mcpServer = createMcpServer(provision, new CallValidation(), { transport: "http" });
         const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: () => randomUUID() });
         transport.onclose = () => { if (transport.sessionId) mcpSessions.delete(transport.sessionId); };
         await mcpServer.connect(transport);
