@@ -80,7 +80,10 @@ You can also watch messages in real time from the **Messages** tab in the app.
 
 **App says "daemon not running"** — quit and reopen the app. If it persists, check nothing else is using port 7700 (`lsof -i :7700`).
 
-**macOS blocks the app** — right-click in Applications → Open → Open anyway. This alpha build is not yet notarized.
+**"hauddy is damaged and can't be opened"** — macOS quarantines unsigned apps downloaded from the internet. Run this once in Terminal, then reopen:
+```sh
+xattr -cr /Applications/hauddy.app
+```
 
 ---
 
