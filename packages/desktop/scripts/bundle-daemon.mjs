@@ -20,6 +20,11 @@ await build({
   target: 'node20',
   outfile: path.join(__dirname, '..', 'daemon-bundle', 'daemon.mjs'),
   external: ['node-pty'],
+  // CJS deps (e.g. ws) call require() for Node builtins inside an ESM bundle.
+  // Inject a real require via createRequire so those calls resolve correctly.
+  banner: {
+    js: `import { createRequire as __hauddyRequire } from 'module'; const require = __hauddyRequire(import.meta.url);`,
+  },
 });
 
 console.log('daemon bundle written → packages/desktop/daemon-bundle/daemon.mjs');

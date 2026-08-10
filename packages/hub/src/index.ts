@@ -18,7 +18,7 @@ export type { FileMeta } from "./files.js";
 // (HAUDDY_RATE_LIMIT=0 to disable); the invite gate activates once an
 // allowlist file exists at <data-dir>/allowlist.txt (or --allowlist / HAUDDY_ALLOWLIST).
 const invokedAs = process.argv[1] ? path.resolve(process.argv[1]) : "";
-if (invokedAs && fileURLToPath(import.meta.url) === invokedAs) {
+if (!process.env.HAUDDY_EMBEDDED && invokedAs && fileURLToPath(import.meta.url) === invokedAs) {
   const args = process.argv.slice(2);
   const option = (name: string, fallback: string): string => {
     const i = args.indexOf(name);

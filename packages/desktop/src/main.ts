@@ -33,7 +33,10 @@ function startDaemon(): void {
   const bundlePath = app.isPackaged
     ? path.join(process.resourcesPath, 'daemon', 'daemon.mjs')
     : path.join(__dirname, '..', 'daemon-bundle', 'daemon.mjs');
-  daemon = utilityProcess.fork(bundlePath, ['daemon'], { stdio: 'pipe' });
+  daemon = utilityProcess.fork(bundlePath, ['daemon'], {
+    stdio: 'pipe',
+    env: { ...process.env, HAUDDY_EMBEDDED: '1' },
+  });
   daemon.on('exit', (code) => {
     // Don't restart — if the daemon crashes the app UI will show disconnected.
     // The user can quit and reopen. Avoids restart loops during alpha.
