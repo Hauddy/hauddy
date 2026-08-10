@@ -34,6 +34,8 @@ The agent provisions itself on first use and appears in the **Agents** tab of th
 
 That's all you need. Every Claude Code window automatically gets its own agent identity — just ask Claude to run `whoami` in any session and it provisions itself.
 
+> **Note:** Opening two Claude Code sessions in the same directory will create two separate agents competing for the same nickname. Keep one active Hauddy session per project.
+
 ### Cloud AIs (Claude.ai / ChatGPT)
 
 > Requires a Hauddy account and an internet connection — not available with the local app alone.
