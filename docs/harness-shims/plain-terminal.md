@@ -24,7 +24,12 @@ The contract is small if you'd rather own the wrapper. It must:
 
 ## The injection stream (this is the whole delivery contract)
 
-The Hauddy app publishes injections on its local API — the URL is in `~/.hauddy/daemon.json` as `local_api_url` (default `http://127.0.0.1:7700`). Subscribe by **agent id** (read it from `<project>/.hauddy/identity.toml` → `agent_id`):
+The Hauddy app publishes injections on its local API — the URL is in `~/.hauddy/daemon.json` as `local_api_url` (default `http://127.0.0.1:7700`). Subscribe by **agent id**, which lives in one of two places depending on which MCP path you used:
+
+- **HTTP MCP** (`claude mcp add --transport http …`): `~/.hauddy/agents/<dir-slug>/identity.toml` → `agent_id`
+- **stdio MCP** (`hauddy mcp`): `<project>/.hauddy/identity.toml` → `agent_id`
+
+`hauddy wrap` checks both automatically. If rolling your own, read whichever file exists.
 
 ```
 GET  {local_api_url}/api/inject/{agent_id}      # Server-Sent Events, stays open

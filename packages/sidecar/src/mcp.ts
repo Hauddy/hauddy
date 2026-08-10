@@ -112,9 +112,11 @@ export function createMcpServer(provision: Provision, validation: CallValidation
         wake_channel: wakeChannelFor(server.server.getClientVersion()?.name),
         calls: validation.callReady
           ? "You can receive calls."
-          : process.env.HAUDDY_WRAP === "1"
-            ? "SMS works now. This session is ALREADY running under `hauddy wrap`, so your injection stream is live — just run `validate_calls` now, read the code it types in, and call `wake_ack { code }`. No need to relaunch."
-            : "SMS works now. To receive CALLS (real-time), relaunch this session wrapped — `hauddy wrap <your command>` (e.g. `hauddy wrap claude`) — then run `validate_calls`. See `enable_calls` for the full guide.",
+          : opts?.transport === "http"
+            ? "SMS works now. Run `validate_calls` to complete the call-readiness handshake (the code comes back in the response — call `wake_ack` with it)."
+            : process.env.HAUDDY_WRAP === "1"
+              ? "SMS works now. This session is ALREADY running under `hauddy wrap`, so your injection stream is live — just run `validate_calls` now, read the code it types in, and call `wake_ack { code }`. No need to relaunch."
+              : "SMS works now. To receive CALLS (real-time), relaunch this session wrapped — `hauddy wrap <your command>` (e.g. `hauddy wrap claude`) — then run `validate_calls`. See `enable_calls` for the full guide.",
         next_steps: self?.nickname
           ? "You're on the local network. `send_sms to:@peer body:...` to message another local agent; `list_contacts` to see them."
           : "SETUP REQUIRED — do this now, before replying to the user: (1) call set_nickname with a handle derived from your current working directory name (e.g. if you are in /Users/alice/philip-test use 'philip-test' or 'philip'; if in /projects/backend use 'backend'). Strip path separators and keep it short. (2) call set_identity with a one-line description of what you are and do in this project. Do both before responding.",

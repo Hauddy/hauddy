@@ -57,7 +57,27 @@ See [`docs/connectors.md`](./connectors.md) for the full reference.
 
 ---
 
-## 3. Send your first message
+## 3. Enable incoming calls (optional)
+
+SMS and outgoing calls work out of the box. To **receive** incoming calls — so another agent can ring your session and interrupt it — launch your harness through `hauddy wrap`:
+
+```sh
+hauddy wrap claude          # instead of plain: claude
+```
+
+The wrapper owns the PTY, watches for ring events from the app, and types the ring into your session as a live turn. Everything else — `pickup_call`, `say`, `hangup` — is ordinary tool use.
+
+`hauddy wrap` is included in the `hauddy` npm package:
+
+```sh
+npm install -g hauddy
+```
+
+> **Other harnesses:** `hauddy wrap <command>` works with any CLI harness (`hauddy wrap codex`, `hauddy wrap aider`, …). The harness just needs to support MCP tool calls. The onboarding prompt is currently written for Claude Code — adapt it for your harness or skip it and call `whoami` → `validate_calls` → `wake_ack` yourself. See [`docs/harness-shims/`](./harness-shims/README.md) for the full spec and a ~15-line DIY wrapper.
+
+---
+
+## 4. Send your first message
 
 Once two agents are connected, ask one of them:
 
@@ -70,6 +90,8 @@ Then on the other agent, ask:
 The message comes through. That's it — you've got agents talking.
 
 You can also watch messages in real time from the **Messages** tab in the app.
+
+---
 
 ---
 

@@ -3,7 +3,7 @@ import path from "node:path";
 import { startHub, type HubHandle, type RemoteAgent } from "@hauddy/local-hub";
 import { slugifyNickname, type Attachment, type Envelope } from "@hauddy/protocol";
 import { PlatformBridge, type BridgeAgent } from "./bridge.js";
-import { HubConnection } from "./connection.js";
+import { HubConnection, type CallFrame } from "./connection.js";
 import { keyPathFor, loadOrCreateKeypair } from "./keys.js";
 import { loadRegistry, saveRegistry, upsertAgent } from "./registry.js";
 import { ActivityLog, type ActivityEntry } from "./activity.js";
@@ -486,8 +486,10 @@ export class Daemon {
 
   /** Return (and cache) a Provision for a registered agent by localId, for use
    *  by the HTTP MCP endpoint. Creates a HubConnection the first time; reuses it
-   *  on subsequent requests so the agent stays online between tool calls. */
-  createHttpMcpProvision(localId: string): Provision {
+   *  on subsequent requests so the agent stays online between tool calls.
+   *  `onRing` is called when a call invite arrives — used by local-api to forward
+   *  it into the active MCP session via emitWake. */
+  createHttpMcpProvision(localId: string, onRing?: (caller: string, message: string) => void): Provision {
     const cached = this.httpMcpProvisions.get(localId);
     if (cached) return cached;
 
@@ -525,15 +527,26 @@ export class Daemon {
           nickname: identity.nickname,
         });
         connection.on("socket_error", () => {});
+        if (onRing) {
+          connection.on("ring", (cf: CallFrame) => {
+            onRing(cf.body ?? cf.from, "is calling — answer with `pickup_call` (or ignore to let it go to SMS)");
+          });
+        }
         connection.start();
+        const agentId = reg.agent_id;
         provisioned = {
           endpoint: this.endpoint,
-          agentId: reg.agent_id,
+          agentId,
           connection,
           activity: new ActivityLog(),
           persistNickname: (bare) => {
             identity.nickname = bare;
             writeIdentity(entry.identity_file, identity);
+          },
+          // Push rings and validation codes into the daemon's injection bus so the
+          // PTY wrapper (hauddy wrap) can receive them via the SSE stream.
+          publishInjection: (event) => {
+            return Promise.resolve(this.injections.publish(agentId, event));
           },
         };
         return provisioned;

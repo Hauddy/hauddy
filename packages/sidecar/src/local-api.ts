@@ -4,7 +4,7 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import { MAX_ATTACHMENTS_BYTES, type Attachment } from "@hauddy/protocol";
 import type { Daemon } from "./daemon.js";
 import { createMcpServer } from "./mcp.js";
-import { CallValidation } from "./wake.js";
+import { CallValidation, emitWake } from "./wake.js";
 
 const CORS = {
   "access-control-allow-origin": "*",
@@ -366,8 +366,12 @@ export async function startLocalApi(opts: LocalApiOptions): Promise<LocalApiHand
         const reqUrl = new URL(req.url ?? "/mcp", "http://localhost");
         const idParam = reqUrl.searchParams.get("id")?.replace(/[^a-z0-9_-]/gi, "").slice(0, 40);
         const localId = idParam ?? "claude";
-        const provision = daemon.createHttpMcpProvision(localId);
-        const mcpServer = createMcpServer(provision, new CallValidation(), { transport: "http" });
+        const validation = new CallValidation();
+        const mcpServer = createMcpServer(
+          daemon.createHttpMcpProvision(localId, (caller, msg) => emitWake(mcpServer, caller, msg)),
+          validation,
+          { transport: "http" },
+        );
         const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: () => randomUUID() });
         transport.onclose = () => { if (transport.sessionId) mcpSessions.delete(transport.sessionId); };
         await mcpServer.connect(transport);

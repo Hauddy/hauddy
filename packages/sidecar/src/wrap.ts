@@ -1,7 +1,9 @@
-import { chmodSync, existsSync, readdirSync, readFileSync } from "node:fs";
+import { chmodSync, existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import os from "node:os";
 import { createRequire } from "node:module";
 import path from "node:path";
 import type { IPty } from "node-pty";
+import { slugifyNickname } from "@hauddy/protocol";
 import { hauddyHome } from "./account.js";
 import { findIdentityFile, loadIdentity } from "./identity.js";
 import type { Injection } from "./inject.js";
@@ -32,6 +34,43 @@ function fixSpawnHelper(): void {
 }
 
 /**
+ * Ensure the current project's hauddy HTTP MCP URL in ~/.claude.json includes
+ * `?id=<dir-slug>` so each project directory gets its own agent identity.
+ * Without this, all projects share `localId="claude"` and collide on one agent.
+ */
+function patchClaudeJsonMcpUrl(): void {
+  const slug = slugifyNickname(path.basename(process.cwd()));
+  if (!slug) return;
+  const claudeJson = path.join(os.homedir(), ".claude.json");
+  if (!existsSync(claudeJson)) return;
+  let doc: Record<string, unknown>;
+  try {
+    doc = JSON.parse(readFileSync(claudeJson, "utf8")) as Record<string, unknown>;
+  } catch {
+    return;
+  }
+  const projects = doc.projects as Record<string, Record<string, unknown>> | undefined;
+  if (!projects) return;
+  const cwd = process.cwd();
+  const entry = projects[cwd];
+  if (!entry) return;
+  const mcpServers = entry.mcpServers as Record<string, { type?: string; url?: string }> | undefined;
+  if (!mcpServers?.hauddy) return;
+  const server = mcpServers.hauddy;
+  if (server.type !== "http" || typeof server.url !== "string") return;
+  // Already has the right ?id= — nothing to do.
+  try {
+    const u = new URL(server.url);
+    if (u.searchParams.get("id") === slug) return;
+    u.searchParams.set("id", slug);
+    server.url = u.toString();
+    writeFileSync(claudeJson, JSON.stringify(doc, null, 2));
+  } catch {
+    return;
+  }
+}
+
+/**
  * `hauddy wrap <command> [args…]` — Hauddy's reference PTY wrapper, the client
  * for the daemon's per-agent injection stream (the plain-terminal call path).
  *
@@ -46,6 +85,9 @@ function fixSpawnHelper(): void {
  * node-pty is loaded lazily so the rest of the CLI (daemon, mcp) never needs it.
  */
 export async function runWrap(command: string, args: string[]): Promise<void> {
+  // Patch this project's MCP URL so it carries the right ?id=<dir> identity.
+  patchClaudeJsonMcpUrl();
+
   let spawn: typeof import("node-pty").spawn;
   try {
     ({ spawn } = await import("node-pty"));
@@ -178,15 +220,32 @@ function localApiUrl(): string | null {
   return null;
 }
 
-/** This project's agent id, once the MCP has provisioned it (else null). */
+/** This project's agent id, once the MCP has provisioned it (else null).
+ *  Checks both the stdio identity (project-local .hauddy/identity.toml) and
+ *  the HTTP MCP identity (~/.hauddy/agents/<dir-slug>/identity.toml). */
 function currentAgentId(): string | null {
+  // stdio path: walk up from cwd
   const file = findIdentityFile();
-  if (!file) return null;
-  try {
-    return loadIdentity(file).agent_id ?? null;
-  } catch {
-    return null;
+  if (file) {
+    try {
+      const id = loadIdentity(file).agent_id;
+      if (id) return id;
+    } catch {
+      /* fall through */
+    }
   }
+  // HTTP MCP path: check ~/.hauddy/agents/<slug>/identity.toml
+  const slug = slugifyNickname(path.basename(process.cwd()));
+  if (slug) {
+    const httpFile = path.join(hauddyHome(), "agents", slug, "identity.toml");
+    try {
+      const id = loadIdentity(httpFile).agent_id;
+      if (id) return id;
+    } catch {
+      /* not provisioned yet */
+    }
+  }
+  return null;
 }
 
 const delay = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
