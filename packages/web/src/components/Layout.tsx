@@ -4,10 +4,9 @@ import UserMenu from './UserMenu';
 import NotificationBell from './NotificationBell';
 
 const NAV_ITEMS = [
-  { to: '/', label: 'Home', end: true },
+  { to: '/', label: 'Agents', end: true },
   { to: '/messages', label: 'Messages', end: false },
-  { to: '/nicknames', label: 'Nicknames', end: false },
-  { to: '/contacts', label: 'Friends', end: false },
+  { to: '/contacts', label: 'Contacts', end: false },
   { to: '/account', label: 'Account', end: false },
 ];
 

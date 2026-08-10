@@ -437,6 +437,27 @@ export async function startHub(options: HubOptions = {}): Promise<HubHandle> {
 
   type RouteResult = { ok: true; status: "delivered" | "queued" } | { ok: false; code: ErrorCode; message: string };
 
+  /** Tag an envelope's (opaque) payload with the owner-identity marker when the
+   *  sender is a human — so the recipient agent perceives its owner, not a bare
+   *  handle, via `payload.from_kind`/`from_description` in check_messages. No-op
+   *  for agent→agent sends; backward-compatible (the protocol leaves payload
+   *  opaque). The human's `description` is mirrored from the platform bio by the
+   *  daemon; empty ⇒ the default "your human owner". */
+  function withOwnerTag(
+    envelope: Envelope,
+    sender: { kind?: string; description?: string } | undefined,
+  ): Envelope {
+    if (sender?.kind !== "human") return envelope;
+    return {
+      ...envelope,
+      payload: {
+        ...envelope.payload,
+        from_kind: "human",
+        from_description: sender.description || "your human owner",
+      },
+    };
+  }
+
   /** The single send path, shared by WS `send` and the human console: resolve the
    *  target (local or remote-gateway), enforce consent, then deliver / forward /
    *  queue. `envelope.from` is trusted here (callers assert it). */
@@ -453,10 +474,14 @@ export async function startHub(options: HubOptions = {}): Promise<HubHandle> {
     if (!areLinked(fromAgentId, toId)) return { ok: false, code: "E_NOT_LINKED", message: `not linked to ${toRef}` };
     const toBare = normalizeNickname(toRef);
     const asserted: Envelope = { ...envelope, from: fromAgentId, to: toId };
+    // When the human owner messages one of its own agents, tag the (opaque)
+    // payload so the recipient perceives the sender as its owner, not a bare
+    // handle — the agent's check_messages then reads from_kind:"human".
+    const enriched = withOwnerTag(asserted, store.getAgent(fromAgentId));
     const bareForClaim = toBare && store.bindingOf(toBare)?.agent_id === toId ? toBare : undefined;
-    const delivered = deliverTo(toId, asserted, bareForClaim);
-    if (!delivered) store.inboxAppend(toId, asserted);
-    options.onDeliver?.(toId, asserted);
+    const delivered = deliverTo(toId, enriched, bareForClaim);
+    if (!delivered) store.inboxAppend(toId, enriched);
+    options.onDeliver?.(toId, enriched);
     return { ok: true, status: delivered ? "delivered" : "queued" };
   }
 

@@ -86,10 +86,10 @@ function NotConnected({ platform }: { platform: PlatformInfo | undefined }) {
       <div className="empty-state">
         {platform === undefined
           ? 'Loading…'
-          : 'Friends live on the platform. '}
+          : 'Contacts live on the network. '}
         {platform && !platform.connected && (
           <>
-            Go to <Link to="/platform">Platform</Link> to connect, then add friends by <code>@handle</code>.
+            Go to <Link to="/account">Account</Link> to connect, then add contacts by <code>@handle</code>.
           </>
         )}
       </div>

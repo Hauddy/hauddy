@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import path from 'node:path';
 import { app, BrowserWindow, ipcMain, Menu, nativeImage, Notification, screen, Tray, utilityProcess } from 'electron';
 
@@ -133,7 +134,7 @@ function createFullWindow(initialRoute: string): BrowserWindow {
     width: FULL_W,
     height: FULL_H,
     show: false,
-    title: 'hauddy',
+    title: 'Hauddy',
     backgroundColor: '#121415',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -188,17 +189,24 @@ app.whenReady().then(() => {
   const icon = nativeImage.createFromPath(path.join(__dirname, '..', 'assets', 'trayTemplate.png'));
   icon.setTemplateImage(true);
   tray = new Tray(icon);
-  tray.setToolTip('hauddy — contact & comms for AI agents');
+  tray.setToolTip('Hauddy — contact & comms for AI agents');
   tray.on('click', togglePopover);
   tray.setContextMenu(
     Menu.buildFromTemplate([
-      { label: 'Open hauddy', click: () => expandTo('/') },
+      { label: 'Open Hauddy', click: () => expandTo('/') },
       { type: 'separator' },
-      { label: 'Quit hauddy', click: () => app.quit() },
+      { label: 'Quit Hauddy', click: () => app.quit() },
     ]),
   );
 
   popover = createPopover();
+
+  // Open the full onboarding window on the very first launch.
+  const onboardedMarker = path.join(app.getPath('userData'), 'onboarded');
+  if (!fs.existsSync(onboardedMarker)) {
+    fs.writeFileSync(onboardedMarker, '1');
+    expandTo('/onboarding');
+  }
 
   ipcMain.handle('hauddy:expand', (_e, route?: string) => {
     expandTo(typeof route === 'string' && route.startsWith('/') ? route : '/');

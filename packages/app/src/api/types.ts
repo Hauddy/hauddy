@@ -28,6 +28,33 @@ export type LinkResult =
   | { ok: true }
   | { ok: false; /** localId currently holding the nickname */ conflict: string };
 
+/** An agent that lives only on the connected platform — a connector (external AI
+ *  / script) or an agent exposed from another machine under this account. Shown
+ *  alongside local agents once connected; absent while offline. */
+export interface NetworkAgent {
+  /** The agent's id on the platform (agt_…) — used to remove it. */
+  agentId: string;
+  handle: string | null;
+  kind: 'connector' | 'agent';
+  online: boolean;
+  description: string | null;
+  /** Discoverable by other accounts (connectors default false). */
+  listed: boolean;
+}
+
+/** Outcome of assigning a platform @handle (globally-unique, reservation-aware). */
+export type NicknameOutcome =
+  | { ok: true; nickname: string }
+  | { ok: false; reason: 'invalid' | 'taken' | 'conflict' };
+
+/** One entry in a network agent's curated contact book (or a candidate to add). */
+export interface NetworkBookContact {
+  agent_id: string;
+  handle: string | null;
+  description: string | null;
+  online: boolean;
+}
+
 /** One entry in an agent's contact book. `origin` is the honest local/web
  *  state: `local` resolves to an agent on this machine, `network` is a handle
  *  we don't hold locally (reachable once the platform tier ships). */
@@ -77,6 +104,14 @@ export interface FriendsView {
   outgoing: FriendAccount[];
 }
 export type FriendActionResult = { ok: true; state?: string } | { ok: false; error: string };
+
+// ---- notifications (badge counts, spec §F) -----------------------------
+
+export interface Notifications {
+  friend_requests: number;
+  unread_messages: number;
+  missed_calls: number;
+}
 
 // ---- human console (message/call agents as the person) -----------------
 

@@ -2,6 +2,7 @@ import { useEffect, useState, useSyncExternalStore } from 'react';
 import type {
   AccountKey,
   Agent,
+  BookContact,
   Contact,
   ContactActionResult,
   Nickname,
@@ -24,6 +25,34 @@ const BASE =
     /\/$/,
     '',
   );
+
+/** The platform origin (e.g. https://api.hauddy.com) — for connector setup
+ *  snippets (the /mcp URL + curl examples shown on the Account screen). */
+export function apiBase(): string {
+  return BASE;
+}
+
+/** A connector token as listed on the Account screen (raw token shown only once,
+ *  at creation). `handle` is its fixed @identity; `scope` is a csv of send/read/files. */
+export interface ConnectorInfo {
+  masked: string;
+  handle: string | null;
+  agent_id: string;
+  label: string | null;
+  scope: string;
+  /** The paired OAuth client_id (client_credentials grant), if minted. */
+  client_id: string | null;
+  created_at: string;
+  last_used_ms: number | null;
+}
+
+/** OAuth credentials returned once alongside a fresh/rotated connector, so a
+ *  browserless agent can run the client_credentials grant instead of a redirect. */
+export interface ConnectorOAuth {
+  client_id: string | null;
+  client_secret: string | null;
+  token_endpoint: string;
+}
 
 // ---- auth: the platform API key -----------------------------------------
 
@@ -81,6 +110,30 @@ async function post<T>(path: string, body?: unknown): Promise<T> {
   return (await res.json()) as T;
 }
 
+/** Authed POST that surfaces the server's `error` string instead of throwing —
+ *  for settings mutations where the message matters (username taken, wrong
+ *  password). A real 401 (bad key) still signs you out; other non-2xx return the
+ *  server message. The password route uses 403 for a wrong current password so
+ *  it never trips the 401 sign-out. */
+async function postResult(path: string, body: unknown): Promise<ContactActionResult> {
+  try {
+    const res = await fetch(BASE + path, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', ...authHeaders() },
+      body: JSON.stringify(body),
+    });
+    if (res.status === 401) {
+      clearKey();
+      return { ok: false, error: 'Session expired — sign in again.' };
+    }
+    const data = (await res.json().catch(() => ({}))) as { error?: string };
+    if (!res.ok) return { ok: false, error: data.error ?? `Request failed (${res.status}).` };
+    return { ok: true };
+  } catch {
+    return { ok: false, error: `Platform unreachable at ${BASE}.` };
+  }
+}
+
 // ---- reactivity: poll on an interval + bump after mutations --------------
 
 // The dashboard re-fetches on this heartbeat, so keep it gentle and skip it
@@ -134,6 +187,13 @@ interface HubAgent {
   description: string | null;
   attached: boolean;
   kind?: string;
+  open_link?: boolean;
+  listed?: boolean;
+  external_links?: number;
+  grant_scope_id?: string;
+  local_id?: string | null;
+  // Owner-only, present on kind='connector' agents in /accounts/me.
+  connector?: { masked: string; scope: string; client_id: string | null; last_used_ms: number | null } | null;
 }
 interface HubAccount {
   username: string | null;
@@ -141,6 +201,9 @@ interface HubAccount {
   masked: string;
   agents: HubAgent[];
   reservations?: string[]; // '@handle's held but not yet attached to an agent
+  // The account's own human identity: its @handle (== username) + bio. The
+  // agent lists below filter out kind:'human' so it doesn't masquerade as an agent.
+  human?: { nickname: string | null; description: string | null };
 }
 interface HubContactEntry {
   agent_id: string;
@@ -156,7 +219,40 @@ const toAgent = (a: HubAgent): Agent => ({
   description: a.description ?? '',
   online: a.attached,
   kind: a.kind,
+  openLink: a.open_link,
+  listed: a.listed,
+  externalLinks: a.external_links,
+  grantScopeId: a.grant_scope_id,
+  localId: a.local_id ?? null,
+  connector: a.connector
+    ? {
+        masked: a.connector.masked,
+        scope: a.connector.scope,
+        clientId: a.connector.client_id,
+        lastUsedMs: a.connector.last_used_ms,
+      }
+    : null,
 });
+
+// Coalesce `/accounts/me`: five methods (getSession, getAccountKey, listAgents,
+// listNicknames, nicknamesOverview) each need it, and every mounted `useApiData`
+// hook re-fetches on the same store `version` (heartbeat tick or a mutation's
+// bump). Left unshared that's ~4-5 identical requests per cycle — historically
+// ~37% of ALL platform traffic. Caching the promise keyed by `version` collapses
+// a whole cycle to ONE network request shared by all callers; a new version
+// (next tick or a mutation) invalidates it so data stays fresh. Failures aren't
+// cached — the next caller retries.
+let acctCache: { version: number; promise: Promise<HubAccount> } | null = null;
+function accountMe(): Promise<HubAccount> {
+  if (acctCache && acctCache.version === version) return acctCache.promise;
+  const forVersion = version;
+  const promise = get<HubAccount>('/accounts/me').catch((err) => {
+    if (acctCache && acctCache.version === forVersion) acctCache = null;
+    throw err;
+  });
+  acctCache = { version: forVersion, promise };
+  return promise;
+}
 
 // ---- friends + human console shapes (spec §"friends" / §"human messaging") --
 
@@ -164,14 +260,35 @@ export interface FriendAccount {
   account_id: string;
   email: string | null;
 }
+/** A friend's agent as it appears in the friends view — a narrowed agentView.
+ *  The hub sends the full view; we consume the fields the friend UI needs. */
+export interface FriendAgent {
+  agent_id: string;
+  nickname: string | null;
+  kind?: string;
+  description?: string | null;
+  attached?: boolean;
+  open_link?: boolean;
+}
 export interface LinkedFriend extends FriendAccount {
-  agents: { agent_id: string; nickname: string | null; kind?: string }[];
+  // Every agent the friend has on the platform: their exposed agents (kind:'agent')
+  // + their human identity (kind:'human'), which carries their @handle + bio in
+  // `nickname`/`description`.
+  agents: FriendAgent[];
 }
 export interface FriendsView {
   auto_accept: boolean;
   linked: LinkedFriend[];
   incoming: FriendAccount[];
   outgoing: FriendAccount[];
+  /** Per-agent open links you've been granted (you reach only that agent). */
+  linked_agents?: FriendAgent[];
+}
+
+/** A friend's human identity — where their @handle (`nickname`) + bio
+ *  (`description`) live. `undefined` if they've never opened a console. */
+export function friendHuman(friend: LinkedFriend): FriendAgent | undefined {
+  return friend.agents.find((a) => a.kind === 'human');
 }
 export interface Attachment {
   file_id: string;
@@ -279,12 +396,12 @@ export function revealKey(): string | null {
 
 export const api = {
   async getSession(): Promise<UserProfile> {
-    const acct = await get<HubAccount>('/accounts/me');
+    const acct = await accountMe();
     return { email: acct.email, name: acct.username ?? acct.email.split('@')[0] ?? acct.email };
   },
 
   async getAccountKey(): Promise<AccountKey> {
-    const acct = await get<HubAccount>('/accounts/me');
+    const acct = await accountMe();
     return { masked: acct.masked };
   },
 
@@ -298,9 +415,159 @@ export const api = {
     clearKey();
   },
 
+  // ---- connector tokens (scoped bearer creds for /v1 + /mcp) --------------
+  async listConnectors(): Promise<ConnectorInfo[]> {
+    const r = await get<{ connectors: ConnectorInfo[] }>('/accounts/connectors');
+    return r.connectors;
+  },
+  /** Mint a connector: a fixed @handle identity + a scoped token (shown once) +
+   *  a paired OAuth client_id/secret for headless (client_credentials) use. */
+  async createConnector(input: {
+    label?: string;
+    scope: string[];
+    handle: string;
+  }): Promise<
+    | { ok: true; token: string; handle: string; oauth: ConnectorOAuth; mcpUrl: string }
+    | { ok: false; error: string }
+  > {
+    try {
+      const res = await fetch(BASE + '/accounts/connectors', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', ...authHeaders() },
+        body: JSON.stringify(input),
+      });
+      if (res.status === 401) {
+        clearKey();
+        return { ok: false, error: 'Session expired — sign in again.' };
+      }
+      const data = (await res.json().catch(() => ({}))) as {
+        token?: string;
+        handle?: string;
+        client_id?: string | null;
+        client_secret?: string | null;
+        token_endpoint?: string;
+        mcp_url?: string;
+        error?: string;
+      };
+      if (!res.ok || !data.token) return { ok: false, error: data.error ?? `Request failed (${res.status}).` };
+      bump();
+      return {
+        ok: true,
+        token: data.token,
+        handle: data.handle ?? input.handle,
+        oauth: {
+          client_id: data.client_id ?? null,
+          client_secret: data.client_secret ?? null,
+          token_endpoint: data.token_endpoint ?? BASE + '/oauth/token',
+        },
+        mcpUrl: data.mcp_url ?? BASE + '/mcp',
+      };
+    } catch {
+      return { ok: false, error: `Platform unreachable at ${BASE}.` };
+    }
+  },
+  /** Rotate a connector's bearer token (and paired OAuth secret) in place — same
+   *  @handle. Returns the new creds once; old ones stop working immediately. */
+  async rotateConnector(
+    agentId: string,
+  ): Promise<{ ok: true; token: string; oauth: ConnectorOAuth } | { ok: false; error: string }> {
+    try {
+      const res = await fetch(BASE + '/accounts/connectors/rotate', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', ...authHeaders() },
+        body: JSON.stringify({ agent_id: agentId }),
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        token?: string;
+        client_id?: string | null;
+        client_secret?: string | null;
+        token_endpoint?: string;
+        error?: string;
+      };
+      if (!res.ok || !data.token) return { ok: false, error: data.error ?? `Request failed (${res.status}).` };
+      bump();
+      return {
+        ok: true,
+        token: data.token,
+        oauth: {
+          client_id: data.client_id ?? null,
+          client_secret: data.client_secret ?? null,
+          token_endpoint: data.token_endpoint ?? BASE + '/oauth/token',
+        },
+      };
+    } catch {
+      return { ok: false, error: `Platform unreachable at ${BASE}.` };
+    }
+  },
+  async revokeConnector(agentId: string): Promise<void> {
+    await post('/accounts/connectors/revoke', { agent_id: agentId }).catch(() => {});
+    bump();
+  },
+
   async listAgents(): Promise<Agent[]> {
-    const acct = await get<HubAccount>('/accounts/me');
-    return acct.agents.map(toAgent);
+    const acct = await accountMe();
+    // Hide the account's own human identity — it's the user's @handle (shown in
+    // Settings), not a messageable/exposable agent.
+    return acct.agents.filter((a) => a.kind !== 'human').map(toAgent);
+  },
+
+  /** The user's own @handle (== username) + bio, for the Settings screen. */
+  async getIdentity(): Promise<{ handle: string | null; bio: string }> {
+    const acct = await accountMe();
+    return { handle: acct.human?.nickname ?? null, bio: acct.human?.description ?? '' };
+  },
+
+  /** One of your agents by id (from the coalesced /accounts/me), for the agent page. */
+  async getAgentById(id: string): Promise<Agent | null> {
+    const acct = await accountMe();
+    const a = acct.agents.find((x) => x.agent_id === id && x.kind !== 'human');
+    return a ? toAgent(a) : null;
+  },
+  /** Assign/replace an agent's @handle (owner-scoped). bindNickname is
+   *  reservation-aware: your own matching reservation is consumed on bind. */
+  async setAgentNickname(agentId: string, name: string): Promise<NicknameOutcome> {
+    try {
+      const r = await post<NicknameOutcome>(`/accounts/agents/${encodeURIComponent(agentId)}/nickname`, {
+        nickname: name,
+      });
+      if (r.ok) bump();
+      return r;
+    } catch {
+      return { ok: false, reason: 'invalid' };
+    }
+  },
+  /** Edit an agent's bio and/or its external auto-accept flag (owner-scoped). */
+  async setAgentSettings(
+    agentId: string,
+    patch: { bio?: string; open_link?: boolean; listed?: boolean },
+  ): Promise<ContactActionResult> {
+    const r = await postResult(`/accounts/agents/${encodeURIComponent(agentId)}/settings`, patch);
+    if (r.ok) bump();
+    return r;
+  },
+  /** Remove an agent from the network (unexpose). */
+  async unexposeAgent(agentId: string): Promise<ContactActionResult> {
+    const r = await postResult(`/accounts/agents/${encodeURIComponent(agentId)}/remove`, {});
+    if (r.ok) bump();
+    return r;
+  },
+
+  // ---- per-agent contact book (curates the agent's list_contacts) ----------
+  /** An agent's curated book + the reachable candidates to add from. */
+  getAgentBook(agentId: string): Promise<{ book: BookContact[]; bookable: BookContact[] }> {
+    return get<{ book: BookContact[]; bookable: BookContact[] }>(
+      `/accounts/agents/${encodeURIComponent(agentId)}/book`,
+    );
+  },
+  async addAgentBookContact(agentId: string, handle: string): Promise<ContactActionResult> {
+    const r = await postResult(`/accounts/agents/${encodeURIComponent(agentId)}/book`, { handle });
+    if (r.ok) bump();
+    return r;
+  },
+  async removeAgentBookContact(agentId: string, handle: string): Promise<ContactActionResult> {
+    const r = await postResult(`/accounts/agents/${encodeURIComponent(agentId)}/book/remove`, { handle });
+    if (r.ok) bump();
+    return r;
   },
 
   async getAgent(nickname: string): Promise<Agent | null> {
@@ -310,9 +577,9 @@ export const api = {
   },
 
   async listNicknames(): Promise<Nickname[]> {
-    const acct = await get<HubAccount>('/accounts/me');
+    const acct = await accountMe();
     return acct.agents
-      .filter((a) => a.nickname)
+      .filter((a) => a.nickname && a.kind !== 'human')
       .map((a) => ({
         agentId: a.agent_id,
         name: a.nickname as string,
@@ -330,10 +597,10 @@ export const api = {
   /** Bound nicknames + account-level reservations + agents, from ONE `/accounts/me`
    *  fetch (the Nicknames screen needs all three; keep it to a single request). */
   async nicknamesOverview(): Promise<{ bound: Nickname[]; reserved: string[]; agents: Agent[] }> {
-    const acct = await get<HubAccount>('/accounts/me');
+    const acct = await accountMe();
     return {
       bound: acct.agents
-        .filter((a) => a.nickname)
+        .filter((a) => a.nickname && a.kind !== 'human')
         .map((a) => ({
           agentId: a.agent_id,
           name: a.nickname as string,
@@ -341,7 +608,7 @@ export const api = {
           online: a.attached,
         })),
       reserved: acct.reservations ?? [],
-      agents: acct.agents.map(toAgent),
+      agents: acct.agents.filter((a) => a.kind !== 'human').map(toAgent),
     };
   },
 
@@ -442,6 +709,20 @@ export const api = {
   },
   setAutoAccept(on: boolean): Promise<{ auto_accept: boolean }> {
     return post<{ auto_accept: boolean }>('/accounts/settings', { auto_accept: on });
+  },
+
+  // ---- account settings (Settings screen) ----
+  /** Update the username (== your network @handle) and/or bio. A username change
+   *  atomically rebinds the handle server-side; a clash rejects the whole change.
+   *  Bumps so the header/session/handle reflect the change everywhere. */
+  async updateProfile(patch: { username?: string; bio?: string }): Promise<ContactActionResult> {
+    const r = await postResult('/accounts/profile', patch);
+    if (r.ok) bump();
+    return r;
+  },
+  /** Change the password. The server verifies `current` before setting `next`. */
+  changePassword(current: string, next: string): Promise<ContactActionResult> {
+    return postResult('/accounts/password', { current, next });
   },
 
   // ---- human console (message/call agents as the person, spec §"human") ----

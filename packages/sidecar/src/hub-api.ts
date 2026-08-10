@@ -28,7 +28,9 @@ export interface AgentView {
   nickname: string | null;
   nicknames: string[];
   speaking_as: string | null;
-  kind?: "human" | "agent";
+  kind?: "human" | "agent" | "connector";
+  open_link?: boolean;
+  listed?: boolean;
   attached: boolean;
   can_receive_calls: boolean;
 }
@@ -197,6 +199,36 @@ export function getAccount(endpoint: string, apiKey: string): Promise<AccountVie
 /** Remove one of the account's agents from the platform (unexpose). */
 export function unexposeAgent(endpoint: string, agentId: string, apiKey: string): Promise<{ ok: boolean }> {
   return request(endpoint, "POST", `/accounts/agents/${encodeURIComponent(agentId)}/remove`, {}, apiKey);
+}
+
+// ---- owner-scoped agent management (proxied for platform-only agents) ------
+
+export function setAgentNickname(endpoint: string, agentId: string, nickname: string, apiKey: string): Promise<NicknameOutcome> {
+  return request(endpoint, "POST", `/accounts/agents/${encodeURIComponent(agentId)}/nickname`, { nickname }, apiKey);
+}
+export function setAgentSettings(
+  endpoint: string,
+  agentId: string,
+  patch: { bio?: string; listed?: boolean; open_link?: boolean },
+  apiKey: string,
+): Promise<{ ok: boolean; error?: string }> {
+  return request(endpoint, "POST", `/accounts/agents/${encodeURIComponent(agentId)}/settings`, patch, apiKey);
+}
+
+export interface BookContactView {
+  agent_id: string;
+  handle: string | null;
+  description: string | null;
+  online: boolean;
+}
+export function getAgentBook(endpoint: string, agentId: string, apiKey: string): Promise<{ book: BookContactView[]; bookable: BookContactView[] }> {
+  return request(endpoint, "GET", `/accounts/agents/${encodeURIComponent(agentId)}/book`, undefined, apiKey);
+}
+export function addBookContact(endpoint: string, agentId: string, handle: string, apiKey: string): Promise<{ ok: boolean; error?: string }> {
+  return request(endpoint, "POST", `/accounts/agents/${encodeURIComponent(agentId)}/book`, { handle }, apiKey);
+}
+export function removeBookContact(endpoint: string, agentId: string, handle: string, apiKey: string): Promise<{ ok: boolean }> {
+  return request(endpoint, "POST", `/accounts/agents/${encodeURIComponent(agentId)}/book/remove`, { handle }, apiKey);
 }
 
 // ---- profile friendships (spec §"friends") ------------------------------

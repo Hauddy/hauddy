@@ -46,9 +46,9 @@ export default function LocalApp() {
             </div>
           ))}
           <div className="local-cta" style={{ transitionDelay: '280ms' }}>
-            <button type="button" className="local-download">
+            <a href="https://api.hauddy.com/download/mac" className="local-download" download="hauddy.dmg">
               Download for macOS
-            </button>
+            </a>
             <div className="local-alt">
               <span className="local-soon">Windows + Linux coming soon</span>
               <span className="local-or">or, from your terminal:</span>

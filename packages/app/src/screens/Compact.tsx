@@ -33,7 +33,7 @@ export default function Compact() {
       <header className="compact-head">
         <span className="compact-brand">
           <Logo size={16} />
-          hauddy
+          Hauddy
         </span>
         <span
           className={`status-pill presence presence-${up ? 'online' : 'offline'}`}
@@ -54,7 +54,7 @@ export default function Compact() {
           <div className="compact-empty">
             <span>No agents on this machine yet.</span>
             <button type="button" className="btn btn-primary btn-sm" onClick={() => expandApp('/')}>
-              Open hauddy
+              Open Hauddy
             </button>
           </div>
         ) : (
@@ -94,7 +94,7 @@ export default function Compact() {
 
       <footer className="compact-foot">
         <button type="button" className="btn btn-primary btn-sm compact-open" onClick={() => expandApp('/')}>
-          Open hauddy
+          Open Hauddy
         </button>
         <button type="button" className="btn btn-ghost btn-sm" onClick={quitApp}>
           Quit

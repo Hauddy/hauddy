@@ -11,4 +11,8 @@ contextBridge.exposeInMainWorld('hauddyDesktop', {
    *  '/network/agents/@gio?add=1'. */
   expand: (route?: string) => ipcRenderer.invoke('hauddy:expand', route),
   quit: () => ipcRenderer.invoke('hauddy:quit'),
+  /** Set the Dock badge to a notification count (0 clears it). */
+  setBadge: (count: number) => ipcRenderer.invoke('hauddy:badge', count),
+  /** Fire a native OS notification. */
+  notify: (input: { title: string; body: string }) => ipcRenderer.invoke('hauddy:notify', input),
 });

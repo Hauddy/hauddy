@@ -8,6 +8,7 @@ release/
 
 # Local data & runtime state
 data/
+.hauddy/
 .hauddy-platform-data/
 .wrangler/
 

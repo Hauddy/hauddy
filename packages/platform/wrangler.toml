@@ -19,6 +19,10 @@ new_sqlite_classes = ["HubDO"]
 binding = "FILES"
 bucket_name = "hauddy-files"
 
+[[r2_buckets]]
+binding = "RELEASES"
+bucket_name = "hauddy-releases"
+
 [vars]
 CORS_ORIGIN = "https://app.hauddy.com"
 

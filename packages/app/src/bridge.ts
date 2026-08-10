@@ -8,11 +8,32 @@ export interface HauddyDesktopBridge {
   isDesktop: true;
   expand(route?: string): Promise<void>;
   quit(): Promise<void>;
+  /** Set the Dock icon badge to a count (0 clears it). macOS only. */
+  setBadge(count: number): Promise<void>;
+  /** Fire a native OS notification. */
+  notify(input: { title: string; body: string }): Promise<void>;
 }
 
 declare global {
   interface Window {
     hauddyDesktop?: HauddyDesktopBridge;
+  }
+}
+
+/** Update the Dock badge with a notification count (no-op in a plain browser). */
+export function setDockBadge(count: number): void {
+  void window.hauddyDesktop?.setBadge(count);
+}
+
+/** Fire a native OS notification (Electron); browser fallback uses the Web
+ *  Notifications API when the user has granted permission. */
+export function notifyDesktop(input: { title: string; body: string }): void {
+  if (window.hauddyDesktop) {
+    void window.hauddyDesktop.notify(input);
+    return;
+  }
+  if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+    new Notification(input.title, { body: input.body });
   }
 }
 

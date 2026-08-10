@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { api, useApiData, type Attachment, type CallLogEntry } from '../api';
 import type { Presence } from '../api/types';
 import Combobox from '../components/Combobox';
@@ -154,7 +155,26 @@ export default function Messages() {
   const selectedCall = calls.find((c) => c.call_id === selectedCallId) ?? null;
 
   const [selected, setSelected] = useState<string | null>(null);
+  // The open thread's authoritative peer agent_id (from the thread list), used to
+  // load history — resilient to a handle that no longer resolves. Null when opened
+  // by handle only (deep-link / "New"), in which case the handle is resolved.
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [composing, setComposing] = useState(false);
+  // Deep-link: `/messages?to=@handle` (e.g. from a friend's profile) opens that
+  // thread on mount, then clears the param so a refresh doesn't re-force it.
+  const [searchParams, setSearchParams] = useSearchParams();
+  useEffect(() => {
+    const to = searchParams.get('to');
+    if (!to) return;
+    setSelected(to);
+    setSelectedId(null);
+    setSelectedCallId(null);
+    setComposing(false);
+    const next = new URLSearchParams(searchParams);
+    next.delete('to');
+    setSearchParams(next, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [lines, setLines] = useState<Line[]>([]);
   const [draft, setDraft] = useState('');
   const [files, setFiles] = useState<File[]>([]);
@@ -180,10 +200,12 @@ export default function Messages() {
   // Resolve a raw agent_id (e.g. a call frame's `from`) back to its @handle.
   const nickOf = (id: string): string => (platformAgents ?? []).find((a) => a.id === id)?.nickname || id;
 
-  // Reachable = your named agents + your friends' exposed agents (for "New").
+  // Reachable = your named agents + your friends' exposed agents + per-agent open
+  // links you've been granted (for "New").
   const targets = [
     ...(agents ?? []).filter((a) => a.nickname).map((a) => a.nickname),
     ...(friends?.linked ?? []).flatMap((f) => f.agents.filter((a) => a.kind !== 'human' && a.nickname).map((a) => a.nickname as string)),
+    ...(friends?.linked_agents ?? []).filter((a) => a.nickname).map((a) => a.nickname as string),
   ];
 
   const scrollToBottom = () => {
@@ -202,6 +224,7 @@ export default function Messages() {
   // Switching identity resets the open conversation (peers differ per identity).
   useEffect(() => {
     setSelected(null);
+    setSelectedId(null);
     setComposing(false);
   }, [viewAs]);
 
@@ -228,7 +251,7 @@ export default function Messages() {
     setAtBottom(true);
     setHasNew(false);
     api
-      .consoleThread(selected, { as: viewAs ?? undefined })
+      .consoleThread(selectedId ?? selected, { as: viewAs ?? undefined })
       .then((res) => {
         if (!live) return;
         peerIdRef.current = res.peer_id;
@@ -236,7 +259,9 @@ export default function Messages() {
         setLines(
           res.messages.map<Line>((m) => ({
             id: m.id,
-            from: res.peer_nick,
+            // Prefer the clicked @handle over the server's resolved nick, which
+            // degrades to `@<id>` for a peer whose handle no longer resolves.
+            from: selected ?? res.peer_nick,
             body: m.body ?? '',
             mine: m.mine,
             attachments: m.attachments,
@@ -249,7 +274,7 @@ export default function Messages() {
     return () => {
       live = false;
     };
-  }, [selected, viewAs]);
+  }, [selected, selectedId, viewAs]);
 
   // Live tail (YOUR inbox): drain /console/inbox and append messages from the
   // OPEN peer. Match on the peer's agent_id — the inbox `from` is an id, not an
@@ -287,7 +312,7 @@ export default function Messages() {
     let live = true;
     const tick = async () => {
       if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
-      const res = await api.consoleThread(selected, { as: viewAs ?? undefined }).catch(() => null);
+      const res = await api.consoleThread(selectedId ?? selected, { as: viewAs ?? undefined }).catch(() => null);
       if (!live || !res) return;
       const fresh: Line[] = [];
       for (const m of res.messages) {
@@ -295,7 +320,7 @@ export default function Messages() {
         seen.current.add(m.id);
         fresh.push({
           id: m.id,
-          from: res.peer_nick,
+          from: selected ?? res.peer_nick,
           body: m.body ?? '',
           mine: m.mine,
           attachments: m.attachments,
@@ -309,16 +334,22 @@ export default function Messages() {
       live = false;
       clearInterval(t);
     };
-  }, [selected, isAgentView, viewAs]);
+  }, [selected, selectedId, isAgentView, viewAs]);
 
-  const openThread = (peer: string) => {
+  // Opening a thread: `peer` is the display @handle, `id` the authoritative peer
+  // agent_id from the thread list. History loads by `id` when we have it — the
+  // handle can fail to resolve back (a deleted connector or an unexposed peer
+  // isn't bound), whereas the id is exactly what the thread was grouped under.
+  const openThread = (peer: string, id?: string | null) => {
     setSelected(peer || null);
+    setSelectedId(id ?? null);
     setSelectedCallId(null);
     setComposing(false);
   };
   const openCall = (callId: string) => {
     setSelectedCallId(callId);
     setSelected(null);
+    setSelectedId(null);
     setComposing(false);
   };
   // Jump from a call transcript to that peer's message thread.
@@ -330,6 +361,7 @@ export default function Messages() {
   const switchView = (v: 'chats' | 'calls') => {
     setView(v);
     setSelected(null);
+    setSelectedId(null);
     setSelectedCallId(null);
     setComposing(false);
   };
@@ -415,7 +447,7 @@ export default function Messages() {
                       key={t.peer_id}
                       type="button"
                       className={`thread-row${selected === t.peer_nick ? ' active' : ''}`}
-                      onClick={() => openThread(t.peer_nick)}
+                      onClick={() => openThread(t.peer_nick, t.peer_id)}
                     >
                       <span className="thread-row-top">
                         <span className="thread-peer">

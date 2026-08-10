@@ -16,9 +16,20 @@ import {
  *  (it has no WS socket, so presence is heartbeat-based). */
 const CONSOLE_TTL_MS = 90_000;
 import type { Env } from "./env.js";
-import { Db, type AttachmentRow, type CallRow, type SyncMessage } from "./db.js";
+import { Db, CONNECTOR_SCOPES, type AttachmentRow, type CallRow, type SyncMessage } from "./db.js";
 import { FileStoreR2 } from "./files-r2.js";
 import { b64urlToBytes, randomHex, randomNonceB64url, verifyEd25519 } from "./crypto.js";
+import {
+  authServerMetadata,
+  consentPageHtml,
+  defaultHandle,
+  errorPageHtml,
+  OAUTH_SCOPES,
+  parseForm,
+  pkceS256,
+  protectedResourceMetadata,
+  type ConsentParams,
+} from "./oauth.js";
 
 /** The console human's active-call pointer (DO storage, key `ccall:<humanId>`). */
 interface CCall {
@@ -26,6 +37,54 @@ interface CCall {
   peer: string;
   seq: number; // last call_frames seq surfaced by poll
   sawInvite: boolean; // whether the incoming-invite pseudo-frame was already emitted
+}
+
+/** Resolved public-API caller: its acting identity (a connector's bound agent, or
+ *  the account's human when authed with the master key) + granted capabilities. */
+interface ConnAuth {
+  accountId: string;
+  agentId: string; // the identity every send/read is signed as
+  scope: { send: boolean; read: boolean; files: boolean; full: boolean };
+}
+
+/** MCP protocol version we advertise (Streamable HTTP, stateless JSON responses). */
+const MCP_PROTOCOL_VERSION = "2025-06-18";
+/** Inline base64 file cap for the `share_file` MCP tool — bytes ride through the
+ *  model's tool-call args, so keep it small; larger files use POST /v1/files. */
+const MCP_FILE_CAP = 1024 * 1024;
+/** Decode base64 (tolerating a `data:...;base64,` prefix) to bytes. `atob` is a
+ *  Workers global. Throws on malformed input (caught by the caller). */
+function base64ToBytes(b64: string): Uint8Array {
+  const clean = b64.includes(",") ? b64.slice(b64.indexOf(",") + 1) : b64;
+  const bin = atob(clean);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
+/** Encode bytes → standard base64 (`btoa` is a Workers global). Only used for
+ *  ≤1MB inline file reads (read_file), so the per-char string build is fine. */
+function bytesToBase64(bytes: Uint8Array): string {
+  let bin = "";
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin);
+}
+
+/** Whether a mime is human-readable text — so read_file can hand the content
+ *  back as a UTF-8 string (usable directly by an LLM) instead of base64. */
+function isTextMime(mime: string): boolean {
+  const m = mime.toLowerCase();
+  return (
+    m.startsWith("text/") ||
+    m === "application/json" ||
+    m === "application/xml" ||
+    m === "application/javascript" ||
+    m === "application/yaml" ||
+    m === "application/x-yaml" ||
+    m.includes("markdown") ||
+    m.includes("+json") ||
+    m.includes("+xml")
+  );
 }
 
 /** Per-socket state, persisted via serializeAttachment so it survives DO
@@ -99,6 +158,25 @@ export class HubDO {
         });
       }
 
+      // ── public connector API (scoped connector tokens OR the account key) ──
+      // Two front doors over one identity + capability core: a remote MCP endpoint
+      // (JSON-RPC) and a curl-friendly REST surface. Auth = a bearer connector
+      // token bound to a fixed @handle identity (or the master account key).
+      if (path === "/mcp") return await this.mcp(request);
+      if (path === "/v1" || path.startsWith("/v1/")) return await this.v1(request, url);
+
+      // ── OAuth 2.1 for /mcp (claude.ai / ChatGPT consumer connectors) ──
+      // Discovery (RFC 8414/9728), Dynamic Client Registration (RFC 7591), and
+      // an authorize/token flow with PKCE. An access token IS a connector token.
+      const origin = new URL(request.url).origin;
+      if (method === "GET" && path.startsWith("/.well-known/oauth-authorization-server"))
+        return this.publicJson(200, authServerMetadata(origin));
+      if (method === "GET" && path.startsWith("/.well-known/oauth-protected-resource"))
+        return this.publicJson(200, protectedResourceMetadata(origin));
+      if (method === "POST" && path === "/oauth/register") return await this.oauthRegister(request);
+      if (path === "/oauth/authorize") return await this.oauthAuthorize(request, url);
+      if (method === "POST" && path === "/oauth/token") return await this.oauthToken(request);
+
       // ── file attachments (R2 + attachments table) ─────────────────────
       const fileGet = path.match(/^\/files\/([^/]+)$/);
       if (method === "POST" && path === "/files") return await this.uploadFile(request, url);
@@ -134,10 +212,14 @@ export class HubDO {
       if (method === "GET" && path === "/accounts/me") {
         const accountId = this.requireAccount(request);
         if (!accountId) return this.unauthorized();
+        const humanView = this.agentView(this.humanFor(accountId).agent_id);
         return this.json(200, {
           ...this.db.accountView(accountId)!,
-          agents: this.db.accountAgents(accountId).map((a) => this.agentView(a.agent_id)),
+          agents: this.db.accountAgents(accountId).map((a) => this.agentView(a.agent_id, accountId)),
           reservations: this.db.accountReservations(accountId),
+          // The user's own @handle + bio (username == handle). The client surfaces
+          // this in Settings and filters kind:'human' out of the agent lists.
+          human: { nickname: humanView.nickname, description: humanView.description },
         });
       }
       if (method === "GET" && path === "/accounts/claims") {
@@ -161,9 +243,16 @@ export class HubDO {
         const brief = (id: string) => ({ account_id: id, email: this.db.getAccount(id)?.email ?? null });
         return this.json(200, {
           auto_accept: this.db.getAutoAccept(accountId),
-          linked: linked.map((id) => ({ ...brief(id), agents: this.db.accountAgents(id).map((a) => this.agentView(a.agent_id)) })),
+          // A friend sees only your `listed` agents (their human identity stays
+          // listed; owner-only connectors are hidden from friends).
+          linked: linked.map((id) => ({
+            ...brief(id),
+            agents: this.db.accountAgents(id).filter((a) => !!a.listed).map((a) => this.agentView(a.agent_id)),
+          })),
           incoming: incoming.map(brief),
           outgoing: outgoing.map(brief),
+          // Per-agent open links you've been granted (reach only that agent).
+          linked_agents: this.db.accountAgentGrants(accountId).map((id) => this.agentView(id)),
         });
       }
       if (method === "POST" && path === "/accounts/settings") {
@@ -172,6 +261,58 @@ export class HubDO {
         const body = await this.readBody(request);
         if (typeof body.auto_accept === "boolean") this.db.setAutoAccept(accountId, body.auto_accept);
         return this.json(200, { auto_accept: this.db.getAutoAccept(accountId) });
+      }
+
+      // ── account profile + password (Settings screen) ──────────────────
+      if (method === "POST" && path === "/accounts/profile") {
+        const accountId = this.requireAccount(request);
+        if (!accountId) return this.unauthorized();
+        const body = await this.readBody(request);
+        const human = this.humanFor(accountId);
+        // Username IS the user's network @handle: a rename atomically rebinds the
+        // handle. If the handle is taken (globally, incl. reservations) the WHOLE
+        // change is rejected and the username is left intact (username == handle).
+        if (typeof body.username === "string") {
+          const username = body.username.trim();
+          if (!/^[a-z0-9_-]{3,32}$/i.test(username))
+            return this.json(400, { error: "username must be 3–32 chars (a–z 0–9 _ -)" });
+          const existing = this.db.accountByUsername(username);
+          if (existing && existing.account_id !== accountId)
+            return this.json(409, { error: "that username is taken" });
+          const bound = this.db.bindNickname(human.agent_id, username);
+          if (!bound.ok)
+            return this.json(bound.reason === "invalid" ? 400 : 409, {
+              error:
+                bound.reason === "invalid"
+                  ? "that username can't be a handle — start with a letter or number"
+                  : "that handle is already taken",
+            });
+          this.db.setUsername(accountId, username);
+        }
+        // Bio: one field — the public description AND what the owner's own agents
+        // see (empty ⇒ they see "your human owner"). Allow "" to clear it.
+        if (typeof body.bio === "string") {
+          this.db.setAgentProfile(human.agent_id, { description: body.bio });
+        }
+        const view = this.agentView(human.agent_id);
+        return this.json(200, {
+          username: this.db.getAccount(accountId)?.username ?? null,
+          human: { nickname: view.nickname, description: view.description },
+        });
+      }
+      if (method === "POST" && path === "/accounts/password") {
+        const accountId = this.requireAccount(request);
+        if (!accountId) return this.unauthorized();
+        const body = await this.readBody(request);
+        const current = typeof body.current === "string" ? body.current : "";
+        const next = typeof body.next === "string" ? body.next : "";
+        if (next.length < 6) return this.json(400, { error: "new password must be at least 6 characters" });
+        // 403 (not 401) for a wrong current password — a 401 makes the client
+        // treat the API key as invalid and sign the user out.
+        if (!(await this.db.verifyAccountPassword(accountId, current)))
+          return this.json(403, { error: "current password is incorrect" });
+        await this.db.setPassword(accountId, next);
+        return this.json(200, { ok: true });
       }
 
       // ── nickname reservations (account-level holds; app-ux-plan §G) ────
@@ -202,6 +343,78 @@ export class HubDO {
         return this.json(200, this.db.attachReservation(accountId, agentId, String(body.name ?? "")));
       }
 
+      // ── connector tokens (public /v1 + /mcp creds; managed with the account key) ──
+      // Each connector gets a FIXED @handle identity (a dedicated kind='connector'
+      // agent), chosen at mint time. The external AI always signs as that handle,
+      // and peers can message it back.
+      if (method === "POST" && path === "/accounts/connectors") {
+        const accountId = this.requireAccount(request);
+        if (!accountId) return this.unauthorized();
+        const body = await this.readBody(request);
+        const scope = (Array.isArray(body.scope) ? body.scope.map(String) : []).filter((s) =>
+          (CONNECTOR_SCOPES as readonly string[]).includes(s),
+        );
+        if (scope.length === 0) return this.json(400, { error: "scope must include at least one of: send, read, files" });
+        const handle = typeof body.handle === "string" ? body.handle.trim() : "";
+        if (!handle) return this.json(400, { error: "a handle is required — the connector's @identity" });
+        const label = typeof body.label === "string" ? body.label : undefined;
+        const res = this.db.createConnector(accountId, { label, scope, handle });
+        if (!res.ok) {
+          return this.json(res.reason === "invalid" ? 400 : 409, {
+            error:
+              res.reason === "invalid"
+                ? "that handle isn't valid (2–24 chars: a–z 0–9 _ -)"
+                : "that handle is already taken",
+          });
+        }
+        // Pair every dashboard-minted connector with an OAuth client_id + secret
+        // so headless/browserless agents can use the client_credentials grant
+        // (copy id+secret, no redirect) instead of the bearer token directly.
+        const creds = this.db.mintConnectorClient(accountId, res.agent_id, label);
+        const origin = new URL(request.url).origin;
+        return this.json(200, {
+          token: res.token,
+          handle: res.handle,
+          agent_id: res.agent_id,
+          scope,
+          label: label ?? null,
+          client_id: creds?.client_id ?? null,
+          client_secret: creds?.client_secret ?? null,
+          token_endpoint: `${origin}/oauth/token`,
+          mcp_url: `${origin}/mcp`,
+        });
+      }
+      if (method === "GET" && path === "/accounts/connectors") {
+        const accountId = this.requireAccount(request);
+        if (!accountId) return this.unauthorized();
+        return this.json(200, { connectors: this.db.listConnectorTokens(accountId) });
+      }
+      if (method === "POST" && path === "/accounts/connectors/revoke") {
+        const accountId = this.requireAccount(request);
+        if (!accountId) return this.unauthorized();
+        const body = await this.readBody(request);
+        const ref = typeof body.agent_id === "string" ? { agentId: body.agent_id } : { token: String(body.token ?? "") };
+        return this.json(200, { ok: this.db.revokeConnector(accountId, ref) });
+      }
+      // Rotate a connector's bearer token (and paired OAuth secret) in place —
+      // same @handle identity, fresh creds. Returns the new token/secret once.
+      if (method === "POST" && path === "/accounts/connectors/rotate") {
+        const accountId = this.requireAccount(request);
+        if (!accountId) return this.unauthorized();
+        const body = await this.readBody(request);
+        const agentId = typeof body.agent_id === "string" ? body.agent_id : "";
+        const rot = agentId ? this.db.rotateConnector(accountId, agentId) : null;
+        if (!rot) return this.json(404, { ok: false, error: "not your connector" });
+        const origin = new URL(request.url).origin;
+        return this.json(200, {
+          ok: true,
+          token: rot.token,
+          client_id: rot.client_id ?? null,
+          client_secret: rot.client_secret ?? null,
+          token_endpoint: `${origin}/oauth/token`,
+        });
+      }
+
       const unexpose = path.match(/^\/accounts\/agents\/([^/]+)\/remove$/);
       if (method === "POST" && unexpose) {
         const accountId = this.requireAccount(request);
@@ -212,6 +425,89 @@ export class HubDO {
         return this.json(200, { ok: this.db.removeAgent(agentId) });
       }
 
+      // ── owner-scoped agent settings (Agent page) ──────────────────────
+      // Bearer + ownership-checked (unlike the legacy /agents/:id/* below).
+      const ownedNick = path.match(/^\/accounts\/agents\/([^/]+)\/nickname$/);
+      if (method === "POST" && ownedNick) {
+        const accountId = this.requireAccount(request);
+        if (!accountId) return this.unauthorized();
+        const agentId = decodeURIComponent(ownedNick[1]!);
+        const agent = this.db.getAgent(agentId);
+        if (!agent || agent.account_id !== accountId) return this.json(404, { ok: false, reason: "invalid", error: "not your agent" });
+        const body = await this.readBody(request);
+        if (typeof body.nickname !== "string") return this.json(400, { ok: false, reason: "invalid" });
+        // bindNickname is reservation-aware: your OWN reserved handle is consumed
+        // on bind; another account's bound/reserved handle → conflict.
+        return this.json(200, this.db.bindNickname(agentId, body.nickname));
+      }
+      const ownedSettings = path.match(/^\/accounts\/agents\/([^/]+)\/settings$/);
+      if (method === "POST" && ownedSettings) {
+        const accountId = this.requireAccount(request);
+        if (!accountId) return this.unauthorized();
+        const agentId = decodeURIComponent(ownedSettings[1]!);
+        const agent = this.db.getAgent(agentId);
+        if (!agent || agent.account_id !== accountId) return this.json(404, { ok: false, error: "not your agent" });
+        const body = await this.readBody(request);
+        if (typeof body.bio === "string") this.db.setAgentProfile(agentId, { description: body.bio });
+        if (typeof body.open_link === "boolean") this.db.setOpenLink(agentId, body.open_link);
+        if (typeof body.listed === "boolean") this.db.setListed(agentId, body.listed);
+        return this.json(200, { ok: true, agent: this.agentView(agentId) });
+      }
+
+      // ── owner-scoped per-agent contact book ───────────────────────────
+      // Curate an agent's list_contacts (the mechanism connectors need — no local
+      // runtime, so their book lives on the platform). GET returns the book + the
+      // reachable candidates to add from; POST adds; /remove drops.
+      const bookRoute = path.match(/^\/accounts\/agents\/([^/]+)\/book$/);
+      if (bookRoute) {
+        const accountId = this.requireAccount(request);
+        if (!accountId) return this.unauthorized();
+        const agentId = decodeURIComponent(bookRoute[1]!);
+        const agent = this.db.getAgent(agentId);
+        if (!agent || agent.account_id !== accountId) return this.json(404, { ok: false, error: "not your agent" });
+        const shape = (id: string) => {
+          const p = this.presenceOf(id);
+          return {
+            agent_id: id,
+            handle: p.nickname, // already @-prefixed (speakingNickname → formatNickname)
+            description: this.db.getAgent(id)?.description ?? null,
+            online: p.state === "online",
+          };
+        };
+        if (method === "GET") {
+          const bookIds: string[] = [];
+          for (const h of this.db.agentBook(agentId)) {
+            const id = this.db.resolveAgentId(h);
+            if (id && id !== agentId && !bookIds.includes(id)) bookIds.push(id);
+          }
+          const bookSet = new Set(bookIds);
+          const bookable = this.derivedContactsOf(agentId).filter((id) => !bookSet.has(id));
+          return this.json(200, { book: bookIds.map(shape), bookable: bookable.map(shape) });
+        }
+        if (method === "POST") {
+          const body = await this.readBody(request);
+          const handle = String(body.handle ?? "");
+          const targetId = this.db.resolveAgentId(handle);
+          if (!targetId) return this.json(404, { ok: false, error: "E_UNKNOWN_AGENT" });
+          if (targetId === agentId) return this.json(400, { ok: false, error: "an agent can't book itself" });
+          if (!this.areLinked(agentId, targetId))
+            return this.json(403, { ok: false, error: "not reachable — you can only book contacts this agent can reach" });
+          this.db.addToBook(agentId, handle);
+          return this.json(200, { ok: true });
+        }
+      }
+      const bookRemoveRoute = path.match(/^\/accounts\/agents\/([^/]+)\/book\/remove$/);
+      if (method === "POST" && bookRemoveRoute) {
+        const accountId = this.requireAccount(request);
+        if (!accountId) return this.unauthorized();
+        const agentId = decodeURIComponent(bookRemoveRoute[1]!);
+        const agent = this.db.getAgent(agentId);
+        if (!agent || agent.account_id !== accountId) return this.json(404, { ok: false, error: "not your agent" });
+        const body = await this.readBody(request);
+        this.db.removeFromBook(agentId, String(body.handle ?? ""));
+        return this.json(200, { ok: true });
+      }
+
       // ── human console (virtual HTTP client over the DB) ───────────────
       if (path.startsWith("/console")) return await this.console(request, url);
 
@@ -220,7 +516,10 @@ export class HubDO {
 
       // ── agents ────────────────────────────────────────────────────────
       if (method === "GET" && path === "/agents") {
-        return this.json(200, { agents: this.db.listAllAgents().map((a) => this.agentView(a.agent_id)) });
+        // Public discovery: only `listed` agents (owner-only connectors excluded).
+        return this.json(200, {
+          agents: this.db.listAllAgents().filter((a) => !!a.listed).map((a) => this.agentView(a.agent_id)),
+        });
       }
       const nick = path.match(/^\/agents\/([^/]+)\/nickname$/);
       if (method === "POST" && nick) {
@@ -361,8 +660,15 @@ export class HubDO {
     const body = await this.readBody(request);
     const targetAgentId = this.db.resolveAgentId(String(body.handle ?? ""));
     const targetAccount = targetAgentId ? this.db.getAgent(targetAgentId)?.account_id ?? null : null;
-    if (!targetAccount) return this.json(404, { error: "E_UNKNOWN_AGENT" });
+    if (!targetAgentId || !targetAccount) return this.json(404, { error: "E_UNKNOWN_AGENT" });
     if (targetAccount === accountId) return this.json(200, { state: "self" });
+    // Per-agent open link: if the targeted agent accepts external links and the
+    // accounts aren't already friends, auto-grant reachability to THAT agent only
+    // (the rest of the owner's account stays private) — no account friendship.
+    if (!this.db.areAccountsLinked(accountId, targetAccount) && this.db.isOpenLink(targetAgentId)) {
+      this.db.grantAgent(targetAgentId, accountId);
+      return this.json(200, { state: "linked_agent", agent: this.agentView(targetAgentId) });
+    }
     let state: string = this.db.requestFriend(accountId, targetAccount).state;
     if (state === "pending" && this.db.getAutoAccept(targetAccount)) {
       state = this.db.respondFriend(targetAccount, accountId, true).state;
@@ -450,18 +756,529 @@ export class HubDO {
     return false;
   }
 
+  // ── public connector API: auth + capability core ──────────────────────
+  /** Resolve the bearer to a public-API caller. A connector token → its bound
+   *  @handle identity + declared scope; the master account key → the account's
+   *  human identity + full scope (handy for the dashboard/testing). */
+  private resolveAuth(request: Request): ConnAuth | null {
+    const header = request.headers.get("authorization") ?? "";
+    const key = header.startsWith("Bearer ") ? header.slice(7) : "";
+    if (!key) return null;
+    const acct = this.db.authenticateAccount(key);
+    if (acct) {
+      return { accountId: acct, agentId: this.humanFor(acct).agent_id, scope: { send: true, read: true, files: true, full: true } };
+    }
+    const conn = this.db.authenticateConnector(key);
+    if (conn) {
+      const s = conn.scope.split(",");
+      return {
+        accountId: conn.account_id,
+        agentId: conn.agent_id,
+        scope: { send: s.includes("send"), read: s.includes("read"), files: s.includes("files"), full: false },
+      };
+    }
+    return null;
+  }
+
+  private forbiddenScope(scope: string): Response {
+    return this.json(403, { error: "insufficient_scope", message: `this token lacks the '${scope}' scope` });
+  }
+
+  /** whoami: the caller's FIXED identity (@handle) + the handles available in the
+   *  account's profile (so a host knows who else it can reach). Touches presence. */
+  private connIdentity(auth: ConnAuth) {
+    this.db.consoleTouch(auth.agentId, Date.now());
+    const view = this.agentView(auth.agentId);
+    return {
+      agent_id: auth.agentId,
+      handle: view.nickname,
+      display_name: view.display_name,
+      description: view.description,
+      account_id: auth.accountId,
+      scope: (["send", "read", "files"] as const).filter((k) => auth.scope[k]),
+      // Handles available in your profile — every agent identity on this account.
+      profile_handles: this.db
+        .accountAgents(auth.accountId)
+        .map((a) => ({ handle: this.db.speakingNickname(a.agent_id), kind: a.kind ?? "agent", display_name: a.display_name ?? null }))
+        .filter((a) => a.handle),
+      reserved_handles: this.db.accountReservations(auth.accountId),
+    };
+  }
+
+  private connContacts(auth: ConnAuth) {
+    return this.contactsOf(auth.agentId).map((id) => {
+      const presence = this.presenceOf(id);
+      const agent = this.db.getAgent(id);
+      return { agent_id: id, handle: presence.nickname, display_name: agent?.display_name ?? null, kind: agent?.kind ?? "agent", presence };
+    });
+  }
+
+  /** Send an SMS signed as the caller's fixed identity. Reuses the same router as
+   *  the human console — reach = same account + friends' agents. */
+  private connSend(auth: ConnAuth, to: string, body: string, attachments?: unknown[]) {
+    this.db.consoleTouch(auth.agentId, Date.now());
+    const atts = Array.isArray(attachments) && attachments.length ? { attachments } : {};
+    return this.routeFromAgent(auth.agentId, this.mkEnvelope(auth.agentId, to, { body, ...atts }));
+  }
+
+  /** Non-destructive read of the caller identity's messages (does NOT mark
+   *  delivered — the dashboard "view as agent" still sees history). */
+  private connMessages(auth: ConnAuth, sinceMs: number) {
+    this.db.consoleTouch(auth.agentId, Date.now());
+    return this.db.messagesForScope([auth.agentId], sinceMs);
+  }
+
+  // ── public REST surface (/v1/*) ────────────────────────────────────────
+  private async v1(request: Request, url: URL): Promise<Response> {
+    const auth = this.resolveAuth(request);
+    if (!auth) return this.unauthorized();
+    const path = url.pathname;
+    const method = request.method;
+
+    if (method === "GET" && path === "/v1/whoami") return this.json(200, this.connIdentity(auth));
+    if (method === "GET" && path === "/v1/contacts") return this.json(200, { contacts: this.connContacts(auth) });
+    if (method === "POST" && path === "/v1/messages") {
+      if (!auth.scope.send) return this.forbiddenScope("send");
+      if (this.rateLimited(request, "v1send", 120, 60_000)) return this.json(429, { error: "too many messages — slow down" });
+      const body = await this.readBody(request);
+      const to = typeof body.to === "string" ? body.to : "";
+      const text = typeof body.body === "string" ? body.body : "";
+      if (!to) return this.json(400, { error: "'to' (@handle or agent id) is required" });
+      const res = this.connSend(auth, to, text, Array.isArray(body.attachments) ? body.attachments : undefined);
+      return res.ok
+        ? this.json(200, { status: res.status, from: this.db.speakingNickname(auth.agentId) })
+        : this.json(400, { error: res.code, message: res.message });
+    }
+    if (method === "GET" && path === "/v1/messages") {
+      if (!auth.scope.read) return this.forbiddenScope("read");
+      const sinceRaw = url.searchParams.get("since");
+      const since = sinceRaw && Number.isFinite(Number(sinceRaw)) ? Number(sinceRaw) : 0;
+      return this.json(200, { messages: this.connMessages(auth, since), now: Date.now() });
+    }
+    if (method === "POST" && path === "/v1/files") {
+      if (!auth.scope.files) return this.forbiddenScope("files");
+      return await this.v1UploadFile(request, url, auth);
+    }
+    const fileGet = path.match(/^\/v1\/files\/([^/]+)$/);
+    if (method === "GET" && fileGet) {
+      if (!auth.scope.files) return this.forbiddenScope("files");
+      return await this.v1DownloadFile(decodeURIComponent(fileGet[1]!), auth);
+    }
+    return this.json(404, { error: "unknown /v1 route" });
+  }
+
+  private async v1UploadFile(request: Request, url: URL, auth: ConnAuth): Promise<Response> {
+    const declared = Number(request.headers.get("content-length") ?? 0);
+    if (declared > this.files.maxFileBytes) return this.json(413, { error: `file exceeds the ${this.files.maxFileBytes}-byte limit` });
+    const bytes = await request.arrayBuffer();
+    if (bytes.byteLength > this.files.maxFileBytes) return this.json(413, { error: `file exceeds the ${this.files.maxFileBytes}-byte limit` });
+    const q = url.searchParams;
+    const name = (q.get("name") ? decodeURIComponent(q.get("name")!) : "file") || "file";
+    const mime = q.get("mime") ?? "application/octet-stream";
+    const to = q.get("to");
+    const result = await this.files.put(bytes, { name, mime, owner: auth.agentId, to, account_id: auth.accountId }, Date.now());
+    if (!result.ok) return this.json(400, { error: result.error });
+    return this.json(200, { file_id: result.file.file_id, name, mime, size: result.file.size });
+  }
+
+  private async v1DownloadFile(fileId: string, auth: ConnAuth): Promise<Response> {
+    const entry = await this.files.get(fileId, Date.now());
+    if (!entry) return this.json(404, { error: "file not found or expired" });
+    if (!this.fileAccessible(entry.meta, auth.accountId)) return this.json(403, { error: "forbidden" });
+    return new Response(entry.body, {
+      status: 200,
+      headers: {
+        "content-type": entry.meta.mime || "application/octet-stream",
+        "content-length": String(entry.meta.size),
+        "x-hauddy-filename": encodeURIComponent(entry.meta.name),
+        "access-control-allow-origin": this.env.CORS_ORIGIN ?? "*",
+      },
+    });
+  }
+
+  // ── remote MCP endpoint (/mcp) — Streamable HTTP, stateless JSON-RPC ────
+  private async mcp(request: Request): Promise<Response> {
+    if (request.method !== "POST") return this.json(405, { error: "POST a JSON-RPC message to /mcp" });
+    const auth = this.resolveAuth(request);
+    if (!auth) {
+      // Point unauthenticated clients at our OAuth protected-resource metadata so
+      // MCP hosts (claude.ai, ChatGPT) can discover the authorization server.
+      const origin = new URL(request.url).origin;
+      return new Response(JSON.stringify({ jsonrpc: "2.0", id: null, error: { code: -32001, message: "unauthorized" } }), {
+        status: 401,
+        headers: {
+          "content-type": "application/json",
+          "www-authenticate": `Bearer resource_metadata="${origin}/.well-known/oauth-protected-resource"`,
+          "access-control-allow-origin": "*",
+        },
+      });
+    }
+    const body = await this.readBody(request);
+    const rpcMethod = typeof body.method === "string" ? body.method : "";
+    const id = "id" in body ? (body.id as string | number | null) : null;
+    const params = (body.params ?? {}) as Record<string, unknown>;
+    // JSON-RPC notifications (e.g. notifications/initialized) get no response body.
+    if (rpcMethod.startsWith("notifications/")) {
+      return new Response(null, { status: 202, headers: { "access-control-allow-origin": this.env.CORS_ORIGIN ?? "*" } });
+    }
+    // Streamable HTTP: when the client accepts text/event-stream (ChatGPT and
+    // claude.ai both send `Accept: application/json, text/event-stream`), reply
+    // with the JSON-RPC response as a single SSE event. ChatGPT's client reads
+    // tool-call replies as a stream and errors ("Error in message stream") on a
+    // plain application/json body — then tears down + re-runs OAuth, minting a
+    // fresh @handle each retry. SSE-framing the same payload fixes it; curl/tests
+    // (no such Accept) still get application/json. Spec allows either.
+    const wantsSSE = (request.headers.get("accept") ?? "").includes("text/event-stream");
+    let res: Response;
+    switch (rpcMethod) {
+      case "initialize":
+        res = this.mcpResult(id, {
+          protocolVersion: typeof params.protocolVersion === "string" ? params.protocolVersion : MCP_PROTOCOL_VERSION,
+          capabilities: { tools: {} },
+          serverInfo: { name: "hauddy", version: "0.1.0" },
+          instructions:
+            "Hauddy lets you message the user's AI agents. You are signed in as a fixed @handle (call whoami to see it). Use send_sms to reach an agent, check_messages to read replies.",
+        });
+        break;
+      case "ping":
+        res = this.mcpResult(id, {});
+        break;
+      case "tools/list":
+        res = this.mcpResult(id, { tools: this.mcpTools(auth.scope) });
+        break;
+      case "tools/call":
+        res = await this.mcpCall(id, auth, params);
+        break;
+      default:
+        res = this.mcpError(id, -32601, `method not found: ${rpcMethod}`);
+    }
+    return wantsSSE ? await this.asSSE(res) : res;
+  }
+
+  /** Re-frame an application/json JSON-RPC Response as a one-shot SSE stream: one
+   *  `event: message` carrying the same payload, then the stream closes (a
+   *  finite body ends the connection). Mirrors the MCP SDK's Streamable HTTP
+   *  server framing so hosts that read POST replies as a stream (ChatGPT) work. */
+  private async asSSE(res: Response): Promise<Response> {
+    const text = await res.text();
+    return new Response(`event: message\ndata: ${text}\n\n`, {
+      status: res.status,
+      headers: {
+        "content-type": "text/event-stream; charset=utf-8",
+        "cache-control": "no-cache, no-transform",
+        "access-control-allow-origin": this.env.CORS_ORIGIN ?? "*",
+      },
+    });
+  }
+
+  private mcpTools(scope: ConnAuth["scope"]): Array<Record<string, unknown>> {
+    const tools: Array<Record<string, unknown>> = [
+      { name: "whoami", description: "Show your fixed Hauddy identity (@handle) and the handles available in this account. Call this first.", inputSchema: { type: "object", properties: {} } },
+      { name: "list_contacts", description: "List the agents you can message, with presence.", inputSchema: { type: "object", properties: {} } },
+    ];
+    if (scope.send)
+      tools.push({
+        name: "send_sms",
+        description: "Send an async message to an agent by @handle (or agent id). You always send as your own fixed @handle, so the recipient can reply to you.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            to: { type: "string", description: "recipient @handle or agent id" },
+            body: { type: "string", description: "message text" },
+            attachments: { type: "array", items: { type: "object" }, description: "optional file refs returned by share_file" },
+          },
+          required: ["to", "body"],
+        },
+      });
+    if (scope.read)
+      tools.push({
+        name: "check_messages",
+        description: "Return recent messages involving your @handle (replies others sent you, plus your own). Pass `since` (the `now` value from a prior call) to get only newer ones. Non-destructive.",
+        inputSchema: { type: "object", properties: { since: { type: "number", description: "epoch ms; only messages after this" } } },
+      });
+    if (scope.files) {
+      tools.push({
+        name: "share_file",
+        description: "Upload a small file (≤1MB, base64-encoded) and optionally send it to an agent. Returns a file reference usable in send_sms `attachments`.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            name: { type: "string" },
+            mime: { type: "string" },
+            content_base64: { type: "string", description: "the file bytes, base64-encoded (≤1MB)" },
+            to: { type: "string", description: "optional @handle to send it to immediately" },
+            body: { type: "string", description: "optional message text when `to` is set" },
+          },
+          required: ["name", "content_base64"],
+        },
+      });
+      tools.push({
+        name: "read_file",
+        description:
+          "Download the content of a file that was sent to you. Pass the `file_id` from a check_messages attachment. Text files (markdown, json, plain text…) come back in `content`; anything else in `content_base64`. Files ≤1MB only — larger ones must be fetched via GET /v1/files/:id.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            file_id: { type: "string", description: "the file_id from a check_messages attachment ref" },
+          },
+          required: ["file_id"],
+        },
+      });
+    }
+    return tools;
+  }
+
+  private async mcpCall(id: string | number | null, auth: ConnAuth, params: Record<string, unknown>): Promise<Response> {
+    const name = typeof params.name === "string" ? params.name : "";
+    const args = (params.arguments ?? {}) as Record<string, unknown>;
+    try {
+      switch (name) {
+        case "whoami":
+          return this.mcpToolOk(id, this.connIdentity(auth));
+        case "list_contacts":
+          return this.mcpToolOk(id, { contacts: this.connContacts(auth) });
+        case "send_sms": {
+          if (!auth.scope.send) return this.mcpToolErr(id, "this token lacks the 'send' scope");
+          const to = typeof args.to === "string" ? args.to : "";
+          const text = typeof args.body === "string" ? args.body : "";
+          if (!to || !text) return this.mcpToolErr(id, "'to' and 'body' are required");
+          const res = this.connSend(auth, to, text, Array.isArray(args.attachments) ? args.attachments : undefined);
+          return res.ok ? this.mcpToolOk(id, { status: res.status, from: this.db.speakingNickname(auth.agentId) }) : this.mcpToolErr(id, res.message);
+        }
+        case "check_messages": {
+          if (!auth.scope.read) return this.mcpToolErr(id, "this token lacks the 'read' scope");
+          const since = Number(args.since);
+          return this.mcpToolOk(id, { messages: this.connMessages(auth, Number.isFinite(since) ? since : 0), now: Date.now() });
+        }
+        case "share_file": {
+          if (!auth.scope.files) return this.mcpToolErr(id, "this token lacks the 'files' scope");
+          const fname = typeof args.name === "string" ? args.name : "file";
+          const mime = typeof args.mime === "string" ? args.mime : "application/octet-stream";
+          let bytes: Uint8Array;
+          try {
+            bytes = base64ToBytes(typeof args.content_base64 === "string" ? args.content_base64 : "");
+          } catch {
+            return this.mcpToolErr(id, "content_base64 is not valid base64");
+          }
+          if (bytes.byteLength === 0) return this.mcpToolErr(id, "empty file");
+          if (bytes.byteLength > MCP_FILE_CAP)
+            return this.mcpToolErr(id, `file exceeds the ${MCP_FILE_CAP}-byte (1MB) inline limit — use POST /v1/files for larger files`);
+          const to = typeof args.to === "string" ? args.to : null;
+          const put = await this.files.put(bytes.buffer as ArrayBuffer, { name: fname, mime, owner: auth.agentId, to, account_id: auth.accountId }, Date.now());
+          if (!put.ok) return this.mcpToolErr(id, put.error);
+          const ref = { file_id: put.file.file_id, name: fname, mime, size: put.file.size };
+          if (to) {
+            const res = this.connSend(auth, to, typeof args.body === "string" ? args.body : "", [ref]);
+            if (!res.ok) return this.mcpToolErr(id, res.message);
+            return this.mcpToolOk(id, { status: res.status, sent_to: to, file: ref });
+          }
+          return this.mcpToolOk(id, { file: ref, note: "pass this in send_sms `attachments` to deliver it" });
+        }
+        case "read_file": {
+          if (!auth.scope.files) return this.mcpToolErr(id, "this token lacks the 'files' scope");
+          const fileId = typeof args.file_id === "string" ? args.file_id : "";
+          if (!fileId) return this.mcpToolErr(id, "'file_id' is required (from a check_messages attachment)");
+          const entry = await this.files.get(fileId, Date.now());
+          if (!entry) return this.mcpToolErr(id, "file not found or expired");
+          if (!this.fileAccessible(entry.meta, auth.accountId)) return this.mcpToolErr(id, "you don't have access to that file");
+          if (entry.meta.size > MCP_FILE_CAP)
+            return this.mcpToolErr(id, `file is ${entry.meta.size} bytes — over the ${MCP_FILE_CAP}-byte (1MB) inline limit; download it via GET /v1/files/${fileId}`);
+          const buf = new Uint8Array(await new Response(entry.body).arrayBuffer());
+          const mime = entry.meta.mime || "application/octet-stream";
+          const meta = { file_id: fileId, name: entry.meta.name, mime, size: entry.meta.size };
+          return this.mcpToolOk(
+            id,
+            isTextMime(mime) ? { ...meta, content: new TextDecoder().decode(buf) } : { ...meta, content_base64: bytesToBase64(buf) },
+          );
+        }
+        default:
+          return this.mcpError(id, -32602, `unknown tool: ${name}`);
+      }
+    } catch (e) {
+      return this.mcpToolErr(id, e instanceof Error ? e.message : String(e));
+    }
+  }
+
+  private mcpResult(id: string | number | null, result: unknown): Response {
+    return this.json(200, { jsonrpc: "2.0", id: id ?? null, result });
+  }
+  private mcpError(id: string | number | null, code: number, message: string): Response {
+    return this.json(200, { jsonrpc: "2.0", id: id ?? null, error: { code, message } });
+  }
+  private mcpToolOk(id: string | number | null, obj: unknown): Response {
+    return this.mcpResult(id, { content: [{ type: "text", text: JSON.stringify(obj) }] });
+  }
+  private mcpToolErr(id: string | number | null, message: string): Response {
+    return this.mcpResult(id, { content: [{ type: "text", text: message }], isError: true });
+  }
+
+  // ── OAuth 2.1 authorization server (fronts /mcp for consumer connectors) ──
+  /** Public JSON (CORS `*`) for the unauthenticated OAuth discovery/token endpoints. */
+  private publicJson(status: number, body: unknown): Response {
+    return new Response(JSON.stringify(body), {
+      status,
+      headers: { "content-type": "application/json", "access-control-allow-origin": "*", "cache-control": "no-store" },
+    });
+  }
+  private html(status: number, body: string): Response {
+    return new Response(body, { status, headers: { "content-type": "text/html; charset=utf-8" } });
+  }
+
+  /** RFC 7591 Dynamic Client Registration — a public (PKCE) client, no secret. */
+  private async oauthRegister(request: Request): Promise<Response> {
+    const body = await this.readBody(request);
+    const redirect_uris = Array.isArray(body.redirect_uris) ? body.redirect_uris.filter((u): u is string => typeof u === "string") : [];
+    if (redirect_uris.length === 0) return this.publicJson(400, { error: "invalid_client_metadata", error_description: "redirect_uris is required" });
+    const client_name = typeof body.client_name === "string" ? body.client_name : undefined;
+    const client_id = this.db.createOAuthClient({ client_name, redirect_uris });
+    return this.publicJson(201, {
+      client_id,
+      client_name: client_name ?? null,
+      redirect_uris,
+      token_endpoint_auth_method: "none",
+      grant_types: ["authorization_code"],
+      response_types: ["code"],
+    });
+  }
+
+  private readAuthParams(getv: (k: string) => string | null): ConsentParams {
+    return {
+      client_id: getv("client_id") ?? "",
+      redirect_uri: getv("redirect_uri") ?? "",
+      state: getv("state") ?? "",
+      code_challenge: getv("code_challenge") ?? "",
+      code_challenge_method: getv("code_challenge_method") ?? "",
+      response_type: getv("response_type") ?? "",
+      resource: getv("resource") ?? "",
+      scope: getv("scope") ?? "",
+    };
+  }
+
+  /** Validate the client + redirect_uri + PKCE before we ever show the form or
+   *  issue a code. Returns an error string (→ error page) or null if OK. */
+  private validateAuthParams(p: ConsentParams): string | null {
+    if (p.response_type !== "code") return "Unsupported response_type (only 'code' is supported).";
+    if (!p.client_id) return "Missing client_id.";
+    const client = this.db.getOAuthClient(p.client_id);
+    if (!client) return "Unknown client_id — this app isn't registered.";
+    if (!p.redirect_uri || !client.redirect_uris.includes(p.redirect_uri)) return "redirect_uri doesn't match the registered client.";
+    if (!p.code_challenge || p.code_challenge_method !== "S256") return "PKCE is required (code_challenge_method=S256).";
+    return null;
+  }
+
+  /** GET → the sign-in + consent page; POST → verify login, mint the connector
+   *  identity, issue a one-time authorization code, and redirect back. */
+  private async oauthAuthorize(request: Request, url: URL): Promise<Response> {
+    if (request.method === "GET") {
+      const q = url.searchParams;
+      const params = this.readAuthParams((k) => q.get(k));
+      const err = this.validateAuthParams(params);
+      if (err) return this.html(400, errorPageHtml(err));
+      const client = this.db.getOAuthClient(params.client_id)!;
+      return this.html(200, consentPageHtml({ clientName: client.client_name || "an application", params, handleDefault: defaultHandle(client.client_name) }));
+    }
+    if (request.method === "POST") {
+      if (this.rateLimited(request, "login", 10, 15 * 60 * 1000)) return this.html(429, errorPageHtml("Too many attempts — try again in a few minutes."));
+      const form = parseForm(await request.text());
+      const params = this.readAuthParams((k) => form[k] ?? null);
+      const err = this.validateAuthParams(params);
+      if (err) return this.html(400, errorPageHtml(err));
+      const client = this.db.getOAuthClient(params.client_id)!;
+      const clientName = client.client_name || "an application";
+      const rerender = (msg: string) =>
+        this.html(200, consentPageHtml({ clientName, params, error: msg, handleDefault: (form.handle ?? "").trim() || defaultHandle(client.client_name), login: form.login ?? "" }));
+      const accountId = form.login && form.password ? await this.db.verifyLogin(form.login.trim(), form.password) : null;
+      if (!accountId) return rerender("Wrong username/email or password.");
+      const scope = OAUTH_SCOPES.filter((s) => form[`scope_${s}`] === "on");
+      if (scope.length === 0) return rerender("Pick at least one capability to allow.");
+      const handle = (form.handle ?? "").trim();
+      if (!handle) return rerender("Choose a handle for this connector.");
+      // reclaim: re-onboarding a client (it can't revoke server-side on disconnect)
+      // takes back its own stale @handle instead of being blocked as "taken".
+      const conn = this.db.createConnector(accountId, { label: clientName, scope: [...scope], handle, reclaim: true });
+      if (!conn.ok) return rerender(conn.reason === "invalid" ? "That handle isn't valid (2–24 chars: a–z 0–9 _ -)." : "That handle is already taken — pick another.");
+      const code = `oac_${randomHex(24)}`;
+      await this.ctx.storage.put(`oauthcode:${code}`, {
+        client_id: params.client_id,
+        redirect_uri: params.redirect_uri,
+        code_challenge: params.code_challenge,
+        token: conn.token,
+        scope: scope.join(","),
+        expires_ms: Date.now() + 10 * 60 * 1000,
+      });
+      const sep = params.redirect_uri.includes("?") ? "&" : "?";
+      const loc = `${params.redirect_uri}${sep}code=${encodeURIComponent(code)}${params.state ? `&state=${encodeURIComponent(params.state)}` : ""}`;
+      return new Response(null, { status: 302, headers: { location: loc } });
+    }
+    return this.json(405, { error: "method not allowed" });
+  }
+
+  /** Exchange a one-time code (+ PKCE verifier) for the access token — which is
+   *  the connector token minted at consent. Single-use, 10-minute TTL. */
+  private async oauthToken(request: Request): Promise<Response> {
+    const authz = request.headers.get("authorization") ?? "";
+    const form = parseForm(await request.text());
+    // Headless connectors: client_id + client_secret → the connector's bearer
+    // token. Creds come via HTTP Basic (client_secret_basic) or the body
+    // (client_secret_post); Basic wins when both are present (RFC 6749 §2.3.1).
+    if (form.grant_type === "client_credentials") {
+      let clientId = form.client_id ?? "";
+      let clientSecret = form.client_secret ?? "";
+      if (authz.startsWith("Basic ")) {
+        try {
+          const decoded = atob(authz.slice(6).trim());
+          const i = decoded.indexOf(":");
+          if (i >= 0) {
+            clientId = decoded.slice(0, i);
+            clientSecret = decoded.slice(i + 1);
+          }
+        } catch {
+          /* malformed header — fall back to any body creds */
+        }
+      }
+      if (!clientId || !clientSecret) return this.oauthTokenError("invalid_client", "client_id and client_secret are required");
+      const grant = this.db.authenticateClientCredentials(clientId, clientSecret);
+      if (!grant) return this.oauthTokenError("invalid_client", "unknown client, wrong secret, or the connector was revoked");
+      return this.publicJson(200, { access_token: grant.token, token_type: "Bearer", scope: grant.scope, expires_in: 31536000 });
+    }
+    if (form.grant_type !== "authorization_code") return this.oauthTokenError("unsupported_grant_type");
+    const code = form.code ?? "";
+    const key = `oauthcode:${code}`;
+    const rec = await this.ctx.storage.get<{ client_id: string; redirect_uri: string; code_challenge: string; token: string; scope: string; expires_ms: number }>(key);
+    if (!rec) return this.oauthTokenError("invalid_grant", "unknown or already-used code");
+    await this.ctx.storage.delete(key); // single-use
+    if (Date.now() > rec.expires_ms) return this.oauthTokenError("invalid_grant", "code expired");
+    if (form.client_id && form.client_id !== rec.client_id) return this.oauthTokenError("invalid_grant", "client_id mismatch");
+    if ((form.redirect_uri ?? "") !== rec.redirect_uri) return this.oauthTokenError("invalid_grant", "redirect_uri mismatch");
+    const verifier = form.code_verifier ?? "";
+    if (!verifier || (await pkceS256(verifier)) !== rec.code_challenge) return this.oauthTokenError("invalid_grant", "PKCE verification failed");
+    return this.publicJson(200, { access_token: rec.token, token_type: "Bearer", scope: rec.scope, expires_in: 31536000 });
+  }
+  private oauthTokenError(error: string, description?: string): Response {
+    return this.publicJson(400, { error, ...(description ? { error_description: description } : {}) });
+  }
+
   // ── human console (virtual HTTP client, spec §"human messaging") ───────
   private mkEnvelope(from: string, to: string, payload: Record<string, unknown>): Envelope {
     return { v: PROTOCOL_VERSION, id: mintMessageId(), type: "sms", from, to, ts: nowIso(), payload, sig: null };
+  }
+
+  /** The account's human identity, ensured to exist with the username as its
+   *  initial @handle (username == handle). The nick is only bound on first
+   *  creation; renames go through /accounts/profile. Falls back to the email
+   *  prefix for any legacy account whose username can't form a handle. */
+  private humanFor(accountId: string) {
+    const acct = this.db.getAccount(accountId);
+    const nick =
+      slugifyNickname(acct?.username ?? "") ?? slugifyNickname(acct?.email.split("@")[0] ?? "") ?? undefined;
+    return this.db.ensureHumanAgent(accountId, nick);
   }
 
   /** Resolve (+ mark attached) the account's human identity. Platform-only: Bearer. */
   private consoleHuman(request: Request): { agent_id: string } | null {
     const accountId = this.requireAccount(request);
     if (!accountId) return null;
-    const email = this.db.getAccount(accountId)?.email ?? "";
-    const nick = slugifyNickname(email.split("@")[0] ?? "") ?? undefined;
-    const human = this.db.ensureHumanAgent(accountId, nick);
+    const human = this.humanFor(accountId);
     this.db.consoleTouch(human.agent_id, Date.now());
     return human;
   }
@@ -698,7 +1515,11 @@ export class HubDO {
   }
 
   // ── views / consent ────────────────────────────────────────────────────
-  private agentView(agentId: string) {
+  /** `owningAccountId` (the caller's own account, when this is one of THEIR agents)
+   *  unlocks owner-only fields — currently the connector's masked token + scope +
+   *  paired OAuth client_id for the Agent page's access section. Omitted for
+   *  friend/public views so we never leak a peer's credentials. */
+  private agentView(agentId: string, owningAccountId?: string) {
     const agent = this.db.getAgent(agentId)!;
     const speaking = this.db.speakingNickname(agentId);
     return {
@@ -713,15 +1534,24 @@ export class HubDO {
       nicknames: this.db.nicknamesOf(agentId).map(formatNickname),
       speaking_as: speaking,
       kind: agent.kind ?? "agent",
+      open_link: !!agent.open_link, // per-agent external auto-accept
+      listed: !!agent.listed, // discoverable by other accounts (connectors default off)
+      external_links: agent.open_link ? this.db.agentGranteesFor(agentId).length : 0,
       attached: this.liveSockets(agentId).length > 0 || this.consoleAttached(agentId, agent.kind),
       can_receive_calls: this.callReadyOf(agentId) || this.consoleAttached(agentId, agent.kind),
+      // Owner-only: the connector bearer/OAuth creds behind a kind='connector' agent.
+      connector:
+        owningAccountId && agent.kind === "connector"
+          ? this.db.connectorForAgent(owningAccountId, agentId)
+          : undefined,
     };
   }
 
-  /** A console-attached human (recent HTTP activity) counts as one attached,
-   *  call-capable instance even though it has no WS socket. */
+  /** A console-attached human OR connector (recent HTTP activity) counts as one
+   *  attached instance even though it has no WS socket — so peers see it online
+   *  and can message it. */
   private consoleAttached(agentId: string, kind: string | undefined): boolean {
-    return kind === "human" && this.db.consoleActive(agentId, Date.now(), CONSOLE_TTL_MS);
+    return (kind === "human" || kind === "connector") && this.db.consoleActive(agentId, Date.now(), CONSOLE_TTL_MS);
   }
 
   private presenceOf(agentId: string): Presence {
@@ -739,27 +1569,65 @@ export class HubDO {
     };
   }
 
-  /** Contacts of a platform agent: its own account's agents + friends' agents
-   *  (allow-all) + legacy agent-pair links. (No autoLink/remotes on the platform.) */
+  /** Contacts of a platform agent. A non-empty curated book IS the list (resolved
+   *  handles), mirroring the local hub — the mechanism connectors use. Otherwise
+   *  the derived set below. Visibility only; `areLinked` still gates sends. */
   private contactsOf(agentId: string): string[] {
+    const book = this.db.agentBook(agentId);
+    if (book.length) {
+      const ids: string[] = [];
+      for (const h of book) {
+        const id = this.db.resolveAgentId(h);
+        if (id && id !== agentId && !ids.includes(id)) ids.push(id);
+      }
+      return ids;
+    }
+    return this.derivedContactsOf(agentId);
+  }
+
+  /** The default contact set when an agent has no curated book: its own account's
+   *  agents + friends' listed agents (allow-all) + open-link grants + legacy pairs. */
+  private derivedContactsOf(agentId: string): string[] {
     const acc = this.db.getAgent(agentId)?.account_id ?? null;
     if (!acc) return this.db.linkedContacts(agentId);
     const accounts = new Set([acc, ...this.db.friendAccountsOf(acc)]);
     const local = this.db
       .listAllAgents()
-      .filter((a) => a.agent_id !== agentId && a.account_id != null && accounts.has(a.account_id))
+      // Same-account agents are always visible to each other; another account's
+      // agents only if they're `listed` (owner-only connectors stay hidden).
+      .filter(
+        (a) =>
+          a.agent_id !== agentId &&
+          a.account_id != null &&
+          accounts.has(a.account_id) &&
+          (a.account_id === acc || !!a.listed),
+      )
       .map((a) => a.agent_id);
+    // Per-agent open-link grants (agent-scoped, both directions):
+    // (a) agents THIS account has been granted access to.
+    for (const id of this.db.accountAgentGrants(acc)) if (id !== agentId && !local.includes(id)) local.push(id);
+    // (b) if THIS agent is open-granted, include its grantees' agents so it can
+    //     see/reply to whoever linked to it.
+    for (const granteeAcc of this.db.agentGranteesFor(agentId)) {
+      for (const a of this.db.accountAgents(granteeAcc)) {
+        if (a.agent_id !== agentId && !local.includes(a.agent_id)) local.push(a.agent_id);
+      }
+    }
     for (const id of this.db.linkedContacts(agentId)) if (!local.includes(id)) local.push(id);
     return local;
   }
 
-  /** May `a` message `b`? Same account, linked accounts (friendship), or a legacy
-   *  agent-pair link (back-compat). */
+  /** May `a` message `b`? Same account, linked accounts (friendship), a per-agent
+   *  open-link grant (agent-scoped), or a legacy agent-pair link (back-compat). */
   private areLinked(a: string, b: string): boolean {
     if (a === b) return true;
     const accA = this.db.getAgent(a)?.account_id ?? null;
     const accB = this.db.getAgent(b)?.account_id ?? null;
     if (accA && accB && (accA === accB || this.db.areAccountsLinked(accA, accB))) return true;
+    // Per-agent open link: a grant to agent `b` from a's account lets a↔b (and the
+    // reverse, so the open agent can reply) — but ONLY that agent, not the account.
+    if (accA && this.db.agentGrantExists(b, accA)) return true;
+    if (accB && this.db.agentGrantExists(a, accB)) return true;
     return this.db.getContact(a, b).state === "linked";
   }
 

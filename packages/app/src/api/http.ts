@@ -13,6 +13,10 @@ import type {
   FriendsView,
   HumanIdentity,
   LinkResult,
+  NetworkAgent,
+  NetworkBookContact,
+  NicknameOutcome,
+  Notifications,
   PlatformActionResult,
   PlatformInfo,
   PoolContact,
@@ -123,6 +127,11 @@ export const httpApi = {
   /** A direct URL to download a received attachment (served by the daemon). */
   humanFileUrl: (fileId: string): string => `${BASE}/api/human/file/${encodeURIComponent(fileId)}`,
   humanInbox: () => get<{ messages: ConsoleMessage[] }>('/api/human/inbox'),
+  // ---- notifications (badge counts + ack) ----
+  notifications: () => get<Notifications>('/api/human/notifications'),
+  async notificationsSeen(): Promise<{ ok?: boolean }> {
+    return post('/api/human/notifications/seen');
+  },
   async humanCall(to: string): Promise<{ status?: string; call_id?: string; error?: string }> {
     return post('/api/human/call', { to });
   },
@@ -203,6 +212,56 @@ export const httpApi = {
     return result;
   },
   listExposure: () => get<ExposureRow[]>('/api/platform/exposure'),
+  /** The account's platform-only agents (connectors + agents exposed elsewhere);
+   *  empty when not connected. */
+  listNetworkAgents: () => get<NetworkAgent[]>('/api/platform/agents'),
+  /** Remove a platform-only agent from the network (retires a connector fully). */
+  async removeNetworkAgent(agentId: string): Promise<{ ok: boolean; error?: string }> {
+    const result = await post<{ ok: boolean; error?: string }>(
+      `/api/platform/agents/${encodeURIComponent(agentId)}/remove`,
+    );
+    bump();
+    return result;
+  },
+  /** One network agent's detail (handle, bio, visibility) — null if gone/offline. */
+  getNetworkAgent: (agentId: string) =>
+    get<NetworkAgent | null>(`/api/platform/agents/${encodeURIComponent(agentId)}`),
+  async setNetworkAgentNickname(agentId: string, nickname: string): Promise<NicknameOutcome> {
+    const r = await post<NicknameOutcome>(`/api/platform/agents/${encodeURIComponent(agentId)}/nickname`, { nickname });
+    bump();
+    return r;
+  },
+  async setNetworkAgentSettings(
+    agentId: string,
+    patch: { bio?: string; listed?: boolean },
+  ): Promise<{ ok: boolean; error?: string }> {
+    const r = await post<{ ok: boolean; error?: string }>(
+      `/api/platform/agents/${encodeURIComponent(agentId)}/settings`,
+      patch,
+    );
+    bump();
+    return r;
+  },
+  networkAgentBook: (agentId: string) =>
+    get<{ book: NetworkBookContact[]; bookable: NetworkBookContact[] }>(
+      `/api/platform/agents/${encodeURIComponent(agentId)}/book`,
+    ),
+  async addNetworkAgentContact(agentId: string, handle: string): Promise<{ ok: boolean; error?: string }> {
+    const r = await post<{ ok: boolean; error?: string }>(
+      `/api/platform/agents/${encodeURIComponent(agentId)}/book`,
+      { handle },
+    );
+    bump();
+    return r;
+  },
+  async removeNetworkAgentContact(agentId: string, handle: string): Promise<{ ok: boolean }> {
+    const r = await post<{ ok: boolean }>(
+      `/api/platform/agents/${encodeURIComponent(agentId)}/book/remove`,
+      { handle },
+    );
+    bump();
+    return r;
+  },
   async expose(localId: string): Promise<PlatformActionResult> {
     const result = await post<PlatformActionResult>('/api/platform/expose', { localId });
     bump();

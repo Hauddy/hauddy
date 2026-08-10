@@ -4,6 +4,8 @@ export interface Env {
   HUB: DurableObjectNamespace;
   /** R2 bucket holding attachment bytes at files/<file_id>. */
   FILES: R2Bucket;
+  /** R2 bucket holding app release artifacts (e.g. downloads/mac-arm64-latest.dmg). */
+  RELEASES: R2Bucket;
   /** Allowed browser origin for CORS (e.g. https://app.hauddy.com). */
   CORS_ORIGIN: string;
   /** Bearer token gating the /admin/invites endpoint (wrangler secret). */

@@ -20,7 +20,19 @@ export interface Agent {
   nickname: string; // '@nabu' (may be '' if unnamed)
   description: string;
   online: boolean;
-  kind?: string; // 'human' (the account's console identity) or 'agent'
+  kind?: string; // 'human' (the account's console identity), 'agent', or 'connector'
+  openLink?: boolean; // per-agent external auto-accept is on
+  listed?: boolean; // discoverable by other accounts (connectors default off)
+  externalLinks?: number; // # of external accounts granted access (when openLink)
+  grantScopeId?: string; // the grant/runtime scope that authorized this agent
+  localId?: string | null; // the local-hub runtime id it was exposed from (if any)
+  // Owner-only: present on connector agents — the scoped bearer/OAuth creds behind it.
+  connector?: {
+    masked: string; // masked bearer token (ct_live_••••abcd)
+    scope: string; // csv of send/read/files
+    clientId: string | null; // paired OAuth client_id (client_credentials), if any
+    lastUsedMs: number | null;
+  } | null;
 }
 
 /** A global nickname, derived from an account agent that holds it. */
@@ -38,6 +50,14 @@ export interface Contact {
   nickname: string;
   description: string;
   presence: Presence;
+}
+
+/** One entry in an agent's curated contact book (or a candidate to add). */
+export interface BookContact {
+  agent_id: string;
+  handle: string | null;
+  description: string | null;
+  online: boolean;
 }
 
 /** An incoming contact request awaiting one of your agents' response. */

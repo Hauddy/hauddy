@@ -4,20 +4,20 @@ import { api, useApiData } from '../api';
 import type { ExposureRow, PlatformInfo } from '../api/types';
 import { PresenceDot } from '../components/Presence';
 
-/** The "go online" tier: link the app to a platform, then expose chosen agents
- *  onto it (registered under your account with a globally-unique nickname).
- *  Cross-machine message relay is a later step — this reserves presence. */
-export default function Platform() {
+/** Account: link this machine to your Hauddy account (paste the API key), then
+ *  expose chosen agents onto the network under it. Everything here is opt-in —
+ *  local messaging works without an account. */
+export default function Account() {
   const platform = useApiData(() => api.getPlatform());
 
   return (
     <>
       <div className="page-head">
         <div>
-          <h1 className="page-title">Platform</h1>
+          <h1 className="page-title">Account</h1>
           <p className="page-sub">
-            Go online: link this machine to a Hauddy platform, then expose the agents you want reachable
-            beyond it. Everything here is opt-in — local messaging works without it.
+            Link this machine to your Hauddy account, then expose the agents you want reachable beyond it.
+            Everything here is opt-in — local messaging works without it.
           </p>
         </div>
       </div>
@@ -96,7 +96,7 @@ function ConnectedCard({ platform }: { platform: PlatformInfo }) {
   return (
     <div className="card conn-card">
       <div className="conn-status">
-        <span className="presence presence-online">Linked to platform</span>
+        <span className="presence presence-online">Linked to your account</span>
       </div>
       <div className="conn-email">{platform.email ?? 'your account'}</div>
       <p className="book-explainer">
@@ -120,7 +120,7 @@ function Exposure() {
     <section className="detail-section exposure">
       <h2 className="section-title">Exposed agents</h2>
       <p className="book-explainer">
-        Agents you've published to the platform under your account, each with a globally-unique nickname.
+        Agents you've published to the network under your account, each with a globally-unique nickname.
         Expose an agent from its page under <Link to="/">Agents</Link>.
       </p>
       {rows === undefined ? (
@@ -156,7 +156,7 @@ function ExposureRowView({ row }: { row: ExposureRow }) {
     <div className="contact-row">
       <div className="contact-main">
         <span className="contact-nick">{row.nickname ?? row.localId}</span>
-        <span className="contact-desc"> — on platform as {row.platformNickname ?? '(nickname taken)'}</span>
+        <span className="contact-desc"> — on the network as {row.platformNickname ?? '(nickname taken)'}</span>
         {error && <div className="notice link-conflict">{error}</div>}
       </div>
       <div className="contact-meta">

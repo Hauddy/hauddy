@@ -8,6 +8,7 @@
 export {
   api,
   configureApi,
+  friendHuman,
   useApiData,
   useAuthed,
   normalizeNickname,
@@ -52,9 +53,11 @@ export type { ComboItem } from './components/Combobox';
 export { PlatformPathsProvider, usePlatformPaths, makePlatformPaths } from './paths';
 export type { PlatformPaths } from './paths';
 
-export { default as Home } from './screens/Home';
-export { default as Nicknames } from './screens/Nicknames';
+export { default as Agents } from './screens/Agents';
+export { default as AgentPage } from './screens/AgentPage';
 export { default as Contacts } from './screens/Contacts';
+export { default as FriendProfile } from './screens/FriendProfile';
 export { default as Messages } from './screens/Messages';
 export { default as Account } from './screens/Account';
 export type { AccountProps } from './screens/Account';
+export { default as Settings } from './screens/Settings';

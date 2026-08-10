@@ -80,6 +80,10 @@ test("human → agent SMS delivers; the agent's reply lands in the console inbox
   const got = await waitFor(() => delivers.find((e) => e.payload.body === "hello bot"));
   assert.ok(got, "agent received the human's message");
   assert.equal(got.to, bot.agentId);
+  // The owner tag: a human→own-agent message is marked so the agent perceives its
+  // owner, not a bare handle. No bio set ⇒ the default "your human owner".
+  assert.equal(got.payload.from_kind, "human", "message tagged as from the human owner");
+  assert.equal(got.payload.from_description, "your human owner", "defaults to the owner label with no bio");
 
   // Agent replies to @me (the human handle derived from the account email).
   agentSend("@me", { body: "hi, I'm the bot" });
@@ -87,7 +91,10 @@ test("human → agent SMS delivers; the agent's reply lands in the console inbox
     const r = await getC("/console/inbox");
     return r.messages.length ? r : null;
   });
-  assert.ok(inbox.messages.some((m) => m.payload.body === "hi, I'm the bot"), "reply reached the console inbox");
+  const reply = inbox.messages.find((m) => m.payload.body === "hi, I'm the bot");
+  assert.ok(reply, "reply reached the console inbox");
+  // Agent→human is NOT owner-tagged (only human→agent is).
+  assert.equal(reply.payload.from_kind, undefined, "an agent's message carries no owner tag");
 });
 
 test("human ↔ agent live call: place → agent frames → say → hangup", async () => {

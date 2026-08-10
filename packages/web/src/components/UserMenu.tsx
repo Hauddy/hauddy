@@ -57,10 +57,21 @@ export default function UserMenu({ email, name }: { email?: string; name?: strin
             role="menuitem"
             onClick={() => {
               setOpen(false);
+              navigate('/settings');
+            }}
+          >
+            Settings
+          </button>
+          <button
+            type="button"
+            className="user-menu-item"
+            role="menuitem"
+            onClick={() => {
+              setOpen(false);
               navigate('/account');
             }}
           >
-            Account &amp; settings
+            Account &amp; API key
           </button>
           <div className="user-menu-divider" />
           <button

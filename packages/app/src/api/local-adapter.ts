@@ -38,15 +38,34 @@ const inviteHubs = new Map<string, 'local' | 'platform'>();
 
 const localApi: Partial<Api> = {
   // ---- directory / presence ----
+  // The account's agents for the shared Messages screen: local-hub agents PLUS
+  // the account's network-only agents (connectors + agents exposed from another
+  // machine). Including them here is what surfaces connectors in the "view as"
+  // Inbox selector — their history lives on the (synced) local hub under the same
+  // agent_id, so `consoleThreads(as=<connectorId>)` resolves. Web's own listAgents
+  // already includes connectors; this brings the desktop to parity.
   async listAgents(): Promise<Agent[]> {
-    const agents = await httpApi.listAgents();
-    return agents.map((a) => ({
+    const [agents, network] = await Promise.all([
+      httpApi.listAgents(),
+      httpApi.listNetworkAgents().catch(() => []),
+    ]);
+    const local: Agent[] = agents.map((a) => ({
       id: a.agentId,
       nickname: a.nicknames[0] ?? '',
       description: a.description ?? '',
       online: a.status === 'attached',
       kind: 'agent',
     }));
+    const net: Agent[] = network
+      .filter((n) => n.handle)
+      .map((n) => ({
+        id: n.agentId,
+        nickname: n.handle as string,
+        description: n.description ?? '',
+        online: n.online,
+        kind: n.kind,
+      }));
+    return [...local, ...net];
   },
 
   async listFriends(): Promise<FriendsView> {

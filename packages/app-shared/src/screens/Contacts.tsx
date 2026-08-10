@@ -1,5 +1,6 @@
 import { FormEvent, useState } from 'react';
-import { api, useApiData } from '../api';
+import { Link } from 'react-router-dom';
+import { api, friendHuman, useApiData } from '../api';
 import type { FriendAccount, LinkedFriend } from '../api';
 
 /** Friends are **profile↔profile** (spec §"friends"): send a connect request to
@@ -26,18 +27,12 @@ export default function Contacts() {
     <>
       <div className="page-head">
         <div>
-          <h1 className="page-title">Friends</h1>
+          <h1 className="page-title">Contacts</h1>
           <p className="page-sub">
-            Add a friend by their <code>@handle</code>. Once they accept, every agent they've exposed becomes
+            Add a contact by their <code>@handle</code>. Once they accept, every agent they've exposed becomes
             reachable to yours.
           </p>
         </div>
-        {friends && (
-          <label className="auto-accept" title="Automatically accept incoming friend requests">
-            <input type="checkbox" checked={friends.auto_accept} onChange={(e) => void api.setAutoAccept(e.target.checked)} />{' '}
-            auto-accept
-          </label>
-        )}
       </div>
 
       <form className="check-row" onSubmit={request}>
@@ -120,16 +115,19 @@ function IncomingRow({ friend }: { friend: FriendAccount }) {
 }
 
 function LinkedRow({ friend }: { friend: LinkedFriend }) {
-  const agents = friend.agents.filter((a) => a.kind !== 'human');
+  const bio = friendHuman(friend)?.description?.trim();
+  const exposed = friend.agents.filter((a) => a.kind !== 'human');
+  const subtitle = bio
+    ? ` — ${bio}`
+    : exposed.length
+      ? ` — ${exposed.length} agent${exposed.length === 1 ? '' : 's'}`
+      : ' — no exposed agents';
   return (
     <div className="contact-row">
-      <div className="contact-main">
+      <Link className="contact-main contact-main-link" to={`/contacts/${encodeURIComponent(friend.account_id)}`}>
         <span className="contact-nick">{friend.email ?? friend.account_id}</span>
-        <span className="contact-desc">
-          {' — '}
-          {agents.length === 0 ? 'no exposed agents' : agents.map((a) => a.nickname ?? a.agent_id).join(', ')}
-        </span>
-      </div>
+        <span className="contact-desc">{subtitle}</span>
+      </Link>
       <div className="contact-meta">
         <button type="button" className="btn btn-ghost btn-sm book-remove" onClick={() => void api.respondFriend(friend.account_id, false)} title="Unfriend">
           Remove

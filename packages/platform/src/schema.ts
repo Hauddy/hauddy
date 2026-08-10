@@ -29,9 +29,37 @@ CREATE TABLE IF NOT EXISTS agents (
   description    TEXT,
   speaking_as    TEXT,
   kind           TEXT NOT NULL DEFAULT 'agent',
+  open_link      INTEGER NOT NULL DEFAULT 0,
+  listed         INTEGER NOT NULL DEFAULT 1,
   created_at     TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_agents_account ON agents(account_id);
+
+-- agent_grants = a PER-AGENT external link: "account_id may reach agent_id".
+-- Created when a non-friend requests a link to an agent with open_link=1
+-- (auto-accepted). Agent-scoped (not account-wide) so an open agent exposes ONLY
+-- itself; the grantee's whole account can talk to it (and it can reply). Cleared
+-- when the owner turns open_link off.
+CREATE TABLE IF NOT EXISTS agent_grants (
+  agent_id   TEXT NOT NULL REFERENCES agents(agent_id) ON DELETE CASCADE,
+  account_id TEXT NOT NULL REFERENCES accounts(account_id) ON DELETE CASCADE,
+  created_at TEXT NOT NULL,
+  PRIMARY KEY (agent_id, account_id)
+);
+CREATE INDEX IF NOT EXISTS idx_agent_grants_account ON agent_grants(account_id);
+
+-- agent_books = a curated contact list for an agent (bare @handles). When an
+-- agent has a non-empty book, its list_contacts is exactly the book (resolved),
+-- instead of the derived same-account+friends+grants set. Mirrors the local hub's
+-- per-agent book — the mechanism connectors need (they have no local runtime, so
+-- their book lives here). Visibility only; sends are still gated by reachability.
+CREATE TABLE IF NOT EXISTS agent_books (
+  agent_id   TEXT NOT NULL REFERENCES agents(agent_id) ON DELETE CASCADE,
+  handle     TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  PRIMARY KEY (agent_id, handle)
+);
+CREATE INDEX IF NOT EXISTS idx_agent_books_agent ON agent_books(agent_id);
 
 CREATE TABLE IF NOT EXISTS nicknames (
   nickname   TEXT PRIMARY KEY,
@@ -158,5 +186,48 @@ CREATE TABLE IF NOT EXISTS rate_limits (
 CREATE TABLE IF NOT EXISTS console_sessions (
   human_id  TEXT PRIMARY KEY,
   last_ms   INTEGER NOT NULL
+);
+
+-- ── CONNECTOR TOKENS: scoped, revocable bearer tokens for the public /v1 REST
+-- API + the remote /mcp endpoint (external AIs: ChatGPT, Claude, curl, scripts).
+-- Distinct from accounts.api_key (the master key): a leaked connector token can
+-- be revoked without rotating the account, and its scope (csv subset of
+-- send,read,files) bounds what it can do. Each token is bound to a dedicated
+-- agent_id (kind=connector) — its FIXED identity: every message it sends is
+-- signed as that agent's @handle, and that agent is addressable so peers can
+-- message it back. Token stored raw (same alpha tradeoff as accounts.api_key).
+CREATE TABLE IF NOT EXISTS connector_tokens (
+  token        TEXT PRIMARY KEY,
+  account_id   TEXT NOT NULL REFERENCES accounts(account_id) ON DELETE CASCADE,
+  agent_id     TEXT NOT NULL REFERENCES agents(agent_id) ON DELETE CASCADE,
+  label        TEXT,
+  scope        TEXT NOT NULL,
+  revoked      INTEGER NOT NULL DEFAULT 0,
+  created_at   TEXT NOT NULL,
+  last_used_ms INTEGER
+);
+CREATE INDEX IF NOT EXISTS idx_ctoken_account ON connector_tokens(account_id);
+
+-- ── OAUTH CLIENTS: two flavours share this table.
+--  1. Dynamic Client Registration (RFC 7591) — public clients (PKCE, no secret),
+--     e.g. claude.ai registers itself. client_secret + connector_agent_id NULL.
+--  2. Dashboard-minted connector credentials — a client_id + client_secret pair
+--     bound (connector_agent_id) to one connector, so a headless/browserless
+--     agent can run the client_credentials grant (copy id+secret, no redirect)
+--     and receive that connector's token. Deleted when the connector is revoked.
+-- We persist client_id → redirect_uris (to validate callbacks). Access tokens are
+-- connector_tokens; auth codes live in DO storage (TTL). Secret stored raw (same
+-- alpha tradeoff as accounts.api_key / connector tokens).
+-- NOTE: client_secret + connector_agent_id are added by migrate() too, so an
+-- oauth_clients table created before they existed gets them. The index on
+-- connector_agent_id is likewise created in migrate() — AFTER the column is
+-- guaranteed to exist — so it never references a not-yet-added column on an old DB.
+CREATE TABLE IF NOT EXISTS oauth_clients (
+  client_id           TEXT PRIMARY KEY,
+  client_name         TEXT,
+  redirect_uris       TEXT NOT NULL,
+  client_secret       TEXT,
+  connector_agent_id  TEXT REFERENCES agents(agent_id) ON DELETE CASCADE,
+  created_at          TEXT NOT NULL
 );
 `;

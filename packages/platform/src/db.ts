@@ -36,6 +36,8 @@ export interface AgentRow {
   description: string | null;
   speaking_as: string | null;
   kind: string;
+  open_link: number; // 1 = external auto-accept (per-agent open link) is on
+  listed: number; // 1 = discoverable by other accounts; 0 = owner-only (connector default)
   created_at: string;
 }
 
@@ -158,6 +160,41 @@ function mintApiKey(): string {
 function maskKey(apiKey: string): string {
   return `sk_live_••••${apiKey.slice(-4)}`;
 }
+function mintConnectorToken(): string {
+  return `ct_live_${randomHex(24)}`;
+}
+function maskConnectorToken(token: string): string {
+  return `ct_live_••••${token.slice(-4)}`;
+}
+function mintClientId(): string {
+  return `oclient_${randomHex(12)}`;
+}
+function mintClientSecret(): string {
+  return `cs_live_${randomHex(24)}`;
+}
+
+/** The capabilities a connector token may hold. Calls are intentionally absent —
+ *  a stateless connector can't ring/hold a real-time call. */
+export const CONNECTOR_SCOPES = ["send", "read", "files"] as const;
+/** Keep only recognized scopes, de-duplicated, in canonical order → csv string. */
+function normalizeScope(scope: string[]): string {
+  return CONNECTOR_SCOPES.filter((s) => scope.includes(s)).join(",");
+}
+
+/** A connector token's masked view (the raw token is only ever returned once, at
+ *  creation). `scope` is a csv subset of send,read,files; `handle` is its bound
+ *  identity's @nickname. */
+export interface ConnectorTokenView {
+  masked: string;
+  handle: string | null;
+  agent_id: string;
+  label: string | null;
+  scope: string;
+  /** The paired OAuth client_id (client_credentials grant), if one was minted. */
+  client_id: string | null;
+  created_at: string;
+  last_used_ms: number | null;
+}
 
 /**
  * SQLite layer over the DO's ctx.storage.sql. Mirrors the Node hub's store.ts
@@ -171,6 +208,42 @@ export class Db {
   /** Apply the full schema. Idempotent — safe on every construction. */
   init(): void {
     this.sql.exec(SCHEMA);
+    this.migrate();
+  }
+
+  /** Additive column migrations for DBs created before a column existed —
+   *  `CREATE TABLE IF NOT EXISTS` won't add columns to an existing table. Each
+   *  is guarded by a PRAGMA check so it's idempotent. */
+  private migrate(): void {
+    const agentCols = new Set(
+      this.rows<{ name: string }>("PRAGMA table_info(agents)").map((c) => c.name),
+    );
+    if (!agentCols.has("open_link")) {
+      this.sql.exec("ALTER TABLE agents ADD COLUMN open_link INTEGER NOT NULL DEFAULT 0");
+    }
+    // `listed` gates cross-account discoverability. Regular exposed agents stay
+    // visible (default 1); connectors are owner-only by default. On first add,
+    // backfill EXISTING connectors to hidden so they match the new default (runs
+    // exactly once — the guard skips it after the column exists, so a connector
+    // the owner later re-lists isn't silently re-hidden).
+    if (!agentCols.has("listed")) {
+      this.sql.exec("ALTER TABLE agents ADD COLUMN listed INTEGER NOT NULL DEFAULT 1");
+      this.sql.exec("UPDATE agents SET listed = 0 WHERE kind = 'connector'");
+    }
+    // oauth_clients gained client_secret + connector_agent_id when connector
+    // credentials (client_credentials grant) were added — backfill on old DBs.
+    const oauthCols = new Set(
+      this.rows<{ name: string }>("PRAGMA table_info(oauth_clients)").map((c) => c.name),
+    );
+    if (!oauthCols.has("client_secret")) {
+      this.sql.exec("ALTER TABLE oauth_clients ADD COLUMN client_secret TEXT");
+    }
+    if (!oauthCols.has("connector_agent_id")) {
+      this.sql.exec("ALTER TABLE oauth_clients ADD COLUMN connector_agent_id TEXT");
+    }
+    // Created here (not in SCHEMA) so it's only built once the column above is
+    // guaranteed present — SCHEMA runs before this and would fault on an old DB.
+    this.sql.exec("CREATE INDEX IF NOT EXISTS idx_oauth_connector ON oauth_clients(connector_agent_id)");
   }
 
   private rows<T = Record<string, Bind>>(query: string, ...binds: Bind[]): T[] {
@@ -259,6 +332,251 @@ export class Db {
     this.sql.exec("UPDATE accounts SET revoked = 1 WHERE account_id = ?", accountId);
   }
 
+  // ── connector tokens (public /v1 + /mcp bearer creds) ───────────────────
+  /** Create a connector: provision its FIXED identity (a keyless kind='connector'
+   *  agent bound to `handle`, owned by the account) + a scoped token that signs
+   *  as it. Returns the RAW token once. `handle` must be free in the account's
+   *  namespace (reservation-aware bind consumes the account's own hold). On a
+   *  handle conflict/invalid the just-created agent is rolled back.
+   *
+   *  `reclaim` (used by the OAuth re-onboarding flow): if the handle is already
+   *  held by one of THIS account's own stale connectors, retire that connector
+   *  and take the handle. Disconnecting a connector in the client (ChatGPT,
+   *  claude.ai) does NOT revoke it server-side, so re-adding it would otherwise
+   *  be permanently blocked by the orphan holding its @handle. Only reclaims
+   *  kind='connector' handles you own — never a human/agent handle or another
+   *  account's. */
+  createConnector(
+    accountId: string,
+    input: { label?: string; scope: string[]; handle: string; reclaim?: boolean },
+  ): { ok: true; token: string; agent_id: string; handle: string; reclaimed?: boolean } | { ok: false; reason: "invalid" | "conflict" | "taken" } {
+    const agent = this.registerAgent({
+      account_id: accountId,
+      grant_scope_id: `connector:${randomHex(8)}`,
+      public_key: HUMAN_PLACEHOLDER_KEY,
+      kind: "connector",
+      display_name: input.label?.trim() || undefined,
+    });
+    // Connectors are owner-only by default; the owner can make one discoverable
+    // on the network from its agent page (setListed).
+    this.sql.exec("UPDATE agents SET listed = 0 WHERE agent_id = ?", agent.agent_id);
+    let bound = this.bindNickname(agent.agent_id, input.handle);
+    let reclaimed = false;
+    if (!bound.ok && bound.reason === "conflict" && input.reclaim) {
+      const holder = this.bindingOf(input.handle);
+      if (holder && holder.account_id === accountId && this.getAgent(holder.agent_id)?.kind === "connector") {
+        this.revokeConnector(accountId, { agentId: holder.agent_id }); // retire the orphan → frees the handle + its token/OAuth creds
+        bound = this.bindNickname(agent.agent_id, input.handle);
+        reclaimed = bound.ok;
+      }
+    }
+    if (!bound.ok) {
+      this.removeAgent(agent.agent_id); // no orphan identity on a failed bind
+      return { ok: false, reason: bound.reason };
+    }
+    const token = mintConnectorToken();
+    this.sql.exec(
+      `INSERT INTO connector_tokens (token, account_id, agent_id, label, scope, revoked, created_at, last_used_ms)
+       VALUES (?, ?, ?, ?, ?, 0, ?, NULL)`,
+      token,
+      accountId,
+      agent.agent_id,
+      input.label?.trim() || null,
+      normalizeScope(input.scope),
+      nowIso(),
+    );
+    return { ok: true, token, agent_id: agent.agent_id, handle: bound.nickname, reclaimed };
+  }
+
+  /** Resolve a connector token to its owner account + scope + bound identity
+   *  agent, bumping last-used. Returns null for unknown/revoked tokens. */
+  authenticateConnector(token: string): { account_id: string; agent_id: string; scope: string } | null {
+    const row = this.first<{ account_id: string; agent_id: string; scope: string }>(
+      "SELECT account_id, agent_id, scope FROM connector_tokens WHERE token = ? AND revoked = 0",
+      token,
+    );
+    if (!row) return null;
+    this.sql.exec("UPDATE connector_tokens SET last_used_ms = ? WHERE token = ?", Date.now(), token);
+    return { account_id: row.account_id, agent_id: row.agent_id, scope: row.scope };
+  }
+
+  listConnectorTokens(accountId: string): ConnectorTokenView[] {
+    return this.rows<Record<string, Bind>>(
+      `SELECT ct.*, oc.client_id AS client_id
+         FROM connector_tokens ct
+         LEFT JOIN oauth_clients oc ON oc.connector_agent_id = ct.agent_id
+        WHERE ct.account_id = ? AND ct.revoked = 0
+        ORDER BY ct.created_at DESC`,
+      accountId,
+    ).map((r) => ({
+      masked: maskConnectorToken(String(r.token)),
+      handle: this.speakingNickname(String(r.agent_id)),
+      agent_id: String(r.agent_id),
+      label: r.label == null ? null : String(r.label),
+      scope: String(r.scope),
+      client_id: r.client_id == null ? null : String(r.client_id),
+      created_at: String(r.created_at),
+      last_used_ms: r.last_used_ms == null ? null : Number(r.last_used_ms),
+    }));
+  }
+
+  /** The connector bound to an agent (its masked token + scope + paired OAuth
+   *  client_id), for the Agent page's "access" section. Null for non-connector
+   *  agents. Account-scoped so a caller only sees its own. */
+  connectorForAgent(accountId: string, agentId: string): { masked: string; scope: string; client_id: string | null; last_used_ms: number | null } | null {
+    const row = this.first<{ token: string; scope: string; last_used_ms: number | null; client_id: string | null }>(
+      `SELECT ct.token, ct.scope, ct.last_used_ms, oc.client_id AS client_id
+         FROM connector_tokens ct
+         LEFT JOIN oauth_clients oc ON oc.connector_agent_id = ct.agent_id
+        WHERE ct.agent_id = ? AND ct.account_id = ? AND ct.revoked = 0`,
+      agentId,
+      accountId,
+    );
+    if (!row) return null;
+    return {
+      masked: maskConnectorToken(String(row.token)),
+      scope: String(row.scope),
+      client_id: row.client_id == null ? null : String(row.client_id),
+      last_used_ms: row.last_used_ms == null ? null : Number(row.last_used_ms),
+    };
+  }
+
+  // ── OAuth clients (Dynamic Client Registration for the /mcp OAuth server) ──
+  /** Register a public OAuth client (PKCE, no secret). Returns its client_id. */
+  createOAuthClient(input: { client_name?: string; redirect_uris: string[] }): string {
+    const client_id = mintClientId();
+    this.sql.exec(
+      "INSERT INTO oauth_clients (client_id, client_name, redirect_uris, created_at) VALUES (?, ?, ?, ?)",
+      client_id,
+      input.client_name?.trim() || null,
+      JSON.stringify(input.redirect_uris),
+      nowIso(),
+    );
+    return client_id;
+  }
+
+  getOAuthClient(clientId: string): { client_name: string | null; redirect_uris: string[] } | null {
+    const row = this.first<{ client_name: string | null; redirect_uris: string }>(
+      "SELECT client_name, redirect_uris FROM oauth_clients WHERE client_id = ?",
+      clientId,
+    );
+    if (!row) return null;
+    let uris: string[] = [];
+    try {
+      uris = JSON.parse(row.redirect_uris) as string[];
+    } catch {
+      uris = [];
+    }
+    return { client_name: row.client_name, redirect_uris: Array.isArray(uris) ? uris : [] };
+  }
+
+  /** Mint (or re-mint) an OAuth client_id + client_secret pair BOUND to a
+   *  connector, enabling the headless client_credentials grant: a browserless
+   *  agent copies the id+secret and exchanges them at /oauth/token for the
+   *  connector's bearer token — no redirect. One pair per connector; a second
+   *  call rotates the secret in place. Returns the raw secret once. */
+  mintConnectorClient(
+    accountId: string,
+    agentId: string,
+    clientName?: string,
+  ): { client_id: string; client_secret: string } | null {
+    const conn = this.first<{ agent_id: string }>(
+      "SELECT agent_id FROM connector_tokens WHERE agent_id = ? AND account_id = ? AND revoked = 0",
+      agentId,
+      accountId,
+    );
+    if (!conn) return null;
+    const client_secret = mintClientSecret();
+    const existing = this.first<{ client_id: string }>(
+      "SELECT client_id FROM oauth_clients WHERE connector_agent_id = ?",
+      agentId,
+    );
+    if (existing) {
+      this.sql.exec("UPDATE oauth_clients SET client_secret = ? WHERE client_id = ?", client_secret, existing.client_id);
+      return { client_id: existing.client_id, client_secret };
+    }
+    const client_id = mintClientId();
+    this.sql.exec(
+      "INSERT INTO oauth_clients (client_id, client_name, redirect_uris, client_secret, connector_agent_id, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+      client_id,
+      clientName?.trim() || null,
+      "[]",
+      client_secret,
+      agentId,
+      nowIso(),
+    );
+    return { client_id, client_secret };
+  }
+
+  /** client_credentials grant: verify a connector's client_id + client_secret and
+   *  return its live bearer token + scope. Null if unknown, wrong secret, not a
+   *  connector-bound client, or the connector was revoked. */
+  authenticateClientCredentials(clientId: string, clientSecret: string): { token: string; scope: string } | null {
+    const client = this.first<{ client_secret: string | null; connector_agent_id: string | null }>(
+      "SELECT client_secret, connector_agent_id FROM oauth_clients WHERE client_id = ?",
+      clientId,
+    );
+    if (!client || !client.client_secret || !client.connector_agent_id) return null;
+    if (client.client_secret !== clientSecret) return null;
+    const conn = this.first<{ token: string; scope: string }>(
+      "SELECT token, scope FROM connector_tokens WHERE agent_id = ? AND revoked = 0",
+      client.connector_agent_id,
+    );
+    if (!conn) return null;
+    this.sql.exec("UPDATE connector_tokens SET last_used_ms = ? WHERE agent_id = ?", Date.now(), client.connector_agent_id);
+    return { token: String(conn.token), scope: String(conn.scope) };
+  }
+
+  /** Rotate a connector's bearer token in place (same @handle identity + scope).
+   *  Any paired OAuth client keeps its client_id but gets a fresh secret, so old
+   *  credentials fully die. Returns the new raw token (+ new client creds if the
+   *  connector had a paired OAuth client). Null if no such connector. */
+  rotateConnector(
+    accountId: string,
+    agentId: string,
+  ): { token: string; client_id?: string; client_secret?: string } | null {
+    const conn = this.first<{ scope: string }>(
+      "SELECT scope FROM connector_tokens WHERE agent_id = ? AND account_id = ? AND revoked = 0",
+      agentId,
+      accountId,
+    );
+    if (!conn) return null;
+    const token = mintConnectorToken();
+    this.sql.exec(
+      "UPDATE connector_tokens SET token = ?, last_used_ms = NULL WHERE agent_id = ? AND account_id = ?",
+      token,
+      agentId,
+      accountId,
+    );
+    const creds = this.first<{ client_id: string }>(
+      "SELECT client_id FROM oauth_clients WHERE connector_agent_id = ?",
+      agentId,
+    );
+    if (creds) {
+      const client_secret = mintClientSecret();
+      this.sql.exec("UPDATE oauth_clients SET client_secret = ? WHERE client_id = ?", client_secret, creds.client_id);
+      return { token, client_id: creds.client_id, client_secret };
+    }
+    return { token };
+  }
+
+  /** Retire a connector by its raw token OR its identity agent_id: delete the
+   *  token row, any paired OAuth client, and the identity agent (freeing the
+   *  @handle). Account-scoped (a caller can only revoke its own). Returns true if
+   *  a connector matched. */
+  revokeConnector(accountId: string, ref: { token?: string; agentId?: string }): boolean {
+    const row = ref.token
+      ? this.first<{ agent_id: string }>("SELECT agent_id FROM connector_tokens WHERE token = ? AND account_id = ?", ref.token, accountId)
+      : ref.agentId
+        ? this.first<{ agent_id: string }>("SELECT agent_id FROM connector_tokens WHERE agent_id = ? AND account_id = ?", ref.agentId, accountId)
+        : undefined;
+    if (!row) return false;
+    this.sql.exec("DELETE FROM oauth_clients WHERE connector_agent_id = ?", row.agent_id);
+    this.sql.exec("DELETE FROM connector_tokens WHERE agent_id = ? AND account_id = ?", row.agent_id, accountId);
+    this.removeAgent(row.agent_id);
+    return true;
+  }
+
   accountView(
     accountId: string,
   ): { account_id: string; username: string | null; email: string; masked: string; revoked: boolean } | null {
@@ -275,6 +593,31 @@ export class Db {
     return !!this.getAccount(accountId)?.auto_accept;
   }
 
+  /** Rename the account's username (its display name + login handle). Callers
+   *  must check availability first — `username` is UNIQUE, so a clash throws. */
+  setUsername(accountId: string, username: string): void {
+    this.sql.exec("UPDATE accounts SET username = ? WHERE account_id = ?", username.trim(), accountId);
+  }
+
+  /** Set a new password (fresh salt + iterations). */
+  async setPassword(accountId: string, password: string): Promise<void> {
+    const { hash, salt, iterations } = await hashPassword(password);
+    this.sql.exec(
+      "UPDATE accounts SET pw_hash = ?, pw_salt = ?, pw_iter = ? WHERE account_id = ?",
+      hash,
+      salt,
+      iterations,
+      accountId,
+    );
+  }
+
+  /** Verify a known account's current password (gate for a password change). */
+  async verifyAccountPassword(accountId: string, password: string): Promise<boolean> {
+    const a = this.getAccount(accountId);
+    if (!a || !a.pw_hash || !a.pw_salt) return false;
+    return verifyPassword(password, a.pw_hash, a.pw_salt, a.pw_iter ?? 100_000);
+  }
+
   // ── agents ──────────────────────────────────────────────────────────────
   /** Idempotent by grant_scope_id: re-registering updates the existing record. */
   registerAgent(input: {
@@ -284,7 +627,7 @@ export class Db {
     local_id?: string;
     display_name?: string;
     description?: string;
-    kind?: "human" | "agent";
+    kind?: "human" | "agent" | "connector";
   }): AgentRow {
     const existing = this.first<AgentRow>(
       "SELECT * FROM agents WHERE grant_scope_id = ?",
@@ -366,8 +709,97 @@ export class Db {
     if (!this.getAgent(agentId)) return false;
     this.sql.exec("DELETE FROM nicknames WHERE agent_id = ?", agentId);
     this.sql.exec("DELETE FROM messages WHERE to_agent = ? AND delivered_at IS NULL", agentId);
+    // A connector identity carries a live bearer token + paired OAuth client; drop
+    // them too so removing the agent can never orphan a still-valid credential
+    // (FK cascade isn't guaranteed on in the DO's SQLite).
+    this.sql.exec("DELETE FROM oauth_clients WHERE connector_agent_id = ?", agentId);
+    this.sql.exec("DELETE FROM connector_tokens WHERE agent_id = ?", agentId);
+    this.sql.exec("DELETE FROM agent_books WHERE agent_id = ?", agentId);
     this.sql.exec("DELETE FROM agents WHERE agent_id = ?", agentId);
     return true;
+  }
+
+  // ── network visibility (listed) ────────────────────────────────────────
+  isListed(agentId: string): boolean {
+    return !!this.getAgent(agentId)?.listed;
+  }
+  /** Set whether other accounts can discover this agent (a connector defaults to
+   *  off — owner-only). The owner always sees/reaches its own agents regardless. */
+  setListed(agentId: string, on: boolean): boolean {
+    if (!this.getAgent(agentId)) return false;
+    this.sql.exec("UPDATE agents SET listed = ? WHERE agent_id = ?", on ? 1 : 0, agentId);
+    return true;
+  }
+
+  // ── per-agent contact book (curated @handles) ───────────────────────────
+  /** The agent's curated book — bare @handles. Non-empty ⇒ it IS the agent's
+   *  list_contacts (resolved), replacing the derived set. */
+  agentBook(agentId: string): string[] {
+    return this.rows<{ handle: string }>(
+      "SELECT handle FROM agent_books WHERE agent_id = ? ORDER BY created_at",
+      agentId,
+    ).map((r) => r.handle);
+  }
+  addToBook(agentId: string, handle: string): void {
+    const bare = handle.replace(/^@+/, "").toLowerCase();
+    if (!bare) return;
+    this.sql.exec(
+      "INSERT OR IGNORE INTO agent_books (agent_id, handle, created_at) VALUES (?, ?, ?)",
+      agentId,
+      bare,
+      nowIso(),
+    );
+  }
+  removeFromBook(agentId: string, handle: string): void {
+    const bare = handle.replace(/^@+/, "").toLowerCase();
+    this.sql.exec("DELETE FROM agent_books WHERE agent_id = ? AND handle = ?", agentId, bare);
+  }
+
+  // ── per-agent external links (open_link + agent_grants) ─────────────────
+  isOpenLink(agentId: string): boolean {
+    return !!this.getAgent(agentId)?.open_link;
+  }
+  /** Set the per-agent external-accept flag. Turning it OFF revokes every grant
+   *  to that agent (kill switch). Returns false for an unknown agent. */
+  setOpenLink(agentId: string, on: boolean): boolean {
+    if (!this.getAgent(agentId)) return false;
+    this.sql.exec("UPDATE agents SET open_link = ? WHERE agent_id = ?", on ? 1 : 0, agentId);
+    if (!on) this.revokeAgentGrants(agentId);
+    return true;
+  }
+  /** Grant an account standing reachability to a single agent (idempotent). */
+  grantAgent(agentId: string, accountId: string): void {
+    this.sql.exec(
+      "INSERT OR IGNORE INTO agent_grants (agent_id, account_id, created_at) VALUES (?, ?, ?)",
+      agentId,
+      accountId,
+      nowIso(),
+    );
+  }
+  revokeAgentGrants(agentId: string): void {
+    this.sql.exec("DELETE FROM agent_grants WHERE agent_id = ?", agentId);
+  }
+  /** Does `accountId` hold a per-agent grant to `agentId`? */
+  agentGrantExists(agentId: string, accountId: string): boolean {
+    return !!this.first<{ n: number }>(
+      "SELECT 1 AS n FROM agent_grants WHERE agent_id = ? AND account_id = ?",
+      agentId,
+      accountId,
+    );
+  }
+  /** Accounts granted standing access to `agentId` (owner-side "who's connected"). */
+  agentGranteesFor(agentId: string): string[] {
+    return this.rows<{ account_id: string }>(
+      "SELECT account_id FROM agent_grants WHERE agent_id = ?",
+      agentId,
+    ).map((r) => r.account_id);
+  }
+  /** Agents `accountId` has been granted access to (requester-side list). */
+  accountAgentGrants(accountId: string): string[] {
+    return this.rows<{ agent_id: string }>(
+      "SELECT agent_id FROM agent_grants WHERE account_id = ?",
+      accountId,
+    ).map((r) => r.agent_id);
   }
 
   // ── nickname registry ─────────────────────────────────────────────────
