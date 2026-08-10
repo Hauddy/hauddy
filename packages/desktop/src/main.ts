@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { app, BrowserWindow, ipcMain, Menu, nativeImage, screen, Tray } from 'electron';
+import { app, BrowserWindow, ipcMain, Menu, nativeImage, Notification, screen, Tray, utilityProcess } from 'electron';
 
 /**
  * hauddy desktop — macOS menu-bar app.
@@ -27,6 +27,20 @@ const DEV_URL = process.env.HAUDDY_DEV_URL ?? 'http://localhost:5201';
 let tray: Tray | null = null;
 let popover: BrowserWindow | null = null;
 let fullWin: BrowserWindow | null = null;
+let daemon: Electron.UtilityProcess | null = null;
+
+function startDaemon(): void {
+  const bundlePath = app.isPackaged
+    ? path.join(process.resourcesPath, 'daemon', 'daemon.mjs')
+    : path.join(__dirname, '..', 'daemon-bundle', 'daemon.mjs');
+  daemon = utilityProcess.fork(bundlePath, ['daemon'], { stdio: 'pipe' });
+  daemon.on('exit', (code) => {
+    // Don't restart — if the daemon crashes the app UI will show disconnected.
+    // The user can quit and reopen. Avoids restart loops during alpha.
+    console.error(`[daemon] exited with code ${code}`);
+    daemon = null;
+  });
+}
 /** The Hauddy Dock icon — re-applied after every dock.show() since a
  *  setIcon done in accessory mode doesn't always stick once the Dock appears. */
 let appIcon: Electron.NativeImage | null = null;
@@ -157,6 +171,8 @@ function expandTo(route: string): void {
 // ---------- app lifecycle ----------
 
 app.whenReady().then(() => {
+  startDaemon();
+
   // menu-bar accessory: no Dock icon while only the popover exists
   app.setActivationPolicy('accessory');
 
@@ -184,6 +200,22 @@ app.whenReady().then(() => {
   });
   ipcMain.handle('hauddy:quit', () => app.quit());
 
+  // Notification count → Dock badge (macOS). 0/NaN clears it.
+  ipcMain.handle('hauddy:badge', (_e, count?: number) => {
+    const n = typeof count === 'number' && count > 0 ? count : 0;
+    app.dock?.setBadge(n > 0 ? String(n) : '');
+  });
+  // Fire a native OS notification (clicking it opens the full window).
+  ipcMain.handle('hauddy:notify', (_e, input?: { title?: string; body?: string }) => {
+    if (!Notification.isSupported()) return;
+    const notif = new Notification({
+      title: input?.title || 'Hauddy',
+      body: input?.body || '',
+    });
+    notif.on('click', () => expandTo('/messages'));
+    notif.show();
+  });
+
   // verification aid: HAUDDY_OPEN_POPOVER=1 auto-opens the popover on launch
   if (process.env.HAUDDY_OPEN_POPOVER === '1') {
     setTimeout(showPopover, 1500);
@@ -193,4 +225,8 @@ app.whenReady().then(() => {
 // menu-bar app: closing all windows must not quit
 app.on('window-all-closed', () => {
   /* stay in the menu bar */
+});
+
+app.on('before-quit', () => {
+  daemon?.kill();
 });

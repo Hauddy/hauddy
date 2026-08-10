@@ -7,14 +7,16 @@
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "icons": "node scripts/make-icons.mjs",
-    "build": "npm run build -w @hauddy/app-ui && node scripts/make-icons.mjs && tsc -p tsconfig.json",
+    "bundle-daemon": "node scripts/bundle-daemon.mjs",
+    "build": "npm run build -w @hauddy/app-ui && node scripts/make-icons.mjs && node scripts/bundle-daemon.mjs && tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "dist": "npm run build && electron-builder --mac dir"
+    "dist": "npm run build && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg"
   },
   "devDependencies": {
     "@types/node": "^22.5.0",
     "electron": "33.4.11",
     "electron-builder": "^25.1.8",
+    "esbuild": "^0.25.0",
     "sharp": "^0.33.5",
     "typescript": "~5.5.4"
   },
@@ -33,13 +35,25 @@
       {
         "from": "../app/dist",
         "to": "app"
+      },
+      {
+        "from": "daemon-bundle",
+        "to": "daemon"
       }
     ],
     "mac": {
       "category": "public.app-category.utilities",
       "icon": "assets/icon.png",
       "target": [
-        "dir"
+        "dmg"
+      ]
+    },
+    "dmg": {
+      "title": "Hauddy",
+      "window": { "width": 540, "height": 380 },
+      "contents": [
+        { "x": 150, "y": 200, "type": "file" },
+        { "x": 390, "y": 200, "type": "link", "path": "/Applications" }
       ]
     },
     "asar": true,
