@@ -1,4 +1,5 @@
 import http from "node:http";
+import { randomUUID } from "node:crypto";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { MAX_ATTACHMENTS_BYTES, type Attachment } from "@hauddy/protocol";
 import type { Daemon } from "./daemon.js";
@@ -31,6 +32,10 @@ export interface LocalApiHandle {
  */
 export async function startLocalApi(opts: LocalApiOptions): Promise<LocalApiHandle> {
   const { daemon } = opts;
+
+  // One transport per MCP session — each new Claude Code window gets its own
+  // agent identity (matching the stdio `hauddy mcp` per-directory behaviour).
+  const mcpSessions = new Map<string, StreamableHTTPServerTransport>();
 
   const json = (res: http.ServerResponse, status: number, body: unknown): void => {
     res.writeHead(status, { "content-type": "application/json", ...CORS });
@@ -337,19 +342,34 @@ export async function startLocalApi(opts: LocalApiOptions): Promise<LocalApiHand
       if (method === "GET" && p === "/api/routing") return json(res, 200, await daemon.getRouting());
       if (method === "GET" && p === "/api/activity") return json(res, 200, daemon.listActivity());
 
-      // ---- HTTP MCP endpoint (/mcp or /mcp/:localId) ----
-      // Exposes a local agent as a stateless Streamable HTTP MCP server.
-      // /mcp          → agent localId defaults to "claude" (one-liner setup)
-      // /mcp/:localId → explicit name, for running multiple distinct agents
+      // ---- HTTP MCP endpoint (/mcp) ----
+      // Each new Claude Code window starts a fresh MCP session and gets its own
+      // agent identity — matching the per-directory behaviour of `hauddy mcp`
+      // (stdio). Existing sessions are routed by Mcp-Session-Id header.
       // Usage: claude mcp add --transport http hauddy http://localhost:7700/mcp
       if (p === "/mcp" || p.startsWith("/mcp/")) {
-        const localId = p === "/mcp" ? "claude" : decodeURIComponent(p.slice("/mcp/".length));
+        const sessionId = req.headers["mcp-session-id"] as string | undefined;
+        if (sessionId) {
+          const transport = mcpSessions.get(sessionId);
+          if (!transport) {
+            res.writeHead(404, { "content-type": "application/json", ...CORS });
+            res.end(JSON.stringify({ error: "session not found" }));
+            return;
+          }
+          const body = method === "POST" ? await readBody(req) : undefined;
+          void transport.handleRequest(req, res, body);
+          return;
+        }
+        // New session — provision a fresh agent identity (short random localId)
+        const localId = `mcp-${randomUUID().slice(0, 8)}`;
         const provision = daemon.createHttpMcpProvision(localId);
         const mcpServer = createMcpServer(provision, new CallValidation());
-        const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
+        const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: () => randomUUID() });
+        transport.onclose = () => { if (transport.sessionId) mcpSessions.delete(transport.sessionId); };
         await mcpServer.connect(transport);
         const body = method === "POST" ? await readBody(req) : undefined;
         await transport.handleRequest(req, res, body);
+        if (transport.sessionId) mcpSessions.set(transport.sessionId, transport);
         return;
       }
 

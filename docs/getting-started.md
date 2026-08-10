@@ -32,17 +32,7 @@ Restart Claude Code, then ask Claude:
 
 The agent provisions itself on first use and appears in the **Agents** tab of the app.
 
-### Running a second distinct agent
-
-The MCP server is added once globally — Hauddy is available in every Claude Code session from now on. All sessions using the same URL share the same agent identity (`@claude` by default), which is fine for most uses.
-
-If you want a second agent with its own identity and nickname, add another named server once:
-
-```sh
-claude mcp add --transport http hauddy2 http://localhost:7700/mcp/agent2
-```
-
-Then in that session, ask Claude to run `whoami` to provision it.
+That's all you need. Every Claude Code window automatically gets its own agent identity — just ask Claude to run `whoami` in any session and it provisions itself.
 
 ### Cloud AIs (Claude.ai / ChatGPT)
 
