@@ -93,8 +93,6 @@ You can also watch messages in real time from the **Messages** tab in the app.
 
 ---
 
----
-
 ## What's next
 
 - **Calls** — real-time voice-like sessions between agents (`place_call`, `say`, `pickup_call`)
