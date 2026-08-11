@@ -158,6 +158,29 @@ export class HubHistory {
     if (changed) this.save();
   }
 
+  /** Replace every occurrence of `oldId` as a party (from_agent/to_agent in
+   *  messages; caller/callee in calls; from_agent in call_frames) with `newId`.
+   *  Used by the daemon when pollRemotes resolves a platform UUID to a @nickname
+   *  for the first time — heals rows stored by injectInbound before the remote
+   *  directory was populated, and rows pulled down during the stale-directory
+   *  window. Single save() at the end regardless of how many rows changed. */
+  repairAgentId(oldId: string, newId: string): number {
+    let n = 0;
+    for (const m of Object.values(this.data.messages)) {
+      if (m.from_agent === oldId) { m.from_agent = newId; n++; }
+      if (m.to_agent === oldId) { m.to_agent = newId; n++; }
+    }
+    for (const c of Object.values(this.data.calls)) {
+      if (c.caller === oldId) { c.caller = newId; n++; }
+      if (c.callee === oldId) { c.callee = newId; n++; }
+    }
+    for (const f of Object.values(this.data.call_frames)) {
+      if (f.from_agent === oldId) { f.from_agent = newId; n++; }
+    }
+    if (n > 0) this.save();
+    return n;
+  }
+
   /** Mark a message delivered (acked) — drives the sender's ✓✓ tick. */
   markDelivered(messageId: string, agentId: string): void {
     const m = this.data.messages[messageId];

@@ -324,7 +324,16 @@ export class Daemon {
       localToPlatform.set(la.agent_id, pa.agent_id);
       platformToLocal.set(pa.agent_id, la.agent_id);
     }
-    return { endpoint: cfg.endpoint, apiKey: cfg.api_key, localHumanId: this.localHumanId, platformHumanId, localToPlatform, platformToLocal };
+    // Map remote agents' platform ids ↔ @nickname so the sync engine can:
+    //   pullDown: normalise raw platform ids → @nickname (thread-merge)
+    //   pushUp:   convert @nicknames back → platform ids (correct SSOT records)
+    const platformIdToNickname = new Map<string, string>();
+    const nicknameToPlatformId = new Map<string, string>();
+    for (const [id, r] of this.remoteDir) {
+      platformIdToNickname.set(id, r.nickname);
+      nicknameToPlatformId.set(r.nickname, id);
+    }
+    return { endpoint: cfg.endpoint, apiKey: cfg.api_key, localHumanId: this.localHumanId, platformHumanId, localToPlatform, platformToLocal, platformIdToNickname, nicknameToPlatformId };
   }
 
   /** An exposed agent wants to reach a remote `@nickname` — relay it upstream. */
@@ -461,6 +470,21 @@ export class Daemon {
           callReady: (c.presence?.capabilities ?? []).includes("call"),
           description: c.display_name ?? null,
         });
+      }
+    }
+    // For any agent_id that is newly resolvable (not in the old dir, or
+    // nickname changed), scan history and repair raw platform UUIDs → @nickname.
+    // This heals two classes of stored bad rows in one pass:
+    //   (a) injectInbound stored envelope.from verbatim because sender was not
+    //       yet in remoteDir (first-ever message from this remote agent).
+    //   (b) pullDown stored the raw UUID because platformIdToNickname was stale
+    //       at sync time (new friendship added between poll ticks).
+    if (this.hubHandle) {
+      for (const [id, r] of dir) {
+        const prev = this.remoteDir.get(id);
+        if (!prev || prev.nickname !== r.nickname) {
+          this.hubHandle.history.repairAgentId(id, r.nickname);
+        }
       }
     }
     this.remoteDir = dir;

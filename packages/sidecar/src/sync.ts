@@ -17,6 +17,14 @@ export interface SyncContext {
   localToPlatform: Map<string, string>;
   /** platform agent_id → local agent_id (inverse; for pull-down remap). */
   platformToLocal: Map<string, string>;
+  /** remote agent platform_id → @nickname (from remoteDir; for outbound to_agent normalisation).
+   *  Without this, outbound messages synced from the platform carry a raw platform id while inbound
+   *  messages from the same peer carry the @nickname — producing two separate threads. */
+  platformIdToNickname: Map<string, string>;
+  /** @nickname → remote agent platform_id (inverse of platformIdToNickname).
+   *  Used by pushUp to convert @nicknames stored locally back to platform agent_ids before
+   *  sending, so the platform SSOT receives correct addressable ids instead of handle strings. */
+  nicknameToPlatformId: Map<string, string>;
 }
 
 interface Cursors {
@@ -108,14 +116,18 @@ export class SyncEngine {
 
     // messagesSince(scope) already returns exactly the messages touching a
     // platform identity (≥1 party in `scope`) — the OR rule. Remap each party:
-    // a platform identity → its platform id; an unexposed local peer → verbatim.
+    // a local/platform identity → its platform id; a @nickname stored by pullDown
+    // for a remote peer → back to that peer's platform agent_id; unknown → verbatim.
+    const toPlat = (id: string) =>
+      ctx.localToPlatform.get(id) ?? ctx.nicknameToPlatformId.get(id) ?? id;
+
     const messages: MessageRow[] = [];
     for (const m of this.history.messagesSince(scope, this.cursors.pushMs)) {
       maxMs = Math.max(maxMs, m.created_ms);
       messages.push({
         ...m,
-        from_agent: ctx.localToPlatform.get(m.from_agent) ?? m.from_agent,
-        to_agent: ctx.localToPlatform.get(m.to_agent) ?? m.to_agent,
+        from_agent: toPlat(m.from_agent),
+        to_agent: toPlat(m.to_agent),
       });
     }
 
@@ -125,9 +137,9 @@ export class SyncEngine {
       maxMs = Math.max(maxMs, c.started_ms);
       calls.push({
         ...c,
-        caller: ctx.localToPlatform.get(c.caller) ?? c.caller,
-        callee: ctx.localToPlatform.get(c.callee) ?? c.callee,
-        frames: c.frames.map((f) => ({ ...f, from_agent: ctx.localToPlatform.get(f.from_agent) ?? f.from_agent })),
+        caller: toPlat(c.caller),
+        callee: toPlat(c.callee),
+        frames: c.frames.map((f) => ({ ...f, from_agent: toPlat(f.from_agent) })),
       });
     }
 
@@ -150,13 +162,18 @@ export class SyncEngine {
       now: number;
     }>(ctx, `/sync/pull?since=${this.cursors.pullMs}`);
 
+    // Remap platform ids → local ids where known. For remote agents (not in
+    // platformToLocal), fall back to their @nickname so outbound threads
+    // (to_agent = remote platform id) merge with inbound threads (from_agent
+    // = @nickname injected by the bridge) into one conversation.
+    const resolveId = (id: string) =>
+      ctx.platformToLocal.get(id) ?? ctx.platformIdToNickname.get(id) ?? id;
+
     for (const m of res.messages ?? []) {
-      // Remap platform ids → local ids where known; unknown (a remote friend's
-      // agent) is kept verbatim as an external peer id.
       const remapped = {
         ...m,
-        from_agent: ctx.platformToLocal.get(m.from_agent) ?? m.from_agent,
-        to_agent: ctx.platformToLocal.get(m.to_agent) ?? m.to_agent,
+        from_agent: resolveId(m.from_agent),
+        to_agent: resolveId(m.to_agent),
         attachments: toAttArray(m.attachments),
       };
       this.history.putMessageRow(remapped);
@@ -173,14 +190,14 @@ export class SyncEngine {
     for (const c of res.calls ?? []) {
       this.history.putCall({
         ...c,
-        caller: ctx.platformToLocal.get(c.caller) ?? c.caller,
-        callee: ctx.platformToLocal.get(c.callee) ?? c.callee,
+        caller: resolveId(c.caller),
+        callee: resolveId(c.callee),
       });
       for (const f of c.frames ?? []) {
         this.history.putCallFrame({
           frame_id: f.frame_id,
           call_id: c.call_id,
-          from_agent: ctx.platformToLocal.get(f.from_agent) ?? f.from_agent,
+          from_agent: resolveId(f.from_agent),
           seq: f.seq,
           body: f.body,
           attachments: toAttArray(f.attachments),
