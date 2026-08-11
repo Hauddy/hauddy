@@ -138,6 +138,26 @@ export class HubHistory {
     this.save();
   }
 
+  /** Repair agent ids on an already-stored message (in-place). Only updates
+   *  fields explicitly provided; undefined = leave untouched. Used by the sync
+   *  engine to heal messages the bridge stored with platform ids — only called
+   *  for ids that were actually remapped (platform→local), never to overwrite a
+   *  stored nickname with a raw platform id. */
+  repairMessageIds(messageId: string, opts: { from_agent?: string; to_agent?: string }): void {
+    const m = this.data.messages[messageId];
+    if (!m) return;
+    let changed = false;
+    if (opts.from_agent !== undefined && m.from_agent !== opts.from_agent) {
+      m.from_agent = opts.from_agent;
+      changed = true;
+    }
+    if (opts.to_agent !== undefined && m.to_agent !== opts.to_agent) {
+      m.to_agent = opts.to_agent;
+      changed = true;
+    }
+    if (changed) this.save();
+  }
+
   /** Mark a message delivered (acked) — drives the sender's ✓✓ tick. */
   markDelivered(messageId: string, agentId: string): void {
     const m = this.data.messages[messageId];

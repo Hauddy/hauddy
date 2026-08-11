@@ -122,8 +122,12 @@ const localApi: Partial<Api> = {
   },
 
   // ---- live SMS (drain the merged inbox; send) ----
+  // Route through the daemon so it merges the local hub's inbox (local agent
+  // replies) with the platform inbox (remote friend messages) in one drain.
+  // Calling the platform directly would skip local messages entirely and leave
+  // the local hub's in-memory buffer undrained.
   consoleInbox(): Promise<{ messages: ConsoleMessage[] }> {
-    return httpApi.humanInbox() as Promise<{ messages: ConsoleMessage[] }>;
+    return daemonGet<{ messages: ConsoleMessage[] }>('/api/human/inbox');
   },
   consoleSms(to: string, body: string, attachments?: Attachment[]) {
     return httpApi.humanSms(to, body, attachments);

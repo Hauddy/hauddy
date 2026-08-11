@@ -385,7 +385,8 @@ export class Daemon {
     // Owner tag: the account's own human (web/app console) → this exposed agent,
     // relayed down. Mark it so the agent sees "your human owner" (or the bio),
     // mirroring the local-hub tagging for same-machine sends.
-    if (this.platformHumanIdCache && envelope.from === this.platformHumanIdCache) {
+    const isOwnerMsg = !!(this.platformHumanIdCache && envelope.from === this.platformHumanIdCache);
+    if (isOwnerMsg) {
       payload = { ...payload, from_kind: "human", from_description: this.ownerBio || "your human owner" };
     }
     const atts = payload.attachments as Attachment[] | undefined;
@@ -416,9 +417,19 @@ export class Daemon {
       }
       payload = { ...payload, attachments: moved };
     }
+    // Normalize from/to before injecting into the local hub's history store:
+    // - `to` must be the local agent_id — bridge envelopes carry the platform agent_id,
+    //   which made history.messagesWithPeer(localAgentId, ...) miss all inbound messages.
+    // - `from` for the account owner → localHumanId so the agent's thread list merges
+    //   bridge-inbound with locally-originated console messages (same person, one thread).
+    // - `from` for other remote senders → their @nickname (gateway-routable for replies).
+    const resolvedFrom = isOwnerMsg
+      ? (this.localHumanId ?? (sender ? sender.nickname : envelope.from))
+      : (sender ? sender.nickname : envelope.from);
     const injected: Envelope = {
       ...envelope,
-      from: sender ? sender.nickname : envelope.from,
+      from: resolvedFrom,
+      to: localAgentId,
       payload,
     };
     this.hubHandle?.injectInbound(localAgentId, injected);

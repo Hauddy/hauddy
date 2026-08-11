@@ -995,7 +995,11 @@ export async function startHub(options: HubOptions = {}): Promise<HubHandle> {
         const resolveConsoleViewer = (): string => {
           const asRef = url.searchParams.get("view_as");
           if (!asRef) return humanId;
-          return store.resolveAgentId(asRef) ?? humanId;
+          // Use the resolved local id, or the ref verbatim (platform/external ids
+          // that live in the history store as-is). Never silently fall back to the
+          // human — a caller who asked for a specific viewer should see that
+          // viewer's history (possibly empty) rather than the human's.
+          return store.resolveAgentId(asRef) ?? asRef;
         };
         const withPeerNick = (t: { peer_id: string; peer_nick: string | null }) => ({
           ...t,

@@ -153,12 +153,22 @@ export class SyncEngine {
     for (const m of res.messages ?? []) {
       // Remap platform ids → local ids where known; unknown (a remote friend's
       // agent) is kept verbatim as an external peer id.
-      this.history.putMessageRow({
+      const remapped = {
         ...m,
         from_agent: ctx.platformToLocal.get(m.from_agent) ?? m.from_agent,
         to_agent: ctx.platformToLocal.get(m.to_agent) ?? m.to_agent,
         attachments: toAttArray(m.attachments),
-      });
+      };
+      this.history.putMessageRow(remapped);
+      // Repair any pre-existing row stored by the bridge with platform ids instead of
+      // local ids — only for fields actually remapped, never overwrite a stored nickname
+      // (e.g. "@chatgpt") with a raw platform id that didn't map to a local agent.
+      const repair: { from_agent?: string; to_agent?: string } = {};
+      if (remapped.from_agent !== m.from_agent) repair.from_agent = remapped.from_agent;
+      if (remapped.to_agent !== m.to_agent) repair.to_agent = remapped.to_agent;
+      if (repair.from_agent !== undefined || repair.to_agent !== undefined) {
+        this.history.repairMessageIds(m.message_id, repair);
+      }
     }
     for (const c of res.calls ?? []) {
       this.history.putCall({
