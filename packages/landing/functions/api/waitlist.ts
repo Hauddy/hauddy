@@ -164,6 +164,22 @@ async function sendWelcomeEmail(email: string, apiKey: string): Promise<void> {
   });
 }
 
+async function sendNotification(email: string, apiKey: string): Promise<void> {
+  await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      from: 'Hauddy Waitlist <hello@hauddy.com>',
+      to: ['hello@hauddy.com'],
+      subject: `New waitlist signup: ${email}`,
+      html: `<p><strong>${email}</strong> just joined the Hauddy waitlist.</p>`,
+    }),
+  });
+}
+
 export async function onRequestPost({
   request,
   env,
@@ -202,7 +218,10 @@ export async function onRequestPost({
   // Send welcome email only for new signups. Use waitUntil so the Worker
   // runtime keeps the fetch alive after the response is returned.
   if (isNew && env.RESEND_API_KEY) {
-    waitUntil(sendWelcomeEmail(email, env.RESEND_API_KEY).catch(() => {}));
+    waitUntil(Promise.all([
+      sendWelcomeEmail(email, env.RESEND_API_KEY).catch(() => {}),
+      sendNotification(email, env.RESEND_API_KEY).catch(() => {}),
+    ]));
   }
 
   // Same response whether the email is new or already present — don't disclose

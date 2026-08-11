@@ -815,6 +815,30 @@ export class Daemon {
         },
         cfg.api_key,
       );
+      // If the nickname wasn't bound (taken by a ghost agent whose grant_scope_id
+      // no longer matches any local agent — a leftover from before the HTTP-MCP
+      // identity format), retire the ghost and reclaim the handle.
+      if (!res.nickname && nick) {
+        const onPlatform = await this.platformAgents(cfg);
+        const localScopes = new Set((await this.agents()).map((a) => a.grant_scope_id));
+        const ghost = onPlatform.find(
+          (p) =>
+            (p.nickname ?? "").replace(/^@+/, "") === nick &&
+            p.agent_id !== res.agent_id &&
+            p.kind !== "connector" &&
+            p.kind !== "human" &&
+            !localScopes.has(p.grant_scope_id),
+        );
+        if (ghost) {
+          await hub.unexposeAgent(cfg.endpoint, ghost.agent_id, cfg.api_key).catch(() => {});
+          const outcome = await hub.setAgentNickname(cfg.endpoint, res.agent_id, nick, cfg.api_key);
+          if (outcome.ok) {
+            this.activity.push("platform.expose", `${localId} → ${outcome.nickname} (reclaimed from ghost)`);
+            await this.refreshBridges();
+            return { ok: true, nickname: outcome.nickname };
+          }
+        }
+      }
       this.activity.push("platform.expose", `${localId} → ${res.nickname ?? "(nickname taken)"}`);
       await this.refreshBridges();
       return { ok: true, nickname: res.nickname };
