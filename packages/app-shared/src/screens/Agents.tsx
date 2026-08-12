@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { api, useApiData } from '../api';
+import { api, useApiState } from '../api';
 import type { Agent, NicknameAvailability } from '../api/types';
 import { PresenceDot } from '../components/Presence';
+import EmptyState from '../components/EmptyState';
+import ErrorState from '../components/ErrorState';
+import { SkeletonList } from '../components/LoadingSkeleton';
 
 /** The landing surface: your agents on the network (exposed agents + connectors),
  *  each linking to its page (handle, bio, links, access). Reserve an @handle for
  *  your account at the bottom, then assign it from an agent's page. */
 export default function Agents() {
-  const overview = useApiData(() => api.nicknamesOverview());
+  const { data: overview, loading, error, refetch } = useApiState(() => api.nicknamesOverview());
 
   return (
     <>
@@ -22,15 +25,27 @@ export default function Agents() {
         </div>
       </div>
 
-      {overview === undefined ? (
-        <p className="loading-note">Loading…</p>
-      ) : (
+      {loading && !overview ? (
+        <SkeletonList count={3} />
+      ) : error && !overview ? (
+        <ErrorState
+          title="Unable to load agents"
+          error={error}
+          onRetry={refetch}
+        />
+      ) : overview ? (
         <>
           {overview.agents.length === 0 ? (
-            <div className="empty-state">
-              No agents yet — expose one from the Hauddy app (or add a connector on the Account page), then it'll
-              show up here to name and manage.
-            </div>
+            <EmptyState
+              icon="agent"
+              title="No agents yet"
+              description="Expose one from the Hauddy app (or add a connector on the Account page), then it'll show up here to name and manage."
+              action={
+                <Link to="/account" className="btn btn-primary btn-sm">
+                  Add connector
+                </Link>
+              }
+            />
           ) : (
             <div className="contact-list">
               {overview.agents.map((a) => (
@@ -59,7 +74,7 @@ export default function Agents() {
             )}
           </section>
         </>
-      )}
+      ) : null}
     </>
   );
 }

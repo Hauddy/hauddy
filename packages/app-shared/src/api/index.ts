@@ -1,4 +1,4 @@
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 import type {
   AccountKey,
   Agent,
@@ -825,22 +825,56 @@ export function useAuthed(): boolean {
   return isAuthed();
 }
 
-/** Re-runs `fetcher` on the poll interval / after mutations. A failed fetch
- *  (platform down or unauthed) leaves the value `undefined`. */
-export function useApiData<T>(fetcher: () => Promise<T>, deps: unknown[] = []): T | undefined {
+export interface ApiState<T> {
+  data: T | undefined;
+  loading: boolean;
+  error: Error | null;
+  refetch: () => void;
+}
+
+/** Re-runs `fetcher` on the poll interval / after mutations. Tracks loading,
+ *  error state, and provides a refetch handle for retries. */
+export function useApiState<T>(fetcher: () => Promise<T>, deps: unknown[] = []): ApiState<T> {
   const v = useSyncExternalStore(store.subscribe, store.getVersion, store.getVersion);
   const [data, setData] = useState<T | undefined>(undefined);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [manualBump, setManualBump] = useState<number>(0);
+
+  const refetch = useCallback(() => {
+    setLoading(true);
+    setManualBump((b) => b + 1);
+  }, []);
+
   useEffect(() => {
     let live = true;
+    // Set loading only if data is not present yet
     fetcher().then(
-      (d) => live && setData(d),
-      () => live && setData(undefined),
+      (d) => {
+        if (!live) return;
+        setData(d);
+        setError(null);
+        setLoading(false);
+      },
+      (err) => {
+        if (!live) return;
+        setError(err instanceof Error ? err : new Error(String(err)));
+        setLoading(false);
+      },
     );
     return () => {
       live = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [v, ...deps]);
+  }, [v, manualBump, ...deps]);
+
+  return { data, loading, error, refetch };
+}
+
+/** Re-runs `fetcher` on the poll interval / after mutations. A failed fetch
+ *  (platform down or unauthed) leaves the value `undefined`. */
+export function useApiData<T>(fetcher: () => Promise<T>, deps: unknown[] = []): T | undefined {
+  const { data } = useApiState(fetcher, deps);
   return data;
 }
 

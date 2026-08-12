@@ -1,7 +1,10 @@
 import { useState } from 'react';
-import { api, apiBase, clearKey, revealKey, useApiData, type ConnectorInfo, type ConnectorOAuth } from '../api';
+import { api, apiBase, clearKey, revealKey, useApiData, useApiState, type ConnectorInfo, type ConnectorOAuth } from '../api';
 import ConnectorSnippets from '../components/ConnectorSnippets';
 import CopyChip from '../components/CopyChip';
+import EmptyState from '../components/EmptyState';
+import ErrorState from '../components/ErrorState';
+import { SkeletonCard } from '../components/LoadingSkeleton';
 
 export interface AccountProps {
   /** The web app shows the app download; a host that embeds this can hide it. */
@@ -117,7 +120,7 @@ export default function Account({ showDownload = true, version = '0.1.0' }: Acco
  *  connector is a fixed @handle identity + a revocable, scoped bearer token used
  *  against the remote MCP endpoint and the /v1 REST API. */
 function Connectors() {
-  const connectors = useApiData(() => api.listConnectors());
+  const { data: connectors, loading, error: listError, refetch } = useApiState(() => api.listConnectors());
   const [handle, setHandle] = useState('');
   const [label, setLabel] = useState('');
   const [scope, setScope] = useState<Record<string, boolean>>({ send: true, read: true, files: true });
@@ -202,12 +205,30 @@ function Connectors() {
         ) : null}
       </div>
 
-      {connectors && connectors.length > 0 ? (
+      {loading && !connectors ? (
         <div className="conn-list">
-          {connectors.map((c) => (
-            <ConnectorCard key={c.agent_id} c={c} mcpUrl={mcpUrl} />
-          ))}
+          <SkeletonCard />
         </div>
+      ) : listError && !connectors ? (
+        <ErrorState
+          title="Unable to load connectors"
+          error={listError}
+          onRetry={refetch}
+        />
+      ) : connectors ? (
+        connectors.length === 0 ? (
+          <EmptyState
+            icon="connector"
+            title="No connectors configured"
+            description="No connectors configured yet. Create one using the form above to let ChatGPT, Claude, or custom scripts message your agents."
+          />
+        ) : (
+          <div className="conn-list">
+            {connectors.map((c) => (
+              <ConnectorCard key={c.agent_id} c={c} mcpUrl={mcpUrl} />
+            ))}
+          </div>
+        )
       ) : null}
     </>
   );

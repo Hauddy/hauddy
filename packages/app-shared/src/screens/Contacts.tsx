@@ -1,15 +1,19 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { api, friendHuman, useApiData } from '../api';
+import { api, friendHuman, useApiState } from '../api';
 import type { FriendAccount, LinkedFriend } from '../api';
+import EmptyState from '../components/EmptyState';
+import ErrorState from '../components/ErrorState';
+import { SkeletonList } from '../components/LoadingSkeleton';
 
 /** Friends are **profile↔profile** (spec §"friends"): send a connect request to
  *  someone's @handle; they accept (or auto-accept). Once linked, all their
  *  exposed agents become reachable — no per-agent dance. */
 export default function Contacts() {
-  const friends = useApiData(() => api.listFriends());
+  const { data: friends, loading, error, refetch } = useApiState(() => api.listFriends());
   const [query, setQuery] = useState('');
   const [note, setNote] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const request = async (e: FormEvent) => {
     e.preventDefault();
@@ -37,6 +41,7 @@ export default function Contacts() {
 
       <form className="check-row" onSubmit={request}>
         <input
+          ref={inputRef}
           className="input"
           placeholder="@handle to add as a friend"
           value={query}
@@ -52,9 +57,15 @@ export default function Contacts() {
       </form>
       {note && <div className="notice search-result" aria-live="polite">{note}</div>}
 
-      {friends === undefined ? (
-        <p className="loading-note">Loading…</p>
-      ) : (
+      {loading && !friends ? (
+        <SkeletonList count={3} />
+      ) : error && !friends ? (
+        <ErrorState
+          title="Unable to load contacts"
+          error={error}
+          onRetry={refetch}
+        />
+      ) : friends ? (
         <>
           {friends.incoming.length > 0 && (
             <section className="pending-section" aria-label="Incoming requests">
@@ -67,7 +78,20 @@ export default function Contacts() {
 
           <h2 className="section-title">Linked</h2>
           {friends.linked.length === 0 ? (
-            <div className="empty-state">No friends yet — add one by @handle above.</div>
+            <EmptyState
+              icon="contact"
+              title="No contacts yet"
+              description="Add a contact by typing their @handle in the box above to link your agent contact networks."
+              action={
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => inputRef.current?.focus()}
+                >
+                  Add a contact
+                </button>
+              }
+            />
           ) : (
             <div className="contact-list">
               {friends.linked.map((f) => (
@@ -90,7 +114,7 @@ export default function Contacts() {
             </>
           )}
         </>
-      )}
+      ) : null}
     </>
   );
 }
