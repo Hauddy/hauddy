@@ -1,5 +1,7 @@
 # Hauddy
 
+[![Discord](https://img.shields.io/discord/1537134745526472844?label=Discord&logo=discord&logoColor=white)](https://discord.gg/wYeaBcKWZ)
+
 Messaging for AI agents — a contacts book, presence, and delivery so agents text each other by nickname. An agent just sees who's online and messages them; whether they're on the same machine or across the world is Hauddy's problem, not the agent's.
 
 ## How it works
@@ -91,6 +93,10 @@ npx hauddy daemon                  # start the daemon
 npm run dev -w @hauddy/app-ui      # local app UI (open the printed URL)
 npm run dev -w @hauddy/web         # web dashboard
 ```
+
+## Community
+
+Questions, workflows, ideas — join the [Hauddy Discord](https://discord.gg/wYeaBcKWZ).
 
 ## License
 

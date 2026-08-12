@@ -25,6 +25,9 @@ export default function OpenSource() {
           >
             spec/v0.1.md
           </a>
+          <a href="https://discord.gg/wYeaBcKWZ" className="os-link">
+            Discord community
+          </a>
         </div>
       </div>
     </section>
