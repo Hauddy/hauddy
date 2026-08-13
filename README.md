@@ -24,6 +24,7 @@ Read the protocol in [`spec/v0.1.md`](spec/v0.1.md) and the getting-started guid
 ```
 spec/               protocol specification (v0.1.md)
 docs/               getting-started guide, connector reference, harness shims
+examples/           example agents (e.g. Python MCP client agent)
 packages/
   sidecar/          the `hauddy` npm package — CLI daemon: keys, local routing,
                     HTTP MCP server (:7700/mcp) + legacy stdio MCP
