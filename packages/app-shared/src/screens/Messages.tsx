@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { api, useApiData, type Attachment, type CallLogEntry } from '../api';
+import { api, useApiData, useApiState, type Attachment, type CallLogEntry } from '../api';
 import type { Presence } from '../api/types';
 import Combobox from '../components/Combobox';
 import { PresenceDot } from '../components/Presence';
+import EmptyState from '../components/EmptyState';
+import ErrorState from '../components/ErrorState';
+import { SkeletonList } from '../components/LoadingSkeleton';
 
 /** Sender-side delivery state → ✓ (sent) / ✓✓ (delivered) / ✓✓ accent (read). */
 type MsgStatus = 'sent' | 'delivered' | 'read';
@@ -137,14 +140,14 @@ export default function Messages() {
   const agentIdentities = (agents ?? []).filter((a) => a.kind !== 'human' && a.nickname);
   const selfLabel = viewAs ? agentIdentities.find((a) => a.id === viewAs)?.nickname ?? 'agent' : 'you';
 
-  const threadsData = useApiData(() => api.consoleThreads(viewAs), [viewAs]);
+  const { data: threadsData, loading: threadsLoading, error: threadsError, refetch: refetchThreads } = useApiState(() => api.consoleThreads(viewAs), [viewAs]);
   const threads = threadsData?.threads ?? [];
 
   const [view, setView] = useState<'chats' | 'calls'>('chats');
   // Only fetch the call log while the Calls tab is showing (keeps polling cheap).
   // `withFrames` pulls each call's transcript so opening one is instant (no
   // extra request); fine for alpha volumes.
-  const callsData = useApiData(
+  const { data: callsData, loading: callsLoading, error: callsError, refetch: refetchCalls } = useApiState(
     () => (view === 'calls' ? api.consoleCalls({ withFrames: true, as: viewAs ?? undefined }) : Promise.resolve({ calls: [] as CallLogEntry[] })),
     [view, viewAs],
   );
@@ -438,8 +441,34 @@ export default function Messages() {
                   />
                 </div>
               )}
-              {threads.length === 0 ? (
-                <div className="empty-state thread-empty">No conversations yet. Start one with “+ New”.</div>
+              {threadsLoading && !threadsData ? (
+                <SkeletonList count={3} className="thread-empty" />
+              ) : threadsError && !threadsData ? (
+                <ErrorState
+                  title="Unable to load conversations"
+                  error={threadsError}
+                  onRetry={refetchThreads}
+                  compact
+                  className="thread-empty"
+                />
+              ) : threads.length === 0 ? (
+                <EmptyState
+                  icon="message"
+                  title="No conversations"
+                  description="No conversations yet."
+                  action={
+                    !isAgentView ? (
+                      <button
+                        type="button"
+                        className="btn btn-primary btn-sm"
+                        onClick={() => setComposing(true)}
+                      >
+                        + New conversation
+                      </button>
+                    ) : null
+                  }
+                  className="thread-empty"
+                />
               ) : (
                 <div className="thread-rows">
                   {threads.map((t) => (
@@ -461,8 +490,18 @@ export default function Messages() {
                 </div>
               )}
             </>
+          ) : callsLoading && !callsData ? (
+            <SkeletonList count={3} className="thread-empty" />
+          ) : callsError && !callsData ? (
+            <ErrorState
+              title="Unable to load call log"
+              error={callsError}
+              onRetry={refetchCalls}
+              compact
+              className="thread-empty"
+            />
           ) : calls.length === 0 ? (
-            <div className="empty-state thread-empty">No calls yet.</div>
+            <EmptyState icon="message" title="No calls" description="No calls yet." className="thread-empty" />
           ) : (
             <div className="thread-rows">
               {calls.map((c) => {
@@ -499,9 +538,16 @@ export default function Messages() {
           {selectedCall ? (
             <CallTranscript call={selectedCall} selfLabel={selfLabel} presenceOf={presenceOf} onOpenMessages={openMessagesFor} />
           ) : !(view === 'chats' && selected) ? (
-            <div className="empty-state thread-placeholder">
-              {view === 'calls' ? 'Pick a call to see its transcript.' : 'Pick a conversation, or start a new one.'}
-            </div>
+            <EmptyState
+              icon="message"
+              title={view === 'calls' ? 'Select a call' : 'Select a conversation'}
+              description={
+                view === 'calls'
+                  ? 'Pick a call from the sidebar to view its transcript.'
+                  : 'Pick a conversation from the sidebar or start a new one to begin messaging.'
+              }
+              className="thread-placeholder"
+            />
           ) : (
             <>
               <div className="thread-panel-head">
@@ -513,9 +559,15 @@ export default function Messages() {
               {!isAgentView && <CallPanel target={selected} nickOf={nickOf} />}
               <div className="chat-thread" aria-label="Conversation" ref={threadRef} onScroll={onThreadScroll}>
                 {lines.length === 0 ? (
-                  <div className="empty-state">
-                    {isAgentView ? `Nothing between ${selfLabel} and ${selected} yet.` : `No messages yet. Say hello to ${selected}.`}
-                  </div>
+                  <EmptyState
+                    icon="message"
+                    title="No messages yet"
+                    description={
+                      isAgentView
+                        ? `Nothing between ${selfLabel} and ${selected} yet.`
+                        : `No messages yet. Say hello to ${selected}.`
+                    }
+                  />
                 ) : (
                   lines.map((l) => (
                     <div key={l.id} className={`chat-line${l.mine ? ' mine' : ''}`}>

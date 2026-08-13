@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { api, useApiData, type ConnectorOAuth } from '../api';
-import type { Agent, NicknameAvailability } from '../api/types';
+import { api, useApiState, type ConnectorOAuth } from '../api';
+import type { Agent, BookContact, NicknameAvailability } from '../api/types';
 import { PresenceDot } from '../components/Presence';
 import Combobox, { type ComboItem } from '../components/Combobox';
 import CopyChip from '../components/CopyChip';
+import EmptyState from '../components/EmptyState';
+import ErrorState from '../components/ErrorState';
+import { SkeletonList } from '../components/LoadingSkeleton';
 
 type Note = { ok: boolean; text: string } | null;
 
@@ -20,20 +23,25 @@ const KIND_LABEL: Record<string, string> = {
 export default function AgentPage() {
   const { agentId = '' } = useParams();
   const navigate = useNavigate();
-  const agent = useApiData(() => api.getAgentById(agentId), [agentId]);
+  const { data: agent, error, refetch } = useApiState(() => api.getAgentById(agentId), [agentId]);
 
-  if (agent === undefined) return <p className="loading-note">Loading…</p>;
+  if (agent === undefined) {
+    if (error) return <ErrorState title="Unable to load agent details" error={error} onRetry={refetch} />;
+    return <SkeletonList count={3} />;
+  }
+
   if (agent === null) {
     return (
-      <div className="page-head">
-        <div>
-          <Link className="back-link" to="/">
-            ← Agents
+      <EmptyState
+        icon="agent"
+        title="Agent not found"
+        description="This agent was not found. It may have been removed or unexposed."
+        action={
+          <Link className="btn btn-ghost btn-sm" to="/">
+            ← Back to Agents
           </Link>
-          <h1 className="page-title">Agent</h1>
-          <p className="page-sub">Not found — it may have been removed.</p>
-        </div>
-      </div>
+        }
+      />
     );
   }
 
@@ -412,15 +420,15 @@ function NetworkVisibilitySection({ agentId, on }: { agentId: string; on: boolea
  *  falls back to your reachable agents/contacts. You can only add contacts the
  *  connector can actually reach (same-account agents + your contacts). */
 function ContactBookSection({ agentId }: { agentId: string }) {
-  const data = useApiData(() => api.getAgentBook(agentId), [agentId]);
+  const { data, loading, error: bookError, refetch: refetchBook } = useApiState(() => api.getAgentBook(agentId), [agentId]);
   const [adding, setAdding] = useState(false);
   const [note, setNote] = useState<Note>(null);
 
   const book = data?.book ?? [];
   const bookable = data?.bookable ?? [];
   const items: ComboItem[] = bookable
-    .map((c) => ({ value: c.handle ?? '', label: c.handle ?? '(unnamed)', description: c.description ?? undefined }))
-    .filter((i) => i.value);
+    .map((c: BookContact) => ({ value: c.handle ?? '', label: c.handle ?? '(unnamed)', description: c.description ?? undefined }))
+    .filter((i: ComboItem) => i.value);
 
   const add = async (handle: string) => {
     setAdding(false);
@@ -446,6 +454,7 @@ function ContactBookSection({ agentId }: { agentId: string }) {
         Curate what this connector sees in <code>list_contacts</code>. With a book set it sees exactly these; leave
         it empty and it sees your reachable agents and contacts by default. You can only add contacts it can reach.
       </p>
+      {note && <div className={`notice ${note.ok ? 'ok' : 'bad'}`}>{note.text}</div>}
       {adding && (
         <div className="pool-add-book">
           {items.length === 0 ? (
@@ -455,15 +464,19 @@ function ContactBookSection({ agentId }: { agentId: string }) {
           )}
         </div>
       )}
-      {data === undefined ? (
-        <p className="loading-note">Loading…</p>
+      {loading && !data ? (
+        <SkeletonList count={2} />
+      ) : bookError && !data ? (
+        <ErrorState title="Unable to load contact book" error={bookError} onRetry={refetchBook} />
       ) : book.length === 0 ? (
-        <div className="empty-state book-empty">
-          No book yet — this connector sees your reachable contacts by default. Add one to curate the list.
-        </div>
+        <EmptyState
+          icon="contact"
+          title="No book contacts yet"
+          description="No book yet — this connector sees your reachable contacts by default. Add one to curate the list."
+        />
       ) : (
         <div className="contact-list">
-          {book.map((c) => (
+          {book.map((c: BookContact) => (
             <div className="contact-row" key={c.agent_id}>
               <div className="contact-main">
                 <span className="contact-nick">
