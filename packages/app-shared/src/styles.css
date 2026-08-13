@@ -986,6 +986,17 @@
   margin-bottom: 8px;
 }
 
+.account-legal {
+  margin-top: 40px;
+  font-size: 12px;
+  color: var(--fg-muted);
+}
+.account-legal a {
+  color: inherit;
+  text-decoration: underline;
+}
+.account-legal a:hover { opacity: 0.75; }
+
 /* API-key card: pad the surface, stack the key over its actions */
 .conn-card {
   padding: 18px;

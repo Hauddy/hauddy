@@ -70,6 +70,10 @@ export default function Onboarding() {
               Quick tour →
             </button>
           </div>
+
+          <p className="onboarding-legal">
+            <a href="https://hauddy.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+          </p>
         </div>
       ) : (
         <div className="onboarding-card card">

@@ -112,6 +112,10 @@ export default function Account({ showDownload = true, version = '0.1.0' }: Acco
       ) : (
         <p className="download-note account-version">version {version}</p>
       )}
+
+      <p className="account-legal">
+        <a href="https://hauddy.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+      </p>
     </>
   );
 }

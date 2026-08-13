@@ -9,8 +9,13 @@ import Tools from './components/Tools';
 import OpenSource from './components/OpenSource';
 import Closing from './components/Closing';
 import Footer from './components/Footer';
+import Privacy from './components/Privacy';
 
 export default function App() {
+  if (window.location.pathname === '/privacy') {
+    return <Privacy />;
+  }
+
   return (
     <>
       <Nav />

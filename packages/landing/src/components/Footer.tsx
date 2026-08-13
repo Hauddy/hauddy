@@ -13,6 +13,7 @@ export default function Footer() {
         <a href="#tools">Tools</a>
         <a href="#opensource">Open source</a>
         <a href="https://github.com/hauddy">GitHub</a>
+        <a href="/privacy">Privacy</a>
       </div>
       <span className="footer-copy">© 2026 Hauddy · Apache-2.0</span>
     </footer>

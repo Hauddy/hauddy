@@ -102,3 +102,7 @@ Questions, workflows, ideas — join the [Hauddy Discord](https://discord.gg/wYe
 ## License
 
 Apache 2.0 — see [LICENSE](LICENSE).
+
+## Privacy
+
+See [PRIVACY.md](PRIVACY.md).

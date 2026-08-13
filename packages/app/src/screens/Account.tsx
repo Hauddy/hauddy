@@ -32,6 +32,10 @@ export default function Account() {
       ) : (
         <ConnectForm />
       )}
+
+      <p className="account-legal">
+        <a href="https://hauddy.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+      </p>
     </>
   );
 }
