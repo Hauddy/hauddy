@@ -1,5 +1,5 @@
-import { KeyboardEvent, useEffect, useState } from 'react';
-import { useReducedMotion, useReveal } from '../hooks';
+import { KeyboardEvent, useEffect, useRef, useState } from 'react';
+import { useReducedMotion, useReveal, useInView } from '../hooks';
 
 /* ---------- transcripts ---------- */
 
@@ -131,43 +131,43 @@ const TRANSCRIPTS: Record<TabId, TermLine[]> = {
 function useTypewriter(lines: TermLine[], run: boolean, reduced: boolean) {
   const [doneCount, setDoneCount] = useState(0);
   const [partial, setPartial] = useState<string | null>('');
+  // cursor tracks position independently so pausing doesn't reset progress
+  const pos = useRef({ li: 0, ci: 0, started: false });
 
+  // reset when the transcript changes (tab switch)
   useEffect(() => {
-    if (reduced || !run) {
-      setDoneCount(reduced ? lines.length : 0);
-      setPartial(reduced ? null : '');
-      return;
-    }
+    pos.current = { li: 0, ci: 0, started: false };
     setDoneCount(0);
-    setPartial('');
-    let li = 0;
-    let ci = 0;
+    setPartial(reduced ? null : '');
+    if (reduced) setDoneCount(lines.length);
+  }, [lines, reduced]);
+
+  // start/pause/resume based on `run`
+  useEffect(() => {
+    if (reduced || !run) return;
+    const p = pos.current;
+    if (p.li >= lines.length) return; // already finished
     let cancelled = false;
     let timer = 0;
     const tick = () => {
       if (cancelled) return;
-      if (li >= lines.length) {
-        setPartial(null);
-        return;
-      }
-      const text = lines[li].t;
-      ci += 1;
-      if (ci < text.length) {
-        setPartial(text.slice(0, ci));
+      if (p.li >= lines.length) { setPartial(null); return; }
+      const text = lines[p.li].t;
+      p.ci += 1;
+      if (p.ci < text.length) {
+        setPartial(text.slice(0, p.ci));
         timer = window.setTimeout(tick, 14 + Math.random() * 22);
       } else {
-        li += 1;
-        ci = 0;
-        setDoneCount(li);
-        setPartial(li >= lines.length ? null : '');
-        timer = window.setTimeout(tick, li % 5 === 0 ? 420 : 170);
+        p.li += 1;
+        p.ci = 0;
+        setDoneCount(p.li);
+        setPartial(p.li >= lines.length ? null : '');
+        timer = window.setTimeout(tick, p.li % 5 === 0 ? 420 : 170);
       }
     };
-    timer = window.setTimeout(tick, 450);
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timer);
-    };
+    timer = window.setTimeout(tick, p.started ? 0 : 450);
+    p.started = true;
+    return () => { cancelled = true; window.clearTimeout(timer); };
   }, [lines, run, reduced]);
 
   return { doneCount, partial, finished: partial === null };
@@ -177,10 +177,16 @@ function useTypewriter(lines: TermLine[], run: boolean, reduced: boolean) {
 
 export default function TerminalSection() {
   const reduced = useReducedMotion();
-  const { ref, visible } = useReveal<HTMLElement>();
+  const { ref: revealRef, visible } = useReveal<HTMLElement>();
+  const { ref: inViewRef, inView } = useInView<HTMLElement>();
+  // single callback ref sets both internal refs
+  const ref = (el: HTMLElement | null) => {
+    revealRef.current = el;
+    inViewRef.current = el;
+  };
   const [tab, setTab] = useState<TabId>('claude');
   const lines = TRANSCRIPTS[tab];
-  const { doneCount, partial, finished } = useTypewriter(lines, visible, reduced);
+  const { doneCount, partial, finished } = useTypewriter(lines, inView, reduced);
 
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     const ids = TABS.map((t) => t.id);

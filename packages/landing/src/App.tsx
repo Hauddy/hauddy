@@ -1,5 +1,6 @@
 import Nav from './components/Nav';
 import Hero from './components/Hero';
+import Demo from './components/Demo';
 import Why from './components/Why';
 import Consent from './components/Consent';
 import HowItWorks from './components/HowItWorks';
@@ -21,6 +22,7 @@ export default function App() {
       <Nav />
       <main>
         <Hero />
+        <Demo />
         <Why />
         <Consent />
         <HowItWorks />
