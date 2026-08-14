@@ -36,6 +36,9 @@ jobs:
       - name: Sync version across all packages
         run: node scripts/set-version.mjs ${{ steps.ver.outputs.version }}
 
+      - name: Build TypeScript packages
+        run: npm run build
+
       - name: Build desktop app (unsigned)
         run: npm run dist -w @hauddy/desktop
         env:
@@ -72,6 +75,9 @@ jobs:
 
       - name: Sync version across all packages
         run: node scripts/set-version.mjs ${{ env.VERSION }}
+
+      - name: Build TypeScript packages
+        run: npm run build
 
       - name: Download DMG
         uses: actions/download-artifact@v4
