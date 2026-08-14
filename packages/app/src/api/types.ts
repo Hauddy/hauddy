@@ -141,12 +141,19 @@ export interface ConsoleCallPoll {
   call_id?: string | null;
 }
 
+export interface PlatformRejection {
+  reason: 'client_outdated' | 'not_allowlisted' | 'bad_credentials';
+  min_version?: string;
+  latest_version?: string;
+}
+
 /** The app's link to a platform (the "go online" tier). */
 export interface PlatformInfo {
   connected: boolean;
   endpoint: string | null;
   email: string | null;
   maskedKey: string | null;
+  rejection: PlatformRejection | null;
 }
 
 /** One local agent's exposure state on the connected platform. */

@@ -25,6 +25,10 @@ bucket_name = "hauddy-releases"
 
 [vars]
 CORS_ORIGIN = "https://app.hauddy.com"
+# Minimum sidecar semver accepted (empty = no enforcement, current default).
+MIN_CLIENT_VERSION = ""
+# Latest known release semver — returned in auth_rejected so the client can show a download link.
+LATEST_CLIENT_VERSION = "0.1.0"
 
 # Secrets (set with `wrangler secret put`): ADMIN_TOKEN (invite admin endpoint).
 

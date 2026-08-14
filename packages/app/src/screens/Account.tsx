@@ -1,8 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api, useApiData } from '../api';
 import type { ExposureRow, PlatformInfo } from '../api/types';
 import { PresenceDot } from '../components/Presence';
+
+const APP_VERSION: string = import.meta.env.VITE_APP_VERSION ?? '0.0.0';
+
+function semverLt(a: string, b: string): boolean {
+  const parse = (s: string) => s.split('.').slice(0, 3).map(Number);
+  const [aMaj = 0, aMin = 0, aPat = 0] = parse(a);
+  const [bMaj = 0, bMin = 0, bPat = 0] = parse(b);
+  if (aMaj !== bMaj) return aMaj < bMaj;
+  if (aMin !== bMin) return aMin < bMin;
+  return aPat < bPat;
+}
 
 /** Account: link this machine to your Hauddy account (paste the API key), then
  *  expose chosen agents onto the network under it. Everything here is opt-in —
@@ -10,6 +21,23 @@ import { PresenceDot } from '../components/Presence';
 export default function Account() {
   const platform = useApiData(() => api.getPlatform());
   const navigate = useNavigate();
+  const [softUpdate, setSoftUpdate] = useState<{ latest: string } | null>(null);
+  const [softDismissed, setSoftDismissed] = useState(false);
+
+  useEffect(() => {
+    if (!platform?.endpoint) return;
+    const base = platform.endpoint.replace(/^ws/, 'http');
+    fetch(`${base}/api/version`)
+      .then((r) => r.json() as Promise<{ latest?: string; min?: string }>)
+      .then(({ latest, min }) => {
+        if (min && semverLt(APP_VERSION, min)) return; // hard block — already shown via rejection
+        if (latest && semverLt(APP_VERSION, latest)) setSoftUpdate({ latest });
+      })
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [platform?.endpoint]);
+
+  const rejection = platform?.rejection;
 
   return (
     <>
@@ -23,10 +51,19 @@ export default function Account() {
         </div>
       </div>
 
-      {platform === undefined ? (
+      {rejection?.reason === 'client_outdated' ? (
+        <OutdatedBanner currentVersion={APP_VERSION} rejection={rejection} />
+      ) : platform === undefined ? (
         <p className="loading-note">Loading…</p>
       ) : platform.connected ? (
         <>
+          {softUpdate && !softDismissed && (
+            <div className="notice update-soft">
+              Hauddy {softUpdate.latest} is available —{' '}
+              <a href="https://hauddy.com/download" target="_blank" rel="noopener noreferrer">Download</a>
+              <button type="button" className="btn-dismiss" onClick={() => setSoftDismissed(true)}>✕</button>
+            </div>
+          )}
           <ConnectedCard platform={platform} />
           <Exposure />
         </>
@@ -120,6 +157,32 @@ function ConnectedCard({ platform }: { platform: PlatformInfo }) {
           {confirmDisc ? 'Click again to disconnect' : 'Disconnect'}
         </button>
       </div>
+    </div>
+  );
+}
+
+function OutdatedBanner({
+  currentVersion,
+  rejection,
+}: {
+  currentVersion: string;
+  rejection: NonNullable<PlatformInfo['rejection']>;
+}) {
+  const downloadUrl = rejection.latest_version
+    ? `https://github.com/hauddy/hauddy/releases/tag/v${rejection.latest_version}`
+    : 'https://hauddy.com/download';
+  return (
+    <div className="card conn-card outdated-banner">
+      <div className="conn-status">
+        <span className="presence presence-delay">Update required</span>
+      </div>
+      <p className="book-explainer">
+        This version of Hauddy ({currentVersion}) is no longer supported.
+        {rejection.min_version ? ` Version ${rejection.min_version} or later is required.` : ''}
+      </p>
+      <a href={downloadUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary conn-submit">
+        Download update
+      </a>
     </div>
   );
 }

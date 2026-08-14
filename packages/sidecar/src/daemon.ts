@@ -37,12 +37,19 @@ export interface EnrolledAgent {
   description: string | null;
 }
 export type LinkResult = { ok: true } | { ok: false; conflict: string };
+export interface PlatformRejection {
+  reason: 'client_outdated' | 'not_allowlisted' | 'bad_credentials';
+  min_version?: string;
+  latest_version?: string;
+}
+
 /** The app's link to a platform (the "go online" tier). */
 export interface PlatformInfo {
   connected: boolean;
   endpoint: string | null;
   email: string | null;
   maskedKey: string | null;
+  rejection: PlatformRejection | null;
 }
 /** One local agent's exposure state on the connected platform. */
 export interface ExposureRow {
@@ -754,14 +761,16 @@ export class Daemon {
   /** The app's platform link, read from ~/.hauddy/account.toml. */
   getPlatform(): PlatformInfo {
     const cfg = loadAccount();
+    const rejection = this.bridge?.getRejection() ?? null;
     if (!cfg?.api_key) {
-      return { connected: false, endpoint: cfg?.endpoint ?? null, email: null, maskedKey: null };
+      return { connected: false, endpoint: cfg?.endpoint ?? null, email: null, maskedKey: null, rejection };
     }
     return {
       connected: true,
       endpoint: cfg.endpoint,
       email: cfg.email ?? null,
       maskedKey: maskKey(cfg.api_key),
+      rejection,
     };
   }
 

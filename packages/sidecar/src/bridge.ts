@@ -1,4 +1,4 @@
-import type { Envelope, Presence } from "@hauddy/protocol";
+import type { AuthRejectedFrame, Envelope, Presence } from "@hauddy/protocol";
 import { HubConnection } from "./connection.js";
 import { loadOrCreateKeypair } from "./keys.js";
 
@@ -36,8 +36,13 @@ export interface PlatformBridgeOptions {
 export class PlatformBridge {
   /** localAgentId → its upstream connection. */
   private conns = new Map<string, HubConnection>();
+  private rejection: Pick<AuthRejectedFrame, "reason" | "min_version" | "latest_version"> | null = null;
 
   constructor(private readonly opts: PlatformBridgeOptions) {}
+
+  getRejection(): Pick<AuthRejectedFrame, "reason" | "min_version" | "latest_version"> | null {
+    return this.rejection;
+  }
 
   /** Bring the live set of upstream connections to exactly `agents`. */
   reconcile(agents: BridgeAgent[]): void {
@@ -62,7 +67,13 @@ export class PlatformBridge {
       raw: true,
     });
     conn.on("envelope", (env: Envelope) => this.opts.onInbound(a.localAgentId, env));
-    conn.on("ready", (presence: Presence[]) => this.opts.onRemotes(a.localAgentId, presence));
+    conn.on("ready", (presence: Presence[]) => {
+      this.rejection = null; // clear on successful auth
+      this.opts.onRemotes(a.localAgentId, presence);
+    });
+    conn.on("auth_rejected", (r: Pick<AuthRejectedFrame, "reason" | "min_version" | "latest_version">) => {
+      this.rejection = r;
+    });
     conn.on("socket_error", () => {
       /* backoff/reconnect is the connection's own job */
     });

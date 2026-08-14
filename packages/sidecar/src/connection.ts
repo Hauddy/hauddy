@@ -7,11 +7,13 @@ import {
   nowIso,
   PROTOCOL_VERSION,
   type Attachment,
+  type AuthRejectedFrame,
   type Envelope,
   type NicknameStatus,
   type Presence,
   type ReceiptStatus,
 } from "@hauddy/protocol";
+import { SIDECAR_VERSION } from "./version.js";
 
 export interface HubConnectionOptions {
   endpoint: string;
@@ -66,6 +68,7 @@ export class HubConnection extends EventEmitter {
   private attempt = 0;
   private stopped = false;
   private ready = false;
+  private rejection: Pick<AuthRejectedFrame, "reason" | "min_version" | "latest_version"> | null = null;
   private inbox: Envelope[] = [];
   /** Buffered incoming call frames (spec §Calls), drained by the call tools. */
   private calls: CallFrame[] = [];
@@ -99,11 +102,16 @@ export class HubConnection extends EventEmitter {
     return this.ready;
   }
 
-  /** Coarse lifecycle state for the local UI: connected | connecting | disconnected. */
-  getConnectionState(): "connected" | "connecting" | "disconnected" {
+  /** Coarse lifecycle state for the local UI. */
+  getConnectionState(): "connected" | "connecting" | "disconnected" | "rejected" {
     if (this.ready) return "connected";
+    if (this.rejection) return "rejected";
     if (this.stopped || !this.ws) return "disconnected";
     return "connecting";
+  }
+
+  getRejection(): Pick<AuthRejectedFrame, "reason" | "min_version" | "latest_version"> | null {
+    return this.rejection;
   }
 
   getNickname(): string | null {
@@ -132,6 +140,7 @@ export class HubConnection extends EventEmitter {
         agent_id: this.opts.agentId,
         grant_scope_id: this.opts.grantScopeId,
         ...(this.nicknameClaim ? { nickname: this.nicknameClaim } : {}),
+        client_version: SIDECAR_VERSION,
       });
     });
     ws.on("message", (data: WebSocket.RawData) => this.onMessage(data.toString()));
@@ -167,7 +176,14 @@ export class HubConnection extends EventEmitter {
         this.sendRaw({ type: "auth_response", signature });
         return;
       }
+      case "auth_rejected": {
+        this.rejection = { reason: frame.reason, min_version: frame.min_version, latest_version: frame.latest_version };
+        this.stopped = true; // no retry storm — this is operator-action-required
+        this.emit("auth_rejected", this.rejection);
+        return;
+      }
       case "auth_ok": {
+        this.rejection = null;
         this.attempt = 0;
         this.ready = true;
         this.nickname = frame.nickname;

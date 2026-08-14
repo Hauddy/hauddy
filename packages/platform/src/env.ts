@@ -12,4 +12,8 @@ export interface Env {
   ADMIN_TOKEN?: string;
   /** "off" disables the signup/login rate limiter (local dev + tests). */
   RATE_LIMIT?: string;
+  /** Minimum sidecar semver accepted. Missing/empty = "0.0.0" (no enforcement). */
+  MIN_CLIENT_VERSION?: string;
+  /** Latest known release semver, returned in auth_rejected so the client can show a download link. */
+  LATEST_CLIENT_VERSION?: string;
 }

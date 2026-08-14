@@ -22,6 +22,18 @@ export const authHelloFrameSchema = z.object({
   grant_scope_id: z.string().min(1),
   /** Optional local nickname claim (spec §2.4), bare form without '@'. */
   nickname: z.string().min(1).optional(),
+  /** Sidecar semver, e.g. "0.1.0". Missing = treated as "0.0.0" by the platform. */
+  client_version: z.string().optional(),
+});
+
+export const authRejectedFrameSchema = z.object({
+  type: z.literal("auth_rejected"),
+  reason: z.enum(["client_outdated", "not_allowlisted", "bad_credentials"]),
+  /** Minimum required semver; present when reason = client_outdated. */
+  min_version: z.string().optional(),
+  /** Latest known release version. */
+  latest_version: z.string().optional(),
+  message: z.string().optional(),
 });
 
 export const authChallengeFrameSchema = z.object({
@@ -96,6 +108,7 @@ export const errorFrameSchema = z.object({
 
 export const controlFrameSchema = z.discriminatedUnion("type", [
   authHelloFrameSchema,
+  authRejectedFrameSchema,
   authChallengeFrameSchema,
   authResponseFrameSchema,
   authOkFrameSchema,
@@ -110,6 +123,7 @@ export const controlFrameSchema = z.discriminatedUnion("type", [
 ]);
 
 export type AuthHelloFrame = z.infer<typeof authHelloFrameSchema>;
+export type AuthRejectedFrame = z.infer<typeof authRejectedFrameSchema>;
 export type AuthChallengeFrame = z.infer<typeof authChallengeFrameSchema>;
 export type AuthResponseFrame = z.infer<typeof authResponseFrameSchema>;
 export type AuthOkFrame = z.infer<typeof authOkFrameSchema>;

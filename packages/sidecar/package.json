@@ -16,6 +16,7 @@
     "hauddy": "./dist/cli.js"
   },
   "scripts": {
+    "prebuild": "node scripts/gen-version.mjs",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/cli.js",
     "postinstall": "node scripts/fix-node-pty.mjs"

@@ -38,6 +38,17 @@ export default {
       }
     }
 
+    // Public version info — no auth required. Used by the app for proactive update checks.
+    if (url.pathname === "/api/version" && request.method === "GET") {
+      return new Response(
+        JSON.stringify({
+          latest: env.LATEST_CLIENT_VERSION?.trim() || null,
+          min: env.MIN_CLIENT_VERSION?.trim() || "0.0.0",
+        }),
+        { status: 200, headers: { "content-type": "application/json", ...corsHeaders(env) } },
+      );
+    }
+
     // Public app download — served directly from R2, no auth required.
     if (url.pathname === "/download/mac") {
       const obj = await env.RELEASES.get("downloads/mac-arm64-latest.dmg");

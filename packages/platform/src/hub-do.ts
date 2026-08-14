@@ -15,6 +15,17 @@ import {
 /** A console human counts as "online" for this long after its last activity
  *  (it has no WS socket, so presence is heartbeat-based). */
 const CONSOLE_TTL_MS = 90_000;
+
+/** Returns true when semver `a` is strictly less than `b` (major.minor.patch only). */
+function semverLt(a: string, b: string): boolean {
+  const parse = (s: string): [number, number, number] =>
+    (s.split(".").slice(0, 3).map(Number) as [number, number, number]);
+  const [aMaj, aMin, aPat] = parse(a);
+  const [bMaj, bMin, bPat] = parse(b);
+  if (aMaj !== bMaj) return aMaj < bMaj;
+  if (aMin !== bMin) return aMin < bMin;
+  return aPat < bPat;
+}
 import type { Env } from "./env.js";
 import { Db, CONNECTOR_SCOPES, type AttachmentRow, type CallRow, type SyncMessage } from "./db.js";
 import { FileStoreR2 } from "./files-r2.js";
@@ -1729,6 +1740,23 @@ export class HubDO {
 
     switch (frame.type) {
       case "auth_hello": {
+        // Version gate: reject before issuing a challenge so stale clients stop retrying.
+        const minVer = this.env.MIN_CLIENT_VERSION?.trim() || "0.0.0";
+        if (minVer !== "0.0.0") {
+          const clientVer = frame.client_version?.trim() || "0.0.0";
+          if (semverLt(clientVer, minVer)) {
+            this.sendFrame(ws, {
+              type: "auth_rejected",
+              reason: "client_outdated",
+              min_version: minVer,
+              ...(this.env.LATEST_CLIENT_VERSION?.trim()
+                ? { latest_version: this.env.LATEST_CLIENT_VERSION.trim() }
+                : {}),
+              message: `Client version ${clientVer} is below the minimum required ${minVer}.`,
+            });
+            return ws.close(4000, "client_outdated");
+          }
+        }
         const agent = this.db.getAgent(frame.agent_id);
         if (!agent) {
           this.sendError(ws, "E_UNKNOWN_AGENT", `unknown agent_id ${frame.agent_id}`);
