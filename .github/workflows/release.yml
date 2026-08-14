@@ -1,0 +1,133 @@
+name: Release
+
+on:
+  push:
+    tags: ['v[0-9]*']
+
+# Required secrets:
+#   CLOUDFLARE_API_TOKEN  — wrangler deploy + pages deploy + r2 object put
+#   CLOUDFLARE_ACCOUNT_ID — r2 object put
+
+jobs:
+  # ── Build the macOS DMG on a real Mac runner ──────────────────────────────
+  build-mac:
+    name: Build macOS DMG
+    runs-on: macos-latest
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
+      dmg: ${{ steps.ver.outputs.dmg }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Resolve version from tag
+        id: ver
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "dmg=hauddy-${VERSION}-arm64.dmg" >> $GITHUB_OUTPUT
+
+      - name: Sync version across all packages
+        run: node scripts/set-version.mjs ${{ steps.ver.outputs.version }}
+
+      - name: Build desktop app (unsigned)
+        run: npm run dist -w @hauddy/desktop
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+
+      - name: Upload DMG artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-dmg
+          path: packages/desktop/release/*.dmg
+          retention-days: 1
+
+  # ── Upload to R2, deploy Cloudflare, create GitHub Release ───────────────
+  deploy:
+    name: Deploy & Release
+    needs: build-mac
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # needed for creating a GitHub Release
+    env:
+      VERSION: ${{ needs.build-mac.outputs.version }}
+      DMG: ${{ needs.build-mac.outputs.dmg }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Sync version across all packages
+        run: node scripts/set-version.mjs ${{ env.VERSION }}
+
+      - name: Download DMG
+        uses: actions/download-artifact@v4
+        with:
+          name: mac-dmg
+          path: dist-artifacts
+
+      # Upload the DMG to R2 under two keys:
+      #   downloads/mac-arm64-latest.dmg  — stable "latest" pointer (served by /download/mac)
+      #   downloads/hauddy-{v}-arm64.dmg  — immutable versioned archive
+      - name: Upload DMG to R2
+        working-directory: packages/platform
+        run: |
+          npx wrangler r2 object put hauddy-releases/downloads/mac-arm64-latest.dmg \
+            --file "$GITHUB_WORKSPACE/dist-artifacts/$DMG" \
+            --content-type application/octet-stream
+          npx wrangler r2 object put "hauddy-releases/downloads/hauddy-${VERSION}-arm64.dmg" \
+            --file "$GITHUB_WORKSPACE/dist-artifacts/$DMG" \
+            --content-type application/octet-stream
+
+      # Deploy the platform Worker. Passes LATEST_CLIENT_VERSION so /api/version
+      # and the auth_rejected frame can report the newest available download.
+      - name: Deploy platform Worker
+        working-directory: packages/platform
+        run: npx wrangler deploy --var "LATEST_CLIENT_VERSION:${VERSION}"
+
+      # Build and deploy the web dashboard (app.hauddy.com)
+      - name: Build web dashboard
+        run: npm run build -w @hauddy/web
+
+      - name: Deploy web dashboard
+        working-directory: packages/web
+        run: npx wrangler pages deploy dist
+
+      # Build and deploy the landing site (hauddy.com)
+      - name: Build landing site
+        run: npm run build -w @hauddy/landing
+
+      - name: Deploy landing site
+        working-directory: packages/landing
+        run: npx wrangler pages deploy dist
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Hauddy v${{ env.VERSION }}
+          body: |
+            ## Download
+
+            | Platform | File |
+            |---|---|
+            | macOS (Apple Silicon) | `hauddy-${{ env.VERSION }}-arm64.dmg` |
+
+            Or use the direct link: **https://api.hauddy.com/download/mac**
+
+            ---
+            See [CHANGELOG](https://github.com/hauddy/hauddy/blob/main/CHANGELOG.md) for what's new.
+          files: dist-artifacts/${{ env.DMG }}
+          fail_on_unmatched_files: true
