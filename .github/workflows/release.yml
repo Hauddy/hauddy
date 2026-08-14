@@ -100,10 +100,12 @@ jobs:
         run: |
           npx wrangler r2 object put hauddy-releases/downloads/mac-arm64-latest.dmg \
             --file "$GITHUB_WORKSPACE/dist-artifacts/$DMG" \
-            --content-type application/octet-stream
+            --content-type application/octet-stream \
+            --remote
           npx wrangler r2 object put "hauddy-releases/downloads/hauddy-${VERSION}-arm64.dmg" \
             --file "$GITHUB_WORKSPACE/dist-artifacts/$DMG" \
-            --content-type application/octet-stream
+            --content-type application/octet-stream \
+            --remote
 
       # Deploy the platform Worker. Passes LATEST_CLIENT_VERSION so /api/version
       # and the auth_rejected frame can report the newest available download.
