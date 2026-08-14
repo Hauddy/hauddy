@@ -34,13 +34,20 @@ jobs:
           echo "dmg=hauddy-${VERSION}-arm64.dmg" >> $GITHUB_OUTPUT
 
       - name: Sync version across all packages
-        run: node scripts/set-version.mjs ${{ steps.ver.outputs.version }}
+        run: |
+          node scripts/set-version.mjs ${{ steps.ver.outputs.version }}
+          # Bake SIDECAR_VERSION into src/version.ts; tsc -b doesn't run npm
+          # prebuild lifecycle scripts so we must call gen-version.mjs explicitly.
+          node packages/sidecar/scripts/gen-version.mjs
 
       - name: Build TypeScript packages
         run: npm run build
 
       - name: Build desktop app (unsigned)
-        run: npm run dist -w @hauddy/desktop
+        # Use working-directory so npm reads package.json directly instead of
+        # resolving the workspace via package-lock.json (which still has 0.1.0).
+        working-directory: packages/desktop
+        run: npm run dist
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
 
