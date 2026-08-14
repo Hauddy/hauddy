@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { api, useApiData } from '../api';
 import type { ExposureRow, PlatformInfo } from '../api/types';
 import { PresenceDot } from '../components/Presence';
@@ -9,6 +9,7 @@ import { PresenceDot } from '../components/Presence';
  *  local messaging works without an account. */
 export default function Account() {
   const platform = useApiData(() => api.getPlatform());
+  const navigate = useNavigate();
 
   return (
     <>
@@ -32,6 +33,13 @@ export default function Account() {
       ) : (
         <ConnectForm />
       )}
+
+      <section className="detail-section">
+        <h2 className="section-title">Help</h2>
+        <button type="button" className="btn btn-ghost" onClick={() => navigate('/onboarding')}>
+          View intro again
+        </button>
+      </section>
 
       <p className="account-legal">
         <a href="https://hauddy.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
