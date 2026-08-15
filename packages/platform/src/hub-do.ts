@@ -1485,6 +1485,44 @@ export class HubDO {
         now: Date.now(),
       });
     }
+    // ---- dashboard (consolidates threads + notifications + friends + agents into one DO request) ----
+    if (method === "GET" && path === "/console/dashboard") {
+      const accountId = this.requireAccount(request);
+      if (!accountId) return this.json(400, { error: "account key required" });
+      const viewerId = this.resolveConsoleViewer(request, url.searchParams.get("as"), humanId);
+      if (!viewerId) return this.json(403, { error: "not your agent" });
+
+      const threads = this.db.threadsFor(viewerId).map((t) => ({
+        ...t,
+        peer_nick: t.peer_nick ?? this.db.speakingNickname(t.peer_id) ?? t.peer_id,
+      }));
+
+      const { linked, incoming, outgoing } = this.db.listFriendships(accountId);
+      const brief = (id: string) => ({ account_id: id, email: this.db.getAccount(id)?.email ?? null });
+      const seen = (await this.ctx.storage.get<number>(`notifseen:${humanId}`)) ?? 0;
+
+      return this.json(200, {
+        threads,
+        notifications: {
+          friend_requests: incoming.length,
+          unread_messages: this.db.unreadMessageCount(humanId),
+          missed_calls: this.db.missedCallCount(humanId, seen),
+        },
+        friends: {
+          auto_accept: this.db.getAutoAccept(accountId),
+          linked: linked.map((id) => ({
+            ...brief(id),
+            agents: this.db.accountAgents(id).filter((a) => !!a.listed).map((a) => this.agentView(a.agent_id)),
+          })),
+          incoming: incoming.map(brief),
+          outgoing: outgoing.map(brief),
+          linked_agents: this.db.accountAgentGrants(accountId).map((id) => this.agentView(id)),
+        },
+        agents: this.db.accountAgents(accountId).map((a) => this.agentView(a.agent_id, accountId)),
+        platform_agents: this.db.listAllAgents().filter((a) => !!a.listed).map((a) => this.agentView(a.agent_id)),
+      });
+    }
+
     return this.json(404, { error: "unknown console route" });
   }
 

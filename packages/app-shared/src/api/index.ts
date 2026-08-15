@@ -139,7 +139,7 @@ async function postResult(path: string, body: unknown): Promise<ContactActionRes
 // The dashboard re-fetches on this heartbeat, so keep it gentle and skip it
 // entirely while the tab is backgrounded (Page Visibility) — an open-but-hidden
 // tab should make zero requests. Refocusing refreshes immediately.
-const POLL_MS = 6000;
+const POLL_MS = 30_000;
 let version = 0;
 const listeners = new Set<() => void>();
 let timer: ReturnType<typeof setInterval> | null = null;
@@ -355,6 +355,14 @@ export interface Notifications {
   friend_requests: number;
   unread_messages: number;
   missed_calls: number;
+}
+
+export interface DashboardResult {
+  threads: ThreadSummary[];
+  notifications: Notifications;
+  friends: FriendsView;
+  agents: Agent[];
+  platform_agents: Agent[];
 }
 
 // ---- auth actions (used by the Login screen) ----------------------------
@@ -796,6 +804,25 @@ export const api = {
   },
   consoleNotifications(): Promise<Notifications> {
     return get<Notifications>('/console/notifications');
+  },
+  /** One-shot endpoint: threads + notifications + friends + agents + platform_agents
+   *  consolidated into a single DO request (replaces 4–5 separate per-tick calls). */
+  async consoleDashboard(opts?: { as?: string | null }): Promise<DashboardResult> {
+    const qs = opts?.as ? `?as=${encodeURIComponent(opts.as)}` : '';
+    const raw = await get<{
+      threads: ThreadSummary[];
+      notifications: Notifications;
+      friends: FriendsView;
+      agents: HubAgent[];
+      platform_agents: HubAgent[];
+    }>(`/console/dashboard${qs}`);
+    return {
+      threads: raw.threads,
+      notifications: raw.notifications,
+      friends: raw.friends,
+      agents: raw.agents.filter((a) => a.kind !== 'human').map(toAgent),
+      platform_agents: raw.platform_agents.map(toAgent),
+    };
   },
   /** Acknowledge missed calls (clears their part of the badge). */
   consoleNotificationsSeen(): Promise<{ ok?: boolean }> {

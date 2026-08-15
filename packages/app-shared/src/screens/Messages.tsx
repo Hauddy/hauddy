@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { api, useApiData, useApiState, type Attachment, type CallLogEntry } from '../api';
+import { api, useApiState, type Attachment, type CallLogEntry } from '../api';
 import type { Presence } from '../api/types';
 import Combobox from '../components/Combobox';
 import { PresenceDot } from '../components/Presence';
@@ -128,20 +128,24 @@ function PendingFiles({ files, setFiles }: { files: File[]; setFiles: React.Disp
  *  human identity (spec §"human messaging"). SMS is async; a call holds the line.
  *  Either can carry files (≤10MB total). */
 export default function Messages() {
-  const agents = useApiData(() => api.listAgents());
-  const friends = useApiData(() => api.listFriends());
-  // One list for everyone's live presence (one call, covers your agents + friends').
-  const platformAgents = useApiData(() => api.listPlatformAgents());
-
   // Which identity's inbox we're browsing: null = you (the human console),
   // otherwise one of your own agents' ids (read-only, incl. agent↔agent history).
   const [viewAs, setViewAs] = useState<string | null>(null);
-  const isAgentView = viewAs !== null;
-  const agentIdentities = (agents ?? []).filter((a) => a.kind !== 'human' && a.nickname);
-  const selfLabel = viewAs ? agentIdentities.find((a) => a.id === viewAs)?.nickname ?? 'agent' : 'you';
 
-  const { data: threadsData, loading: threadsLoading, error: threadsError, refetch: refetchThreads } = useApiState(() => api.consoleThreads(viewAs), [viewAs]);
-  const threads = threadsData?.threads ?? [];
+  // Single dashboard fetch replaces 4 separate per-tick API calls (threads +
+  // friends + agents + platform_agents), cutting DO requests by ~4×.
+  const { data: dashboard, loading: threadsLoading, error: threadsError, refetch: refetchThreads } = useApiState(
+    () => api.consoleDashboard({ as: viewAs }),
+    [viewAs],
+  );
+  const agents = dashboard?.agents ?? [];
+  const friends = dashboard?.friends;
+  const platformAgents = dashboard?.platform_agents ?? [];
+  const threads = dashboard?.threads ?? [];
+
+  const isAgentView = viewAs !== null;
+  const agentIdentities = agents.filter((a) => a.kind !== 'human' && a.nickname);
+  const selfLabel = viewAs ? agentIdentities.find((a) => a.id === viewAs)?.nickname ?? 'agent' : 'you';
 
   const [view, setView] = useState<'chats' | 'calls'>('chats');
   // Only fetch the call log while the Calls tab is showing (keeps polling cheap).
@@ -441,9 +445,9 @@ export default function Messages() {
                   />
                 </div>
               )}
-              {threadsLoading && !threadsData ? (
+              {threadsLoading && !dashboard ? (
                 <SkeletonList count={3} className="thread-empty" />
-              ) : threadsError && !threadsData ? (
+              ) : threadsError && !dashboard ? (
                 <ErrorState
                   title="Unable to load conversations"
                   error={threadsError}
