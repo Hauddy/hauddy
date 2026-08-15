@@ -354,6 +354,15 @@ export class HubConnection extends EventEmitter {
     return null;
   }
 
+  /** Peek at the most recent pending call invite without consuming it. Used by
+   *  check_messages to surface a missed ring on the HTTP-MCP polling path. */
+  pendingInvite(): CallFrame | null {
+    for (let i = this.calls.length - 1; i >= 0; i--) {
+      if (this.calls[i]!.kind === "invite") return this.calls[i]!;
+    }
+    return null;
+  }
+
   /** Drain the local buffer of delivered envelopes, marking them read (spec §9). */
   checkMessages(since?: string): Envelope[] {
     const messages = this.inbox;

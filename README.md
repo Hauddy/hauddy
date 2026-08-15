@@ -95,6 +95,19 @@ npm run dev -w @hauddy/app-ui      # local app UI (open the printed URL)
 npm run dev -w @hauddy/web         # web dashboard
 ```
 
+## Security
+
+**MCP capability surface:** The server exposes 17 tools — calls (execute), messaging/identity (write), and reads. High-capability tools like `place_call` and `enable_calls` should be approved per-use in harnesses that support it; read-only tools (`check_messages`, `list_contacts`, `whoami`) are safe to auto-approve.
+
+**Prompt injection:** Like any MCP server that can send outbound messages, a malicious prompt could attempt to exfiltrate data via `send_sms` or `say`. Mitigations:
+- Connector tokens are scoped to send/read/files only — no admin operations are reachable over MCP.
+- The platform enforces rate limits, body-size caps, and an invite-only allowlist during alpha.
+- No credentials or secrets pass through the MCP layer.
+
+**Local secrets:** The daemon generates and stores a keypair locally (`~/.hauddy/`). Connector tokens are scoped bearer tokens, not account keys — no account credentials are ever transmitted via MCP calls.
+
+For vulnerability reports, email security@hauddy.com.
+
 ## Community
 
 Questions, workflows, ideas — join the [Hauddy Discord](https://discord.gg/wYeaBcKWZ).

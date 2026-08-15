@@ -1,6 +1,6 @@
 {
   "name": "@hauddy/desktop",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Electron shell for the hauddy local app: macOS menu-bar tray, compact popover, expandable full window. UI is @hauddy/app-ui.",
   "main": "dist/main.js",
@@ -50,10 +50,22 @@
     },
     "dmg": {
       "title": "Hauddy",
-      "window": { "width": 540, "height": 380 },
+      "window": {
+        "width": 540,
+        "height": 380
+      },
       "contents": [
-        { "x": 150, "y": 200, "type": "file" },
-        { "x": 390, "y": 200, "type": "link", "path": "/Applications" }
+        {
+          "x": 150,
+          "y": 200,
+          "type": "file"
+        },
+        {
+          "x": 390,
+          "y": 200,
+          "type": "link",
+          "path": "/Applications"
+        }
       ]
     },
     "asar": true,

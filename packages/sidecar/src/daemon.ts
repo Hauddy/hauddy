@@ -136,6 +136,14 @@ export class Daemon {
   };
   /** Cached provisions for agents connected via the HTTP MCP endpoint. */
   private httpMcpProvisions = new Map<string, Provision>();
+  /**
+   * Mutable ring callbacks for HTTP MCP sessions — updated every time a new MCP
+   * session connects for the same localId (the provision/connection is reused, but
+   * the McpServer and its transport are replaced on each reconnect). The "ring"
+   * listener on the HubConnection reads from this map at call-time so it always
+   * reaches the live session's emitWake, not a stale one.
+   */
+  private httpMcpRingCallbacks = new Map<string, ((caller: string, msg: string) => void) | undefined>();
 
   private get endpoint(): string {
     return this.hubHandle?.wsUrl ?? `ws://127.0.0.1:${DEFAULT_HUB_PORT}`;
@@ -532,6 +540,11 @@ export class Daemon {
    *  `onRing` is called when a call invite arrives — used by local-api to forward
    *  it into the active MCP session via emitWake. */
   createHttpMcpProvision(localId: string, onRing?: (caller: string, message: string) => void): Provision {
+    // Always update the ring callback — the McpServer is recreated for every new
+    // session (new transport), but the HubConnection is reused. Without this update
+    // the "ring" listener would call emitWake on a stale, closed transport.
+    this.httpMcpRingCallbacks.set(localId, onRing);
+
     const cached = this.httpMcpProvisions.get(localId);
     if (cached) return cached;
 
@@ -569,11 +582,12 @@ export class Daemon {
           nickname: identity.nickname,
         });
         connection.on("socket_error", () => {});
-        if (onRing) {
-          connection.on("ring", (cf: CallFrame) => {
-            onRing(cf.body ?? cf.from, "is calling — answer with `pickup_call` (or ignore to let it go to SMS)");
-          });
-        }
+        // Read the callback through the mutable map so reconnects always reach
+        // the current session's McpServer (the map is updated above on every call).
+        connection.on("ring", (cf: CallFrame) => {
+          const cb = this.httpMcpRingCallbacks.get(localId);
+          cb?.(cf.body ?? cf.from, "is calling — answer with `pickup_call` (or ignore to let it go to SMS)");
+        });
         connection.start();
         const agentId = reg.agent_id;
         provisioned = {

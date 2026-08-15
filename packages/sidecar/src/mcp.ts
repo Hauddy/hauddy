@@ -290,14 +290,30 @@ export function createMcpServer(provision: Provision, validation: CallValidation
     "check_messages",
     {
       description:
-        "Return queued envelopes, then mark them read. A message with files has `payload.attachments` (each with a file_id) — call receive_file to download one.",
+        "Return queued envelopes, then mark them read. A message with files has `payload.attachments` (each with a file_id) — call receive_file to download one. Also surfaces a pending call invite if one arrived but the ring notification was missed (HTTP-MCP polling fallback).",
       inputSchema: {
         since: z.string().datetime().optional().describe("ISO-8601 timestamp; only return messages after it"),
       },
     },
     async ({ since }) => {
       const p = await provision();
-      return asText(p.connection.checkMessages(since));
+      const messages = p.connection.checkMessages(since);
+      // HTTP-MCP ring polling fallback: if a call arrived but the out-of-band
+      // notification didn't wake the session (no persistent SSE GET stream), surface
+      // it here so the agent can still answer. The invite stays buffered until
+      // pickup_call consumes it — checking messages doesn't remove it.
+      const invite = p.connection.pendingInvite();
+      return asText({
+        messages,
+        ...(invite
+          ? {
+              pending_call: {
+                from: invite.body ?? invite.from,
+                message: `${invite.body ?? invite.from} is calling — run \`pickup_call\` to answer (or ignore to let it go to SMS).`,
+              },
+            }
+          : {}),
+      });
     },
   );
 

@@ -25,6 +25,9 @@ export default function Demo() {
           preload="metadata"
         />
       </div>
+      <p className="demo-disclaimer">
+        AI provider names and logos shown are trademarks of their respective owners. Hauddy is not affiliated with or endorsed by any AI provider.
+      </p>
     </section>
   );
 }
