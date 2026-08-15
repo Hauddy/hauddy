@@ -1,20 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api, useApiData } from '../api';
 import type { ExposureRow, PlatformInfo } from '../api/types';
 import { PresenceDot } from '../components/Presence';
 import { isDesktop, downloadUpdate, installUpdate, onUpdateProgress, onUpdateReady, onUpdateError } from '../bridge';
-
-const APP_VERSION: string = import.meta.env.VITE_APP_VERSION ?? '0.0.0';
-
-function semverLt(a: string, b: string): boolean {
-  const parse = (s: string) => s.split('.').slice(0, 3).map(Number);
-  const [aMaj = 0, aMin = 0, aPat = 0] = parse(a);
-  const [bMaj = 0, bMin = 0, bPat = 0] = parse(b);
-  if (aMaj !== bMaj) return aMaj < bMaj;
-  if (aMin !== bMin) return aMin < bMin;
-  return aPat < bPat;
-}
+import { APP_VERSION, fetchVersion, semverLt, useVersionResult } from '../versionCheck';
 
 /** Account: link this machine to your Hauddy account (paste the API key), then
  *  expose chosen agents onto the network under it. Everything here is opt-in —
@@ -22,21 +12,17 @@ function semverLt(a: string, b: string): boolean {
 export default function Account() {
   const platform = useApiData(() => api.getPlatform());
   const navigate = useNavigate();
-  const [softUpdate, setSoftUpdate] = useState<{ latest: string } | null>(null);
   const [softDismissed, setSoftDismissed] = useState(false);
+  const versionResult = useVersionResult();
 
   useEffect(() => {
-    if (!platform?.endpoint) return;
-    const base = platform.endpoint.replace(/^ws/, 'http');
-    fetch(`${base}/api/version`)
-      .then((r) => r.json() as Promise<{ latest?: string; min?: string }>)
-      .then(({ latest, min }) => {
-        if (min && semverLt(APP_VERSION, min)) return; // hard block — already shown via rejection
-        if (latest && semverLt(APP_VERSION, latest)) setSoftUpdate({ latest });
-      })
-      .catch(() => {});
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (platform?.endpoint) fetchVersion(platform.endpoint);
   }, [platform?.endpoint]);
+
+  const softUpdate = versionResult?.latest && semverLt(APP_VERSION, versionResult.latest)
+    ? { latest: versionResult.latest }
+    : null;
+  const proactiveHardBlock = versionResult?.min && semverLt(APP_VERSION, versionResult.min);
 
   const rejection = platform?.rejection;
 
@@ -52,8 +38,15 @@ export default function Account() {
         </div>
       </div>
 
-      {rejection?.reason === 'client_outdated' ? (
-        <OutdatedBanner currentVersion={APP_VERSION} rejection={rejection} />
+      {rejection?.reason === 'client_outdated' || proactiveHardBlock ? (
+        <OutdatedBanner
+          currentVersion={APP_VERSION}
+          rejection={rejection ?? {
+            reason: 'client_outdated',
+            min_version: versionResult?.min ?? undefined,
+            latest_version: versionResult?.latest ?? undefined,
+          }}
+        />
       ) : platform === undefined ? (
         <p className="loading-note">Loading…</p>
       ) : platform.connected ? (

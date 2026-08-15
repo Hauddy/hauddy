@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { api, useApiData, useReachable } from '../api';
+import { fetchVersion, hasSoftUpdate, useVersionResult } from '../versionCheck';
 import { IconActivity, IconAgents, IconContacts, IconMessages, IconPlatform } from './icons';
 import Logo from './Logo';
 import NotificationBell from './NotificationBell';
@@ -20,6 +22,13 @@ export default function Layout() {
   const platform = useApiData(() => api.getPlatform());
   const up = reachable !== false; // treat "not yet probed" as up to avoid a flash
   const label = reachable === false ? 'Hub not running' : 'Local hub';
+
+  useVersionResult(); // subscribe so the badge re-renders when the fetch completes
+  useEffect(() => {
+    if (platform?.endpoint) fetchVersion(platform.endpoint);
+  }, [platform?.endpoint]);
+
+  const updateBadge = hasSoftUpdate();
 
   return (
     <div className="app-shell">
@@ -61,6 +70,9 @@ export default function Layout() {
               >
                 <item.icon />
                 <span>{item.label}</span>
+                {item.to === '/account' && updateBadge && (
+                  <span className="rail-update-dot" aria-label="Update available" />
+                )}
               </NavLink>
             ))}
           </div>

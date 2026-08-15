@@ -1177,6 +1177,17 @@
   align-self: flex-start;
 }
 
+/* update available dot on the Account nav item */
+.rail-update-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-left: auto;
+  flex: none;
+}
+
 /* ---------- In-app software update ---------- */
 
 .update-version-row,
