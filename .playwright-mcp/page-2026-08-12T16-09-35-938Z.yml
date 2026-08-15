@@ -1,0 +1,124 @@
+- generic [ref=f12e2]:
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - dialog:
+                - group [ref=f12e3]:
+                  - dialog [ref=f12e5]:
+                    - generic [ref=f12e1164]:
+                      - generic [ref=f12e1165]:
+                        - button [ref=f12e1168] [cursor=pointer]
+                        - generic [ref=f12e1183]:
+                          - generic [ref=f12e1184]:
+                            - paragraph [ref=f12e1186]: Set up your account
+                            - paragraph [ref=f12e1188]: Choose a name, username, and password.
+                          - generic [ref=f12e1190]:
+                            - generic [ref=f12e1191]:
+                              - paragraph [ref=f12e1193]: Name *
+                              - textbox "Full name" [active] [ref=f12e1195]: Hauddy
+                            - generic [ref=f12e1196]:
+                              - paragraph [ref=f12e1198]: Username *
+                              - generic [ref=f12e1199]:
+                                - paragraph [ref=f12e1201]: "@"
+                                - textbox "Username" [ref=f12e1203]: hauddy_app
+                              - paragraph [ref=f12e1225]: Username is available
+                            - generic [ref=f12e1204]:
+                              - paragraph [ref=f12e1206]: Password *
+                              - generic [ref=f12e1207]:
+                                - textbox "Password" [ref=f12e1208]: BabaHauddy22
+                                - button "Show password" [ref=f12e1209] [cursor=pointer]
+                              - paragraph [ref=f12e1213]: At least 8 characters.
+                      - button [ref=f12e1226] [cursor=pointer]:
+                        - paragraph [ref=f12e1230]: Continue
+      - main [ref=f12e15]:
+        - generic [ref=f12e17]:
+          - generic [ref=f12e20]:
+            - heading "Happening now." [level=1] [ref=f12e21]
+            - generic [ref=f12e163]:
+              - generic [ref=f12e164]:
+                - button [ref=f12e165] [cursor=pointer]:
+                  - paragraph [ref=f12e172]: Continue with phone
+                - generic [ref=f12e174]:
+                  - generic: Continue with Google
+                  - generic [ref=f12e176]:
+                    - button "Continuar con Google. Se abre en una pestaña nueva." [ref=f12e178] [cursor=pointer]:
+                      - generic [ref=f12e180]: Continuar con Google
+                    - iframe [ref=f12e190]:
+                      - button "Continue with Google. Opens in new tab" [ref=f16e3] [cursor=pointer]:
+                        - generic [ref=f16e5]: Continue with Google
+                - button [ref=f12e191] [cursor=pointer]:
+                  - paragraph [ref=f12e198]: Continue with Apple
+              - paragraph [ref=f12e202]: or
+              - generic [ref=f12e205]:
+                - generic: Email or username
+                - textbox "Email or username" [ref=f12e263]
+                - textbox
+              - paragraph [ref=f12e210]: Continue
+              - paragraph [ref=f12e214]:
+                - text: By continuing, you agree to our
+                - link "Terms of Service" [ref=f12e215] [cursor=pointer]:
+                  - /url: https://x.com/tos
+                - text: ","
+                - link "Privacy Policy" [ref=f12e216] [cursor=pointer]:
+                  - /url: https://x.com/privacy
+                - text: and
+                - link "Cookie Use" [ref=f12e217] [cursor=pointer]:
+                  - /url: https://help.x.com/rules-and-policies/twitter-cookies
+                - text: .
+          - navigation "Footer" [ref=f12e35]:
+            - generic [ref=f12e36]:
+              - link "About" [ref=f12e37] [cursor=pointer]:
+                - /url: https://about.x.com
+              - generic [ref=f12e38]: ·
+            - generic [ref=f12e39]:
+              - link "Get App" [ref=f12e40] [cursor=pointer]:
+                - /url: https://help.x.com/using-x/download-the-x-app
+              - generic [ref=f12e41]: ·
+            - generic [ref=f12e42]:
+              - link "Grok" [ref=f12e43] [cursor=pointer]:
+                - /url: https://grok.com?referrer=x_footer
+              - generic [ref=f12e44]: ·
+            - generic [ref=f12e45]:
+              - link "Imagine" [ref=f12e46] [cursor=pointer]:
+                - /url: https://grok.com/imagine?referrer=x_footer
+              - generic [ref=f12e47]: ·
+            - generic [ref=f12e48]:
+              - link "Help" [ref=f12e49] [cursor=pointer]:
+                - /url: https://help.x.com
+              - generic [ref=f12e50]: ·
+            - generic [ref=f12e51]:
+              - link "Terms" [ref=f12e52] [cursor=pointer]:
+                - /url: https://x.com/tos
+              - generic [ref=f12e53]: ·
+            - generic [ref=f12e54]:
+              - link "Privacy" [ref=f12e55] [cursor=pointer]:
+                - /url: https://x.com/privacy
+              - generic [ref=f12e56]: ·
+            - generic [ref=f12e57]:
+              - link "Cookies" [ref=f12e58] [cursor=pointer]:
+                - /url: https://support.x.com/articles/20170514
+              - generic [ref=f12e59]: ·
+            - generic [ref=f12e60]:
+              - link "Careers" [ref=f12e61] [cursor=pointer]:
+                - /url: https://careers.x.com
+              - generic [ref=f12e62]: ·
+            - generic [ref=f12e63]:
+              - link "Ads & Business" [ref=f12e64] [cursor=pointer]:
+                - /url: https://business.x.com/advertising?ref=gl-tw-tw-twitter-advertise
+              - generic [ref=f12e65]: ·
+            - generic [ref=f12e66]:
+              - link "Developers" [ref=f12e67] [cursor=pointer]:
+                - /url: https://developer.x.com
+              - generic [ref=f12e68]: ·
+            - generic [ref=f12e69]:
+              - link "News" [ref=f12e70] [cursor=pointer]:
+                - /url: https://x.com/i/jf/stories/home
+              - generic [ref=f12e71]: ·
+            - generic [ref=f12e72]:
+              - link "Accessibility" [ref=f12e73] [cursor=pointer]:
+                - /url: https://help.x.com/resources/accessibility
+              - generic [ref=f12e74]: ·
+            - generic [ref=f12e75]: © 2026 X Corp.

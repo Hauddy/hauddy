@@ -1,0 +1,106 @@
+- generic [ref=f26e65]:
+  - generic [ref=f26e67]:
+    - generic [ref=f26e72]:
+      - generic [ref=f26e73]:
+        - generic [ref=f26e74]: Amici
+        - generic [ref=f26e80]:
+          - button "Messaggi ricevuti" [ref=f26e83] [cursor=pointer]
+          - link [ref=f26e86] [cursor=pointer]:
+            - /url: https://support.discord.com
+            - button "Aiuto" [ref=f26e87]
+      - generic [ref=f26e91]:
+        - generic [ref=f26e92]:
+          - navigation "Barra laterale del server" [ref=f26e93]:
+            - tree [ref=f26e94]:
+              - generic [ref=f26e95]:
+                - treeitem "Messaggi diretti" [level=1] [selected] [ref=f26e104] [cursor=pointer]
+                - group "Server"
+                - generic [ref=f26e111]:
+                  - treeitem "Aggiungi un server" [level=1] [selected] [ref=f26e117] [cursor=pointer]
+                  - button "Consiglio tutorial" [ref=f26e121]
+                - treeitem "Scopri" [level=1] [ref=f26e134] [cursor=pointer]
+                - treeitem "Scarica le app" [level=1] [ref=f26e145] [cursor=pointer]
+          - navigation "Canali privati" [ref=f26e149]:
+            - button "Trova o avvia una conversazione" [ref=f26e151] [cursor=pointer]
+            - list "Messaggi diretti" [ref=f26e157]:
+              - listitem [ref=f26e160]:
+                - link "Amici" [ref=f26e162] [cursor=pointer]:
+                  - /url: /channels/@me
+              - listitem [ref=f26e171]:
+                - link "Negozio" [ref=f26e173] [cursor=pointer]:
+                  - /url: /shop
+              - listitem [ref=f26e183]:
+                - link "Missioni" [ref=f26e185] [cursor=pointer]:
+                  - /url: /quest-home
+              - heading "Messaggi diretti Di più Crea un messaggio" [level=2] [ref=f26e194]:
+                - generic [ref=f26e195]: Messaggi diretti
+                - generic [ref=f26e196]:
+                  - button "Di più" [ref=f26e197] [cursor=pointer]
+                  - button "Crea un messaggio" [ref=f26e200] [cursor=pointer]
+          - separator "Resize Sidebar" [ref=f26e224]
+          - region "Impostazioni e stato utente" [ref=f26e225]:
+            - generic [ref=f26e226]:
+              - generic [ref=f26e227] [cursor=pointer]:
+                - button "Gestisci profilo e stato"
+                - generic [ref=f26e230]:
+                  - generic [ref=f26e231]: barnaba.barcellona
+                  - generic [ref=f26e235]:
+                    - generic: barnaba.barcellona_81199
+                    - generic: Online
+              - generic [ref=f26e236]:
+                - generic [ref=f26e237]:
+                  - switch "Silenzia" [checked] [ref=f26e238] [cursor=pointer]
+                  - generic [ref=f26e259]: Togli il silenziamento al microfono
+                  - button "Opzioni di ingresso" [ref=f26e260] [cursor=pointer]
+                - generic [ref=f26e264]:
+                  - switch "Silenzia l'audio" [ref=f26e265] [cursor=pointer]
+                  - button "Opzioni di uscita" [ref=f26e277] [cursor=pointer]
+                - button "Impostazioni utente" [ref=f26e281] [cursor=pointer]
+        - main "Amici" [ref=f26e291]:
+          - navigation [ref=f26e292]:
+            - generic [ref=f26e293]:
+              - generic [ref=f26e294]:
+                - heading "Amici" [level=1] [ref=f26e300]
+                - tablist "Amici" [ref=f26e303]:
+                  - tab "Aggiungi amico" [selected] [ref=f26e304] [cursor=pointer]
+              - button "Nuova chat di gruppo" [ref=f26e309] [cursor=pointer]
+          - tabpanel [ref=f26e314]:
+            - generic [ref=f26e315]:
+              - heading "Aggiungi amico" [level=2] [ref=f26e316]
+              - generic [ref=f26e317]:
+                - generic [ref=f26e318]:
+                  - generic [ref=f26e319]: Puoi aggiungere gli amici con il loro nome utente Discord.
+                  - img "Wumpus Waving" [ref=f26e320]
+                - generic [ref=f26e322]:
+                  - textbox "Inserisci un nome utente" [ref=f26e324]
+                  - button "Invia richiesta di amicizia" [disabled]
+                - status
+            - generic [ref=f26e325]:
+              - heading "Altri posti dove fare amicizia" [level=2] [ref=f26e326]
+              - generic [ref=f26e327]: Non hai un nome utente a portata di mano? Dai un'occhiata alla nostra lista di server pubblici che include di tutto, dai giochi alla cucina, alla musica, agli anime e altro ancora.
+            - button "Esplora i server che possono essere trovati" [ref=f26e329] [cursor=pointer]
+    - button "Consiglio tutorial" [ref=f26e337]
+  - generic:
+    - generic:
+      - dialog "Crea il tuo server Il tuo server è dove ti incontri con i tuoi amici. Creane uno e inizia a parlare. Chiudi":
+        - generic:
+          - generic:
+            - log
+            - log
+        - generic [ref=f26e343]:
+          - generic [ref=f26e344]:
+            - heading "Crea il tuo server" [level=1] [ref=f26e345]
+            - generic [ref=f26e346]: Il tuo server è dove ti incontri con i tuoi amici. Creane uno e inizia a parlare.
+            - button "Chiudi" [ref=f26e347] [cursor=pointer]
+          - generic [ref=f26e351]:
+            - button "Crea personalizzato" [active] [ref=f26e352] [cursor=pointer]
+            - generic [ref=f26e354]: Parti da un template
+            - button "Gaming" [ref=f26e355] [cursor=pointer]
+            - button "Amici" [ref=f26e357] [cursor=pointer]
+            - button "Gruppo di studio" [ref=f26e359] [cursor=pointer]
+            - button "Club scolastico" [ref=f26e361] [cursor=pointer]
+            - button "Comunità locale" [ref=f26e363] [cursor=pointer]
+            - button "Artisti e Creatori" [ref=f26e365] [cursor=pointer]
+          - generic [ref=f26e367]:
+            - heading "Hai già un invito?" [level=2] [ref=f26e368]
+            - button "Unisciti a un server" [ref=f26e370] [cursor=pointer]

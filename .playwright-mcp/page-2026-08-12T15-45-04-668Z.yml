@@ -1,0 +1,79 @@
+- generic [ref=e2]:
+  - generic:
+    - generic:
+      - generic:
+        - generic [ref=e4]:
+          - generic [ref=e5]:
+            - generic [ref=e6]: Did someone say … cookies?
+            - generic [ref=e7]:
+              - text: X and its partners use cookies to provide you with a better, safer and faster service and to support our business. Some cookies are necessary to use our services, improve our services, and make sure they work properly.
+              - button "Show more about your choices." [ref=e8]
+          - generic [ref=e9]:
+            - button "Accept all cookies" [ref=e10] [cursor=pointer]
+            - button "Refuse non-essential cookies" [ref=e14] [cursor=pointer]
+        - generic:
+          - generic:
+            - generic:
+              - dialog:
+                - group [active] [ref=e18]:
+                  - dialog [ref=e20]:
+                    - img "Loading spinner" [ref=e26]
+      - main [ref=e30]:
+        - generic [ref=e32]:
+          - generic [ref=e35]:
+            - heading "Happening now." [level=1] [ref=e36]
+            - img "Loading spinner" [ref=e42]
+          - navigation "Footer" [ref=e50]:
+            - generic [ref=e51]:
+              - link "About" [ref=e52] [cursor=pointer]:
+                - /url: https://about.twitter.com
+              - generic [ref=e53]: ·
+            - generic [ref=e54]:
+              - link "Get App" [ref=e55] [cursor=pointer]:
+                - /url: https://help.twitter.com/using-x/download-the-x-app
+              - generic [ref=e56]: ·
+            - generic [ref=e57]:
+              - link "Grok" [ref=e58] [cursor=pointer]:
+                - /url: https://grok.com?referrer=x_footer
+              - generic [ref=e59]: ·
+            - generic [ref=e60]:
+              - link "Imagine" [ref=e61] [cursor=pointer]:
+                - /url: https://grok.com/imagine?referrer=x_footer
+              - generic [ref=e62]: ·
+            - generic [ref=e63]:
+              - link "Help" [ref=e64] [cursor=pointer]:
+                - /url: https://help.twitter.com
+              - generic [ref=e65]: ·
+            - generic [ref=e66]:
+              - link "Terms" [ref=e67] [cursor=pointer]:
+                - /url: https://twitter.com/tos
+              - generic [ref=e68]: ·
+            - generic [ref=e69]:
+              - link "Privacy" [ref=e70] [cursor=pointer]:
+                - /url: https://twitter.com/privacy
+              - generic [ref=e71]: ·
+            - generic [ref=e72]:
+              - link "Cookies" [ref=e73] [cursor=pointer]:
+                - /url: https://support.twitter.com/articles/20170514
+              - generic [ref=e74]: ·
+            - generic [ref=e75]:
+              - link "Careers" [ref=e76] [cursor=pointer]:
+                - /url: https://careers.twitter.com
+              - generic [ref=e77]: ·
+            - generic [ref=e78]:
+              - link "Ads & Business" [ref=e79] [cursor=pointer]:
+                - /url: https://business.twitter.com/advertising?ref=gl-tw-tw-twitter-advertise
+              - generic [ref=e80]: ·
+            - generic [ref=e81]:
+              - link "Developers" [ref=e82] [cursor=pointer]:
+                - /url: https://developer.twitter.com
+              - generic [ref=e83]: ·
+            - generic [ref=e84]:
+              - link "News" [ref=e85] [cursor=pointer]:
+                - /url: https://twitter.com/i/jf/stories/home
+              - generic [ref=e86]: ·
+            - generic [ref=e87]:
+              - link "Accessibility" [ref=e88] [cursor=pointer]:
+                - /url: https://help.twitter.com/resources/accessibility
+              - generic [ref=e89]: ·
+            - generic [ref=e90]: © 2026 X Corp.

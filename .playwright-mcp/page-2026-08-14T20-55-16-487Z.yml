@@ -1,0 +1,1548 @@
+- generic [active] [ref=f65e1]:
+  - link "Skip to main content" [ref=f65e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=f65e6]:
+    - generic:
+      - generic: "Muse Glimmer was frontier In the model class around 30b models for four days. : r/LocalLLaMA"
+      - banner [ref=f65e10]:
+        - navigation [ref=f65e11]:
+          - link "Home" [ref=f65e15] [cursor=pointer]:
+            - /url: https://www.reddit.com/
+          - search [ref=f65e34]:
+            - generic [ref=f65e36]:
+              - generic "Remove r/LocalLLaMA filter and expand search to all of Reddit" [ref=f65e42] [cursor=pointer]:
+                - button [pressed] [ref=f65e43]:
+                  - generic [ref=f65e46]: r/LocalLLaMA
+              - textbox "Remove r/LocalLLaMA filter and expand search to all of Reddit" [ref=f65e53]:
+                - /placeholder: Search in ⁨r/LocalLLaMA⁩
+          - generic [ref=f65e54]:
+            - generic [ref=f65e55]:
+              - link "Advertise on Reddit" [ref=f65e61] [cursor=pointer]:
+                - /url: https://ads.reddit.com/register?utm_source=web3x_consumer&utm_name=nav_cta
+              - button "Open chat" [ref=f65e72] [cursor=pointer]
+              - link "Create post" [ref=f65e82] [cursor=pointer]:
+                - /url: /r/LocalLLaMA/submit/
+                - generic [ref=f65e83]: Create
+              - link "Open inbox" [ref=f65e92] [cursor=pointer]:
+                - /url: /notifications
+            - button "User is online Expand user menu" [ref=f65e102] [cursor=pointer]:
+              - generic "User is online" [ref=f65e114]
+              - generic [ref=f65e115]: Expand user menu
+      - generic [ref=f65e116]:
+        - generic [ref=f65e117]:
+          - generic [ref=f65e118]:
+            - generic:
+              - generic:
+                - link "Skip to Navigation" [ref=f65e119] [cursor=pointer]:
+                  - /url: "#left-sidebar-container"
+                - link "Skip to Right Sidebar" [ref=f65e120] [cursor=pointer]:
+                  - /url: "#right-sidebar-container"
+          - generic [ref=f65e121]:
+            - main [ref=f65e122]:
+              - 'generic "Muse Glimmer was frontier In the model class around 30b models for four days. : r/LocalLLaMA"'
+              - generic [ref=f65e123]:
+                - generic [ref=f65e124]:
+                  - generic [ref=f65e125]:
+                    - button "Back" [ref=f65e127] [cursor=pointer]
+                    - link "Go to LocalLLaMA" [ref=f65e135] [cursor=pointer]:
+                      - /url: https://www.reddit.com/r/LocalLLaMA/
+                    - group [ref=f65e140]:
+                      - generic [ref=f65e141]:
+                        - link "r/LocalLLaMA" [ref=f65e145] [cursor=pointer]:
+                          - /url: https://www.reddit.com/r/LocalLLaMA/
+                        - generic [ref=f65e146]: •
+                        - time [ref=f65e148]: 2h ago
+                      - generic [ref=f65e149]:
+                        - 'link "Author: InternationalGap3698" [ref=f65e154] [cursor=pointer]':
+                          - /url: https://www.reddit.com/user/InternationalGap3698/
+                          - generic [ref=f65e155]: InternationalGap3698
+                        - 'generic "Flair: :Discord:" [ref=f65e158]':
+                          - img "emoji:Discord:" [ref=f65e162]
+                        - generic [ref=f65e164] [cursor=pointer]:
+                          - img "Profile Badge for the Achievement Top 1% Poster" [ref=f65e165]
+                          - text: Top 1% Poster
+                  - button "Open user actions" [ref=f65e169] [cursor=pointer]
+                - generic [ref=f65e175]:
+                  - 'heading "Post Title: Muse Glimmer was frontier In the model class around 30b models for four days." [level=1] [ref=f65e176]': Muse Glimmer was frontier In the model class around 30b models for four days.
+                  - 'link "Flair: Discussion" [ref=f65e179] [cursor=pointer]':
+                    - /url: /r/LocalLLaMA/?f=flair_name%3A%22Discussion%22
+                    - 'generic "Flair: Discussion" [ref=f65e181]': Discussion
+                - img "r/LocalLLaMA - Muse Glimmer was frontier In the model class around 30b models for four days." [ref=f65e187] [cursor=pointer]
+                - generic "Actions available for this post" [ref=f65e189]:
+                  - generic [ref=f65e192]:
+                    - button "Upvote" [ref=f65e193] [cursor=pointer]
+                    - generic [ref=f65e198]: "163"
+                    - button "Downvote" [ref=f65e200] [cursor=pointer]
+                  - button "63 Go to comments" [ref=f65e205] [cursor=pointer]:
+                    - generic [ref=f65e206]: "63"
+                    - generic [ref=f65e212]: Go to comments
+                  - button "Repost" [ref=f65e215] [cursor=pointer]
+                  - button "Share" [ref=f65e224] [cursor=pointer]
+              - generic "Come to play aircraft carriers!" [ref=f65e232]:
+                - generic [ref=f65e233]:
+                  - 'generic "Advertisement: Come to play aircraft carriers!" [ref=f65e234]':
+                    - 'link "Advertisement: Come to play aircraft carriers!" [ref=f65e235] [cursor=pointer]':
+                      - /url: https://alb.reddit.com/cr?za=BJZW9rV0fLu_-IVwW8BtTz7vGsWe6vq6PpA4X1ROnXczXyzshdyUqgL1gJsW7KmmvXjdU7nll_pxSo7A5T7cExJ5uG5BzQC3wTTkYT3JUkua7KAfvcrW7K8yutuc968nsxDjcAGCH0cyAP9cFJn9teYupXLxLI3uQIOuGDMNOcD3US1q3ua75rQOBCsJw5-XU2Pxf-zj6dqqW7MKklV9VTIbHQawuFEej5HMf2HnAXIcCp60n6FjEH_5odmvWpC7_GUq91-WNxOOcWM9xpEm3WSypvnspQR_NP_EJa3MuUVFiIZ0adQyqK7jiVgg-_QKfzVvEjr7WGPNx_GU9ruaEafgvfeaedHqkZKdZ61hMMIvuVdx8MLpC9r01BV92VQSGGml2T0nMdviVdLeJ3ul73WAPRccqjdmoU_x-LaSlxsnI0Hbkq-RxdhM82nYTrph17lGYBYRUryr27-YZGC2PM9DjbSKhK35_jNtOW6ofGvOcoSNiOfzlFbBGnCxd49JmL5wDM0FFOStepYQDQ_R40D7C-iRQmbYrcQgZ1ACh-Rl-SjfM-4HO2cuY42MGbKlqL3eGjY95dtqls2hLtc9hPEizUdZdUUj50Hdk7KBg1vZcAwhZO30ZCFKZ87quPyXm8RHnRsLBlTCEqcBfvFaMZf3H2YcpXW5WQ64gAV9GA8e7SIvBLUQktNX5tSiCoRbrAWx8w7rLQY7lpL6OV4HnbLvKCfNwV04B-z2Ngvz&zp=dHlHgZkCtYoKymm-CfcvCg_HrGsY-Ako4TkWN4DUegAcDnNOpyWkvwuqLRIV5HkoMELMFFnC65uFb1Pb6Wg7Ox4I_ix2md1j7Swbd3klyBwVy2stJVe_jcq08EncRkCDZRosG56T0RLbCVNttokc6NabWqlUvk4ERNHcdYjMQDriQVlrlJrDaRDFGbKq6o6VZ8gr7pfVR9zDRYFigtckUtdIWQ_rrlPOZE3ljIV869rdzAcGkHGBm65AK4sPLN2-kKnjTup053e_dQ
+                  - generic [ref=f65e236]:
+                    - generic [ref=f65e237]:
+                      - link "RedditforBusiness" [ref=f65e240] [cursor=pointer]:
+                        - /url: /user/RedditforBusiness/
+                        - img "u/RedditforBusiness avatar" [ref=f65e243]
+                      - generic [ref=f65e245]: •
+                      - link "Promoted" [ref=f65e247] [cursor=pointer]:
+                        - /url: /user/RedditforBusiness/
+                      - link [ref=f65e250] [cursor=pointer]:
+                        - /url: https://alb.reddit.com/cr?za=BJZW9rV0fLu_-IVwW8BtTz7vGsWe6vq6PpA4X1ROnXczXyzshdyUqgL1gJsW7KmmvXjdU7nll_pxSo7A5T7cExJ5uG5BzQC3wTTkYT3JUkua7KAfvcrW7K8yutuc968nsxDjcAGCH0cyAP9cFJn9teYupXLxLI3uQIOuGDMNOcD3US1q3ua75rQOBCsJw5-XU2Pxf-zj6dqqW7MKklV9VTIbHQawuFEej5HMf2HnAXIcCp60n6FjEH_5odmvWpC7_GUq91-WNxOOcWM9xpEm3WSypvnspQR_NP_EJa3MuUVFiIZ0adQyqK7jiVgg-_QKfzVvEjr7WGPNx_GU9ruaEafgvfeaedHqkZKdZ61hMMIvuVdx8MLpC9r01BV92VQSGGml2T0nMdviVdLeJ3ul73WAPRccqjdmoU_x-LaSlxsnI0Hbkq-RxdhM82nYTrph17lGYBYRUryr27-YZGC2PM9DjbSKhK35_jNtOW6ofGvOcoSNiOfzlFbBGnCxd49JmL5wDM0FFOStepYQDQ_R40D7C-iRQmbYrcQgZ1ACh-Rl-SjfM-4HO2cuY42MGbKlqL3eGjY95dtqls2hLtc9hPEizUdZdUUj50Hdk7KBg1vZcAwhZO30ZCFKZ87quPyXm8RHnRsLBlTCEqcBfvFaMZf3H2YcpXW5WQ64gAV9GA8e7SIvBLUQktNX5tSiCoRbrAWx8w7rLQY7lpL6OV4HnbLvKCfNwV04B-z2Ngvz&zp=dHlHgZkCtYoKymm-CfcvCg_HrGsY-Ako4TkWN4DUegAcDnNOpyWkvwuqLRIV5HkoMELMFFnC65uFb1Pb6Wg7Ox4I_ix2md1j7Swbd3klyBwVy2stJVe_jcq08EncRkCDZRosG56T0RLbCVNttokc6NabWqlUvk4ERNHcdYjMQDriQVlrlJrDaRDFGbKq6o6VZ8gr7pfVR9zDRYFigtckUtdIWQ_rrlPOZE3ljIV869rdzAcGkHGBm65AK4sPLN2-kKnjTup053e_dQ
+                    - button "Open user actions" [ref=f65e256] [cursor=pointer]
+                  - generic [ref=f65e262]:
+                    - generic [ref=f65e263]:
+                      - link "Come to play aircraft carriers!" [ref=f65e265] [cursor=pointer]:
+                        - /url: https://alb.reddit.com/cr?za=BJZW9rV0fLu_-IVwW8BtTz7vGsWe6vq6PpA4X1ROnXczXyzshdyUqgL1gJsW7KmmvXjdU7nll_pxSo7A5T7cExJ5uG5BzQC3wTTkYT3JUkua7KAfvcrW7K8yutuc968nsxDjcAGCH0cyAP9cFJn9teYupXLxLI3uQIOuGDMNOcD3US1q3ua75rQOBCsJw5-XU2Pxf-zj6dqqW7MKklV9VTIbHQawuFEej5HMf2HnAXIcCp60n6FjEH_5odmvWpC7_GUq91-WNxOOcWM9xpEm3WSypvnspQR_NP_EJa3MuUVFiIZ0adQyqK7jiVgg-_QKfzVvEjr7WGPNx_GU9ruaEafgvfeaedHqkZKdZ61hMMIvuVdx8MLpC9r01BV92VQSGGml2T0nMdviVdLeJ3ul73WAPRccqjdmoU_x-LaSlxsnI0Hbkq-RxdhM82nYTrph17lGYBYRUryr27-YZGC2PM9DjbSKhK35_jNtOW6ofGvOcoSNiOfzlFbBGnCxd49JmL5wDM0FFOStepYQDQ_R40D7C-iRQmbYrcQgZ1ACh-Rl-SjfM-4HO2cuY42MGbKlqL3eGjY95dtqls2hLtc9hPEizUdZdUUj50Hdk7KBg1vZcAwhZO30ZCFKZ87quPyXm8RHnRsLBlTCEqcBfvFaMZf3H2YcpXW5WQ64gAV9GA8e7SIvBLUQktNX5tSiCoRbrAWx8w7rLQY7lpL6OV4HnbLvKCfNwV04B-z2Ngvz&zp=dHlHgZkCtYoKymm-CfcvCg_HrGsY-Ako4TkWN4DUegAcDnNOpyWkvwuqLRIV5HkoMELMFFnC65uFb1Pb6Wg7Ox4I_ix2md1j7Swbd3klyBwVy2stJVe_jcq08EncRkCDZRosG56T0RLbCVNttokc6NabWqlUvk4ERNHcdYjMQDriQVlrlJrDaRDFGbKq6o6VZ8gr7pfVR9zDRYFigtckUtdIWQ_rrlPOZE3ljIV869rdzAcGkHGBm65AK4sPLN2-kKnjTup053e_dQ
+                      - generic [ref=f65e266]:
+                        - link [ref=f65e268] [cursor=pointer]:
+                          - /url: https://alb.reddit.com/cr?za=BJZW9rV0fLu_-IVwW8BtTz7vGsWe6vq6PpA4X1ROnXczXyzshdyUqgL1gJsW7KmmvXjdU7nll_pxSo7A5T7cExJ5uG5BzQC3wTTkYT3JUkua7KAfvcrW7K8yutuc968nsxDjcAGCH0cyAP9cFJn9teYupXLxLI3uQIOuGDMNOcD3US1q3ua75rQOBCsJw5-XU2Pxf-zj6dqqW7MKklV9VTIbHQawuFEej5HMf2HnAXIcCp60n6FjEH_5odmvWpC7_GUq91-WNxOOcWM9xpEm3WSypvnspQR_NP_EJa3MuUVFiIZ0adQyqK7jiVgg-_QKfzVvEjr7WGPNx_GU9ruaEafgvfeaedHqkZKdZ61hMMIvuVdx8MLpC9r01BV92VQSGGml2T0nMdviVdLeJ3ul73WAPRccqjdmoU_x-LaSlxsnI0Hbkq-RxdhM82nYTrph17lGYBYRUryr27-YZGC2PM9DjbSKhK35_jNtOW6ofGvOcoSNiOfzlFbBGnCxd49JmL5wDM0FFOStepYQDQ_R40D7C-iRQmbYrcQgZ1ACh-Rl-SjfM-4HO2cuY42MGbKlqL3eGjY95dtqls2hLtc9hPEizUdZdUUj50Hdk7KBg1vZcAwhZO30ZCFKZ87quPyXm8RHnRsLBlTCEqcBfvFaMZf3H2YcpXW5WQ64gAV9GA8e7SIvBLUQktNX5tSiCoRbrAWx8w7rLQY7lpL6OV4HnbLvKCfNwV04B-z2Ngvz&zp=dHlHgZkCtYoKymm-CfcvCg_HrGsY-Ako4TkWN4DUegAcDnNOpyWkvwuqLRIV5HkoMELMFFnC65uFb1Pb6Wg7Ox4I_ix2md1j7Swbd3klyBwVy2stJVe_jcq08EncRkCDZRosG56T0RLbCVNttokc6NabWqlUvk4ERNHcdYjMQDriQVlrlJrDaRDFGbKq6o6VZ8gr7pfVR9zDRYFigtckUtdIWQ_rrlPOZE3ljIV869rdzAcGkHGBm65AK4sPLN2-kKnjTup053e_dQ
+                        - link "worldofwarships.com" [ref=f65e272] [cursor=pointer]:
+                          - /url: https://alb.reddit.com/cr?za=BJZW9rV0fLu_-IVwW8BtTz7vGsWe6vq6PpA4X1ROnXczXyzshdyUqgL1gJsW7KmmvXjdU7nll_pxSo7A5T7cExJ5uG5BzQC3wTTkYT3JUkua7KAfvcrW7K8yutuc968nsxDjcAGCH0cyAP9cFJn9teYupXLxLI3uQIOuGDMNOcD3US1q3ua75rQOBCsJw5-XU2Pxf-zj6dqqW7MKklV9VTIbHQawuFEej5HMf2HnAXIcCp60n6FjEH_5odmvWpC7_GUq91-WNxOOcWM9xpEm3WSypvnspQR_NP_EJa3MuUVFiIZ0adQyqK7jiVgg-_QKfzVvEjr7WGPNx_GU9ruaEafgvfeaedHqkZKdZ61hMMIvuVdx8MLpC9r01BV92VQSGGml2T0nMdviVdLeJ3ul73WAPRccqjdmoU_x-LaSlxsnI0Hbkq-RxdhM82nYTrph17lGYBYRUryr27-YZGC2PM9DjbSKhK35_jNtOW6ofGvOcoSNiOfzlFbBGnCxd49JmL5wDM0FFOStepYQDQ_R40D7C-iRQmbYrcQgZ1ACh-Rl-SjfM-4HO2cuY42MGbKlqL3eGjY95dtqls2hLtc9hPEizUdZdUUj50Hdk7KBg1vZcAwhZO30ZCFKZ87quPyXm8RHnRsLBlTCEqcBfvFaMZf3H2YcpXW5WQ64gAV9GA8e7SIvBLUQktNX5tSiCoRbrAWx8w7rLQY7lpL6OV4HnbLvKCfNwV04B-z2Ngvz&zp=dHlHgZkCtYoKymm-CfcvCg_HrGsY-Ako4TkWN4DUegAcDnNOpyWkvwuqLRIV5HkoMELMFFnC65uFb1Pb6Wg7Ox4I_ix2md1j7Swbd3klyBwVy2stJVe_jcq08EncRkCDZRosG56T0RLbCVNttokc6NabWqlUvk4ERNHcdYjMQDriQVlrlJrDaRDFGbKq6o6VZ8gr7pfVR9zDRYFigtckUtdIWQ_rrlPOZE3ljIV869rdzAcGkHGBm65AK4sPLN2-kKnjTup053e_dQ
+                    - link [ref=f65e275] [cursor=pointer]:
+                      - /url: https://alb.reddit.com/cr?za=BJZW9rV0fLu_-IVwW8BtTz7vGsWe6vq6PpA4X1ROnXczXyzshdyUqgL1gJsW7KmmvXjdU7nll_pxSo7A5T7cExJ5uG5BzQC3wTTkYT3JUkua7KAfvcrW7K8yutuc968nsxDjcAGCH0cyAP9cFJn9teYupXLxLI3uQIOuGDMNOcD3US1q3ua75rQOBCsJw5-XU2Pxf-zj6dqqW7MKklV9VTIbHQawuFEej5HMf2HnAXIcCp60n6FjEH_5odmvWpC7_GUq91-WNxOOcWM9xpEm3WSypvnspQR_NP_EJa3MuUVFiIZ0adQyqK7jiVgg-_QKfzVvEjr7WGPNx_GU9ruaEafgvfeaedHqkZKdZ61hMMIvuVdx8MLpC9r01BV92VQSGGml2T0nMdviVdLeJ3ul73WAPRccqjdmoU_x-LaSlxsnI0Hbkq-RxdhM82nYTrph17lGYBYRUryr27-YZGC2PM9DjbSKhK35_jNtOW6ofGvOcoSNiOfzlFbBGnCxd49JmL5wDM0FFOStepYQDQ_R40D7C-iRQmbYrcQgZ1ACh-Rl-SjfM-4HO2cuY42MGbKlqL3eGjY95dtqls2hLtc9hPEizUdZdUUj50Hdk7KBg1vZcAwhZO30ZCFKZ87quPyXm8RHnRsLBlTCEqcBfvFaMZf3H2YcpXW5WQ64gAV9GA8e7SIvBLUQktNX5tSiCoRbrAWx8w7rLQY7lpL6OV4HnbLvKCfNwV04B-z2Ngvz&zp=dHlHgZkCtYoKymm-CfcvCg_HrGsY-Ako4TkWN4DUegAcDnNOpyWkvwuqLRIV5HkoMELMFFnC65uFb1Pb6Wg7Ox4I_ix2md1j7Swbd3klyBwVy2stJVe_jcq08EncRkCDZRosG56T0RLbCVNttokc6NabWqlUvk4ERNHcdYjMQDriQVlrlJrDaRDFGbKq6o6VZ8gr7pfVR9zDRYFigtckUtdIWQ_rrlPOZE3ljIV869rdzAcGkHGBm65AK4sPLN2-kKnjTup053e_dQ
+                      - 'img "Thumbnail image: Come to play aircraft carriers!" [ref=f65e276]'
+              - generic [ref=f65e278]:
+                - generic:
+                  - textbox [ref=f65e288]:
+                    - /placeholder: Join the conversation
+                  - generic [ref=f65e294]:
+                    - generic [ref=f65e296]:
+                      - generic [ref=f65e297]: "Sort by:"
+                      - button "Sort by Best" [ref=f65e302] [cursor=pointer]:
+                        - generic [ref=f65e303]: Best
+                    - button "Search Comments Expand comment search" [ref=f65e311] [cursor=pointer]:
+                      - generic [ref=f65e312]: Search Comments
+                      - generic [ref=f65e319]: Expand comment search
+              - region "Comments" [ref=f65e322]:
+                - heading "Comments Section" [level=1] [ref=f65e323]
+                - article "Comment from pmttyji 2 hours ago" [ref=f65e325]:
+                  - generic [ref=f65e326] [cursor=pointer]:
+                    - link "pmttyji's profile --- avatar" [ref=f65e332]:
+                      - /url: https://www.reddit.com/user/pmttyji/
+                    - generic [ref=f65e341]:
+                      - generic [ref=f65e342]:
+                        - link "pmttyji's profile" [ref=f65e346]:
+                          - /url: https://www.reddit.com/user/pmttyji/
+                          - text: pmttyji
+                        - generic [ref=f65e347]: •
+                        - link [ref=f65e349]:
+                          - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pb79r/
+                          - time [ref=f65e351]: 2h ago
+                      - generic [ref=f65e352]:
+                        - 'generic "Flair: :Discord:" [ref=f65e355]':
+                          - img "emoji:Discord:" [ref=f65e359]
+                        - generic [ref=f65e361]:
+                          - img "Profile Badge for the Achievement Top 1% Poster" [ref=f65e362]
+                          - text: Top 1% Poster
+                  - generic [ref=f65e364]:
+                    - generic [ref=f65e367]:
+                      - paragraph [ref=f65e368]: This is why every Model creators should release many models in different size ranges so any single upcoming model can't beat your all models.
+                      - paragraph [ref=f65e369]: Zuck should've released multiple models like Glimmer-70B, Glimmer-100B & Glimmer-400B.
+                    - generic [ref=f65e372]:
+                      - 'article "Comment thread level 1: Reply from SpicyWangz 2 hours ago" [ref=f65e374]':
+                        - generic [ref=f65e375] [cursor=pointer]:
+                          - link "SpicyWangz's profile --- avatar" [ref=f65e381]:
+                            - /url: https://www.reddit.com/user/SpicyWangz/
+                            - img "u/SpicyWangz avatar" [ref=f65e384]
+                          - generic [ref=f65e387]:
+                            - generic [ref=f65e388]:
+                              - link "SpicyWangz's profile" [ref=f65e392]:
+                                - /url: https://www.reddit.com/user/SpicyWangz/
+                                - text: SpicyWangz
+                              - generic [ref=f65e393]: •
+                              - link [ref=f65e395]:
+                                - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pdara/
+                                - time [ref=f65e397]: 2h ago
+                            - generic [ref=f65e400]:
+                              - img "Profile Badge for the Achievement Top 1% Commenter" [ref=f65e401]
+                              - text: Top 1% Commenter
+                        - generic [ref=f65e403]:
+                          - paragraph [ref=f65e407]: 80b a18b would’ve gone hard
+                          - 'article "Comment thread level 2: Reply from Strong_Chicken6838 12 minutes ago" [ref=f65e412]':
+                            - generic "Strong_Chicken6838's profile --- avatar Strong_Chicken6838's profile 12m ago" [ref=f65e413] [cursor=pointer]:
+                              - link "Strong_Chicken6838's profile --- avatar" [ref=f65e419]:
+                                - /url: https://www.reddit.com/user/Strong_Chicken6838/
+                                - img "u/Strong_Chicken6838 avatar" [ref=f65e422]
+                              - generic [ref=f65e426]:
+                                - link "Strong_Chicken6838's profile" [ref=f65e430]:
+                                  - /url: https://www.reddit.com/user/Strong_Chicken6838/
+                                  - text: Strong_Chicken6838
+                                - generic [ref=f65e431]: •
+                                - link [ref=f65e433]:
+                                  - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pxx0h/
+                                  - time [ref=f65e435]: 12m ago
+                            - paragraph [ref=f65e442]: Why a18b? Any particular reason?
+                      - 'article "Comment thread level 1: Reply from RoyalCities 21 minutes ago" [ref=f65e446]':
+                        - generic "RoyalCities's profile --- avatar RoyalCities's profile 21m ago" [ref=f65e447] [cursor=pointer]:
+                          - link "RoyalCities's profile --- avatar" [ref=f65e453]:
+                            - /url: https://www.reddit.com/user/RoyalCities/
+                          - generic [ref=f65e463]:
+                            - link "RoyalCities's profile" [ref=f65e467]:
+                              - /url: https://www.reddit.com/user/RoyalCities/
+                              - text: RoyalCities
+                            - generic [ref=f65e468]: •
+                            - link [ref=f65e470]:
+                              - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pvyxj/
+                              - time [ref=f65e472]: 21m ago
+                        - generic [ref=f65e478]:
+                          - paragraph [ref=f65e479]: God I would love more proper 70b and 100b models. It seems to be a huge gap. I get it'll be slower but for those that have the power to use them why not give more options.
+                          - paragraph [ref=f65e480]: It seems to always go from 30b to basically needing a datacenter with no in-between.
+                      - 'article "Comment thread level 1: Reply from james_pic 8 minutes ago" [ref=f65e484]':
+                        - generic "james_pic's profile --- avatar james_pic's profile 8m ago" [ref=f65e485] [cursor=pointer]:
+                          - link "james_pic's profile --- avatar" [ref=f65e491]:
+                            - /url: https://www.reddit.com/user/james_pic/
+                            - img "u/james_pic avatar" [ref=f65e494]
+                          - generic [ref=f65e498]:
+                            - link "james_pic's profile" [ref=f65e502]:
+                              - /url: https://www.reddit.com/user/james_pic/
+                              - text: james_pic
+                            - generic [ref=f65e503]: •
+                            - link [ref=f65e505]:
+                              - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pyv95/
+                              - time [ref=f65e507]: 8m ago
+                        - paragraph [ref=f65e514]: Glimmer 4B would also be welcome.
+                - article "Comment from Kappalonia 2 hours ago" [ref=f65e518]:
+                  - generic "Kappalonia's profile --- avatar Kappalonia's profile 2h ago" [ref=f65e519] [cursor=pointer]:
+                    - link "Kappalonia's profile --- avatar" [ref=f65e525]:
+                      - /url: https://www.reddit.com/user/Kappalonia/
+                    - generic [ref=f65e535]:
+                      - link "Kappalonia's profile" [ref=f65e539]:
+                        - /url: https://www.reddit.com/user/Kappalonia/
+                        - text: Kappalonia
+                      - generic [ref=f65e540]: •
+                      - link [ref=f65e542]:
+                        - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3p7293/
+                        - time [ref=f65e544]: 2h ago
+                  - generic [ref=f65e547]:
+                    - paragraph [ref=f65e551]: so.... we're actually at Opus 4.6 Max level with 27B parameters?
+                    - generic [ref=f65e554]:
+                      - 'article "Comment thread level 1: Reply from Poupulino 2 hours ago" [ref=f65e556]':
+                        - generic [ref=f65e557] [cursor=pointer]:
+                          - link "Poupulino's profile --- avatar" [ref=f65e563]:
+                            - /url: https://www.reddit.com/user/Poupulino/
+                            - img "u/Poupulino avatar" [ref=f65e566]
+                          - generic [ref=f65e569]:
+                            - generic [ref=f65e570]:
+                              - link "Poupulino's profile" [ref=f65e574]:
+                                - /url: https://www.reddit.com/user/Poupulino/
+                                - text: Poupulino
+                              - generic [ref=f65e575]: •
+                              - link [ref=f65e577]:
+                                - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3p7t6f/
+                                - time [ref=f65e579]: 2h ago
+                            - generic [ref=f65e582]:
+                              - img "Profile Badge for the Achievement Top 1% Commenter" [ref=f65e583]
+                              - text: Top 1% Commenter
+                        - generic [ref=f65e585]:
+                          - paragraph [ref=f65e589]: Can't wait for a non-dense 27B model at Fable level in about a year. It's honestly insane.
+                          - 'article "Comment thread level 2: Reply from darkwalker247 2 hours ago" [ref=f65e594]':
+                            - generic "darkwalker247's profile --- avatar darkwalker247's profile 2h ago" [ref=f65e595] [cursor=pointer]:
+                              - link "darkwalker247's profile --- avatar" [ref=f65e601]:
+                                - /url: https://www.reddit.com/user/darkwalker247/
+                                - img "u/darkwalker247 avatar" [ref=f65e604]
+                              - generic [ref=f65e608]:
+                                - link "darkwalker247's profile" [ref=f65e612]:
+                                  - /url: https://www.reddit.com/user/darkwalker247/
+                                  - text: darkwalker247
+                                - generic [ref=f65e613]: •
+                                - link [ref=f65e615]:
+                                  - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pd86m/
+                                  - time [ref=f65e617]: 2h ago
+                            - paragraph [ref=f65e624]: qwen4-35b-a3b is going to change local LLMs as we know it
+                      - 'article "Comment thread level 1: Reply from Technical-Earth-3254 2 hours ago" [ref=f65e628]':
+                        - generic [ref=f65e629] [cursor=pointer]:
+                          - link "Technical-Earth-3254's profile --- avatar" [ref=f65e635]:
+                            - /url: https://www.reddit.com/user/Technical-Earth-3254/
+                            - img "u/Technical-Earth-3254 avatar" [ref=f65e638]
+                          - generic [ref=f65e641]:
+                            - generic [ref=f65e642]:
+                              - link "Technical-Earth-3254's profile" [ref=f65e646]:
+                                - /url: https://www.reddit.com/user/Technical-Earth-3254/
+                                - text: Technical-Earth-3254
+                              - generic [ref=f65e647]: •
+                              - link [ref=f65e649]:
+                                - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pf5ih/
+                                - time [ref=f65e651]: 2h ago
+                            - generic [ref=f65e654]:
+                              - img "Profile Badge for the Achievement Top 1% Commenter" [ref=f65e655]
+                              - text: Top 1% Commenter
+                        - paragraph [ref=f65e661]: In benchmarks we are. In real world scenarios that are not just straight up tool calling? Not even close (that's to be expected).
+                      - 'article "Comment thread level 1: Reply from PhantomGaming27249 2 hours ago" [ref=f65e665]':
+                        - generic "PhantomGaming27249's profile --- avatar PhantomGaming27249's profile 2h ago" [ref=f65e666] [cursor=pointer]:
+                          - link "PhantomGaming27249's profile --- avatar" [ref=f65e672]:
+                            - /url: https://www.reddit.com/user/PhantomGaming27249/
+                          - generic [ref=f65e682]:
+                            - link "PhantomGaming27249's profile" [ref=f65e686]:
+                              - /url: https://www.reddit.com/user/PhantomGaming27249/
+                              - text: PhantomGaming27249
+                            - generic [ref=f65e687]: •
+                            - link [ref=f65e689]:
+                              - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3p7r4o/
+                              - time [ref=f65e691]: 2h ago
+                        - generic [ref=f65e694]:
+                          - paragraph [ref=f65e698]: Its actually kind of better than opus 4.6, it has way better image capabilities and agent abilities.
+                          - generic [ref=f65e701]:
+                            - 'article "Comment thread level 2: Reply from Both_Opportunity5327 53 minutes ago" [ref=f65e703]':
+                              - generic "Both_Opportunity5327's profile --- avatar Both_Opportunity5327's profile 53m ago" [ref=f65e704] [cursor=pointer]:
+                                - link "Both_Opportunity5327's profile --- avatar" [ref=f65e710]:
+                                  - /url: https://www.reddit.com/user/Both_Opportunity5327/
+                                - generic [ref=f65e720]:
+                                  - link "Both_Opportunity5327's profile" [ref=f65e724]:
+                                    - /url: https://www.reddit.com/user/Both_Opportunity5327/
+                                    - text: Both_Opportunity5327
+                                  - generic [ref=f65e725]: •
+                                  - link [ref=f65e727]:
+                                    - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3povoz/
+                                    - time [ref=f65e729]: 53m ago
+                              - generic [ref=f65e732]:
+                                - paragraph [ref=f65e736]: No it does not, please use the bloody thing before commenting.
+                                - generic [ref=f65e739]:
+                                  - 'article "Comment thread level 3: Reply from ClintWoodeast 36 minutes ago" [ref=f65e741]':
+                                    - generic "ClintWoodeast's profile --- avatar ClintWoodeast's profile 36m ago" [ref=f65e742] [cursor=pointer]:
+                                      - link "ClintWoodeast's profile --- avatar" [ref=f65e748]:
+                                        - /url: https://www.reddit.com/user/ClintWoodeast/
+                                        - img "u/ClintWoodeast avatar" [ref=f65e751]
+                                      - generic [ref=f65e755]:
+                                        - link "ClintWoodeast's profile" [ref=f65e759]:
+                                          - /url: https://www.reddit.com/user/ClintWoodeast/
+                                          - text: ClintWoodeast
+                                        - generic [ref=f65e760]: •
+                                        - link [ref=f65e762]:
+                                          - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3psq39/
+                                          - time [ref=f65e764]: 36m ago
+                                    - paragraph [ref=f65e771]: But it's been pre-trained, post-trained, and RL'ed on the benchmarks. It must be amazing!
+                                  - 'article "Comment thread level 3: Reply from smith7018 24 minutes ago" [ref=f65e775]':
+                                    - generic "smith7018's profile --- avatar smith7018's profile 24m ago" [ref=f65e776] [cursor=pointer]:
+                                      - link "smith7018's profile --- avatar" [ref=f65e782]:
+                                        - /url: https://www.reddit.com/user/smith7018/
+                                      - generic [ref=f65e792]:
+                                        - link "smith7018's profile" [ref=f65e796]:
+                                          - /url: https://www.reddit.com/user/smith7018/
+                                          - text: smith7018
+                                        - generic [ref=f65e797]: •
+                                        - link [ref=f65e799]:
+                                          - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pve0k/
+                                          - time [ref=f65e801]: 24m ago
+                                    - paragraph [ref=f65e808]: It’s honestly giving bots atp. There’s no way 27B can beat Opus. Especially when Qwen Max doesn’t really beat Opus. It’s insane how little cognitive ability people have here
+                                  - 'article "Comment thread level 3: Reply from Strong_Chicken6838 11 minutes ago" [ref=f65e812]':
+                                    - generic "Strong_Chicken6838's profile --- avatar Strong_Chicken6838's profile 11m ago" [ref=f65e813] [cursor=pointer]:
+                                      - link "Strong_Chicken6838's profile --- avatar" [ref=f65e819]:
+                                        - /url: https://www.reddit.com/user/Strong_Chicken6838/
+                                        - img "u/Strong_Chicken6838 avatar" [ref=f65e822]
+                                      - generic [ref=f65e826]:
+                                        - link "Strong_Chicken6838's profile" [ref=f65e830]:
+                                          - /url: https://www.reddit.com/user/Strong_Chicken6838/
+                                          - text: Strong_Chicken6838
+                                        - generic [ref=f65e831]: •
+                                        - link [ref=f65e833]:
+                                          - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pyakp/
+                                          - time [ref=f65e835]: 11m ago
+                                    - generic [ref=f65e838]:
+                                      - paragraph [ref=f65e842]: How are you confidently saying that, just as the guy above you is, when it has only been out for a few hours and you yourself couldn’t have even followed your own advice in saying that?
+                                      - 'article "Comment thread level 4: Reply from Both_Opportunity5327 3 minutes ago" [ref=f65e847]':
+                                        - generic "Both_Opportunity5327's profile --- avatar Both_Opportunity5327's profile 3m ago" [ref=f65e848] [cursor=pointer]:
+                                          - link "Both_Opportunity5327's profile --- avatar" [ref=f65e854]:
+                                            - /url: https://www.reddit.com/user/Both_Opportunity5327/
+                                          - generic [ref=f65e864]:
+                                            - link "Both_Opportunity5327's profile" [ref=f65e868]:
+                                              - /url: https://www.reddit.com/user/Both_Opportunity5327/
+                                              - text: Both_Opportunity5327
+                                            - generic [ref=f65e869]: •
+                                            - link [ref=f65e871]:
+                                              - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pzvnf/
+                                              - time [ref=f65e873]: 3m ago
+                                        - generic [ref=f65e879]:
+                                          - paragraph [ref=f65e880]: Yep, I was able to do one test with thinking on Xhigh and it is a very good model.
+                                          - paragraph [ref=f65e881]: That test took two hours.
+                                  - 'article "Comment thread level 3: Reply from PhantomGaming27249 1 minute ago" [ref=f65e885]':
+                                    - generic "PhantomGaming27249's profile --- avatar PhantomGaming27249's profile 1m ago" [ref=f65e886] [cursor=pointer]:
+                                      - link "PhantomGaming27249's profile --- avatar" [ref=f65e892]:
+                                        - /url: https://www.reddit.com/user/PhantomGaming27249/
+                                      - generic [ref=f65e902]:
+                                        - link "PhantomGaming27249's profile" [ref=f65e906]:
+                                          - /url: https://www.reddit.com/user/PhantomGaming27249/
+                                          - text: PhantomGaming27249
+                                        - generic [ref=f65e907]: •
+                                        - link [ref=f65e909]:
+                                          - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3q0jvo/
+                                          - time [ref=f65e911]: 1m ago
+                                    - paragraph [ref=f65e918]: I did, in pi agent and properly configured at fp8 it's great. What harness are you using?
+                            - 'article "Comment thread level 2: Reply from Dry_Yam_4597 2 hours ago" [ref=f65e922]':
+                              - generic [ref=f65e923] [cursor=pointer]:
+                                - link "Dry_Yam_4597's profile --- avatar" [ref=f65e929]:
+                                  - /url: https://www.reddit.com/user/Dry_Yam_4597/
+                                  - img "u/Dry_Yam_4597 avatar" [ref=f65e932]
+                                - generic [ref=f65e935]:
+                                  - generic [ref=f65e936]:
+                                    - link "Dry_Yam_4597's profile" [ref=f65e940]:
+                                      - /url: https://www.reddit.com/user/Dry_Yam_4597/
+                                      - text: Dry_Yam_4597
+                                    - generic [ref=f65e941]: •
+                                    - link [ref=f65e943]:
+                                      - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pa5bp/
+                                      - time [ref=f65e945]: 2h ago
+                                  - generic [ref=f65e948]:
+                                    - img "Profile Badge for the Achievement Top 1% Commenter" [ref=f65e949]
+                                    - text: Top 1% Commenter
+                              - paragraph [ref=f65e955]: This is the way.
+                      - 'article "Comment thread level 1: Reply from Alt_Restorer 2 hours ago" [ref=f65e959]':
+                        - generic "Alt_Restorer's profile --- avatar Alt_Restorer's profile 2h ago" [ref=f65e960] [cursor=pointer]:
+                          - link "Alt_Restorer's profile --- avatar" [ref=f65e966]:
+                            - /url: https://www.reddit.com/user/Alt_Restorer/
+                          - generic [ref=f65e976]:
+                            - link "Alt_Restorer's profile" [ref=f65e980]:
+                              - /url: https://www.reddit.com/user/Alt_Restorer/
+                              - text: Alt_Restorer
+                            - generic [ref=f65e981]: •
+                            - link [ref=f65e983]:
+                              - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pfhqf/
+                              - time [ref=f65e985]: 2h ago
+                        - generic [ref=f65e988]:
+                          - paragraph [ref=f65e992]: No. Models have gotten more agentic over time with RL, and that capability seems to scale very well to small models, but by other metrics, it's nowhere near. My favorite example is knowledge. Opus 4.6 is vastly more knowledgeable about random stuff, even if it's less well trained on the core function of reasoning.
+                          - 'article "Comment thread level 2: Reply from Southern_Sun_2106 52 minutes ago" [ref=f65e997]':
+                            - generic "Southern_Sun_2106's profile --- avatar Southern_Sun_2106's profile 52m ago" [ref=f65e998] [cursor=pointer]:
+                              - link "Southern_Sun_2106's profile --- avatar" [ref=f65e1004]:
+                                - /url: https://www.reddit.com/user/Southern_Sun_2106/
+                                - img "u/Southern_Sun_2106 avatar" [ref=f65e1007]
+                              - generic [ref=f65e1011]:
+                                - link "Southern_Sun_2106's profile" [ref=f65e1015]:
+                                  - /url: https://www.reddit.com/user/Southern_Sun_2106/
+                                  - text: Southern_Sun_2106
+                                - generic [ref=f65e1016]: •
+                                - link [ref=f65e1018]:
+                                  - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pp869/
+                                  - time [ref=f65e1020]: 52m ago
+                            - generic [ref=f65e1023]:
+                              - paragraph [ref=f65e1027]: At this point it is pretty clear that being 'knowledgeable' is not crucial. Most people these days don't use models as knowledge storage. They use models to solve problems by using tools (including using tools to get knowledge online or wherever one stores it). There is the whole wold of internet out there. I don't get the obsession with having the model 'know everything' when everything is just one search away. Plus 100 percent accuracy of knowledge is as illusive as a unicorn, in any context.
+                              - 'article "Comment thread level 3: Reply from j0j0n4th4n 34 minutes ago" [ref=f65e1032]':
+                                - generic "j0j0n4th4n's profile --- avatar j0j0n4th4n's profile 34m ago" [ref=f65e1033] [cursor=pointer]:
+                                  - link "j0j0n4th4n's profile --- avatar" [ref=f65e1039]:
+                                    - /url: https://www.reddit.com/user/j0j0n4th4n/
+                                    - img "u/j0j0n4th4n avatar" [ref=f65e1042]
+                                  - generic [ref=f65e1046]:
+                                    - link "j0j0n4th4n's profile" [ref=f65e1050]:
+                                      - /url: https://www.reddit.com/user/j0j0n4th4n/
+                                      - text: j0j0n4th4n
+                                    - generic [ref=f65e1051]: •
+                                    - link [ref=f65e1053]:
+                                      - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pt2pz/
+                                      - time [ref=f65e1055]: 34m ago
+                                - paragraph [ref=f65e1062]: Is not that simple, if you're writing code then edge cases or quirks of the language may literally be an unsurmountable wall that breaks the code since small models wouldn't know that and a smart small model may actually be worst cause it might think some other stuff is the culprint and make you waste a lot of time to figure out the real culprint. So yeah, knowledge can be circunvented with a proper database but just up to a point. Depending on the task a database will not even be required but in others it might not even be enough.
+                      - 'article "Comment thread level 1: Reply from toothpastespiders 1 hour ago" [ref=f65e1066]':
+                        - generic "toothpastespiders's profile --- avatar toothpastespiders's profile 1h ago" [ref=f65e1067] [cursor=pointer]:
+                          - link "toothpastespiders's profile --- avatar" [ref=f65e1073]:
+                            - /url: https://www.reddit.com/user/toothpastespiders/
+                            - img "u/toothpastespiders avatar" [ref=f65e1076]
+                          - generic [ref=f65e1080]:
+                            - link "toothpastespiders's profile" [ref=f65e1084]:
+                              - /url: https://www.reddit.com/user/toothpastespiders/
+                              - text: toothpastespiders
+                            - generic [ref=f65e1085]: •
+                            - link [ref=f65e1087]:
+                              - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pn3dw/
+                              - time [ref=f65e1089]: 1h ago
+                        - generic [ref=f65e1095]:
+                          - paragraph [ref=f65e1096]: We're not. I think qwen's been on an amazing roll since 3.5. Likewise the gemma 4 line has been a phenomenal improvement over Gemma 3. But size is ultimately an unbeatable constraint. The big benchmarks just don't translate to real world use. If a benchmark suggests that the small models beat Opus 4.6 , GPT-4o , etc then that's not a sign of how far we've come. It's a sign of underlying issues in the benchmarks.
+                          - paragraph [ref=f65e1097]: A larger issue I'm seeing is that I suspect that most of the people here have a background in CS rather than experimental sciences that require more complicated experimental design. Psych studies obviously have their own inherent issues. But I see LLM as having similar challenges there than they do with standard computational benchmarking practices.
+                          - paragraph [ref=f65e1098]: My use of local models is heavily tied to additional training. I'm fairly sure that if I used standard benchmarking methodology that my fine tunes would beat claude on the subjects covered by my datasets. But in terms of real world use they're barely at a level I'd call adequate.
+                      - 'article "Comment thread level 1: Reply from Thin_Pollution8843 2 hours ago" [ref=f65e1102]':
+                        - generic [ref=f65e1103] [cursor=pointer]:
+                          - link "Thin_Pollution8843's profile --- avatar" [ref=f65e1109]:
+                            - /url: https://www.reddit.com/user/Thin_Pollution8843/
+                            - img "u/Thin_Pollution8843 avatar" [ref=f65e1112]
+                          - generic [ref=f65e1115]:
+                            - generic [ref=f65e1116]:
+                              - link "Thin_Pollution8843's profile" [ref=f65e1120]:
+                                - /url: https://www.reddit.com/user/Thin_Pollution8843/
+                                - text: Thin_Pollution8843
+                              - generic [ref=f65e1121]: •
+                              - link [ref=f65e1123]:
+                                - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3p8163/
+                                - time [ref=f65e1125]: 2h ago
+                            - generic [ref=f65e1128]:
+                              - img "Profile Badge for the Achievement Top 1% Commenter" [ref=f65e1129]
+                              - text: Top 1% Commenter
+                        - generic [ref=f65e1131]:
+                          - paragraph [ref=f65e1135]: Nah it’s only benchmarks. Irl it won’t be so impressive as usual
+                          - 'article "Comment thread level 2: Reply from InternationalGap3698 2 hours ago" [ref=f65e1140]':
+                            - generic [ref=f65e1141] [cursor=pointer]:
+                              - link "InternationalGap3698's profile --- avatar" [ref=f65e1147]:
+                                - /url: https://www.reddit.com/user/InternationalGap3698/
+                                - img "u/InternationalGap3698 avatar" [ref=f65e1150]
+                              - generic [ref=f65e1153]:
+                                - generic [ref=f65e1154]:
+                                  - link "InternationalGap3698's profile" [ref=f65e1158]:
+                                    - /url: https://www.reddit.com/user/InternationalGap3698/
+                                    - text: InternationalGap3698
+                                  - generic "Comment distinguished as the original poster" [ref=f65e1161]: OP
+                                  - generic [ref=f65e1162]: •
+                                  - link [ref=f65e1164]:
+                                    - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3p8pfd/
+                                    - time [ref=f65e1166]: 2h ago
+                                - generic [ref=f65e1167]:
+                                  - 'generic "Flair: :Discord:" [ref=f65e1170]'
+                                  - generic [ref=f65e1175]:
+                                    - img "Profile Badge for the Achievement Top 1% Poster" [ref=f65e1176]
+                                    - text: Top 1% Poster
+                            - generic [ref=f65e1178]:
+                              - paragraph [ref=f65e1182]:
+                                - link "https://www.reddit.com/r/LocalLLaMA/comments/1voer8u/qwen_38_27b_aquarium_burst_sample_test/" [ref=f65e1183] [cursor=pointer]:
+                                  - /url: https://www.reddit.com/r/LocalLLaMA/comments/1voer8u/qwen_38_27b_aquarium_burst_sample_test/
+                              - generic [ref=f65e1186]:
+                                - 'article "Comment thread level 3: Reply from Dry_Yam_4597 2 hours ago" [ref=f65e1188]':
+                                  - generic [ref=f65e1189] [cursor=pointer]:
+                                    - link "Dry_Yam_4597's profile --- avatar" [ref=f65e1195]:
+                                      - /url: https://www.reddit.com/user/Dry_Yam_4597/
+                                      - img "u/Dry_Yam_4597 avatar" [ref=f65e1198]
+                                    - generic [ref=f65e1201]:
+                                      - generic [ref=f65e1202]:
+                                        - link "Dry_Yam_4597's profile" [ref=f65e1206]:
+                                          - /url: https://www.reddit.com/user/Dry_Yam_4597/
+                                          - text: Dry_Yam_4597
+                                        - generic [ref=f65e1207]: •
+                                        - link [ref=f65e1209]:
+                                          - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3paftz/
+                                          - time [ref=f65e1211]: 2h ago
+                                      - generic [ref=f65e1214]:
+                                        - img "Profile Badge for the Achievement Top 1% Commenter" [ref=f65e1215]
+                                        - text: Top 1% Commenter
+                                  - generic [ref=f65e1217]:
+                                    - paragraph [ref=f65e1221]: Lmao antrophic's workers and boosters are out in numbers to suppress positive feeedback about their competition, downvoting left and right.
+                                    - 'article "Comment thread level 4: Reply from --_---------_-- 2 hours ago" [ref=f65e1226]':
+                                      - generic "--_---------_--'s profile --- avatar --_---------_--'s profile 2h ago" [ref=f65e1227] [cursor=pointer]:
+                                        - link "--_---------_--'s profile --- avatar" [ref=f65e1233]:
+                                          - /url: https://www.reddit.com/user/--_---------_--/
+                                          - img "u/--_---------_-- avatar" [ref=f65e1236]
+                                        - generic [ref=f65e1240]:
+                                          - link "--_---------_--'s profile" [ref=f65e1244]:
+                                            - /url: https://www.reddit.com/user/--_---------_--/
+                                            - text: "--_---------_--"
+                                          - generic [ref=f65e1245]: •
+                                          - link [ref=f65e1247]:
+                                            - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pcuuh/
+                                            - time [ref=f65e1249]: 2h ago
+                                      - paragraph [ref=f65e1256]: The future is now
+                                - 'article "Comment thread level 3: Reply from TheRealMasonMac 40 minutes ago" [ref=f65e1260]':
+                                  - generic [ref=f65e1261] [cursor=pointer]:
+                                    - link "TheRealMasonMac's profile --- avatar" [ref=f65e1267]:
+                                      - /url: https://www.reddit.com/user/TheRealMasonMac/
+                                      - img "u/TheRealMasonMac avatar" [ref=f65e1270]
+                                    - generic [ref=f65e1273]:
+                                      - generic [ref=f65e1274]:
+                                        - link "TheRealMasonMac's profile" [ref=f65e1278]:
+                                          - /url: https://www.reddit.com/user/TheRealMasonMac/
+                                          - text: TheRealMasonMac
+                                        - generic [ref=f65e1279]: •
+                                        - link [ref=f65e1281]:
+                                          - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3prtc1/
+                                          - time [ref=f65e1283]: 40m ago
+                                      - generic [ref=f65e1284]:
+                                        - 'generic "Flair: :Discord:" [ref=f65e1287]'
+                                        - generic [ref=f65e1292]:
+                                          - img "Profile Badge for the Achievement Top 1% Commenter" [ref=f65e1293]
+                                          - text: Top 1% Commenter
+                                  - paragraph [ref=f65e1299]: Probably trained for that by now.
+                - article "Comment from Thin_Pollution8843 2 hours ago" [ref=f65e1303]:
+                  - generic [ref=f65e1304] [cursor=pointer]:
+                    - link "Thin_Pollution8843's profile --- avatar" [ref=f65e1310]:
+                      - /url: https://www.reddit.com/user/Thin_Pollution8843/
+                      - img "u/Thin_Pollution8843 avatar" [ref=f65e1313]
+                    - generic [ref=f65e1316]:
+                      - generic [ref=f65e1317]:
+                        - link "Thin_Pollution8843's profile" [ref=f65e1321]:
+                          - /url: https://www.reddit.com/user/Thin_Pollution8843/
+                          - text: Thin_Pollution8843
+                        - generic [ref=f65e1322]: •
+                        - link [ref=f65e1324]:
+                          - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3p87om/
+                          - time [ref=f65e1326]: 2h ago
+                      - generic [ref=f65e1329]:
+                        - img "Profile Badge for the Achievement Top 1% Commenter" [ref=f65e1330]
+                        - text: Top 1% Commenter
+                  - generic [ref=f65e1332]:
+                    - paragraph [ref=f65e1336]: I hope Meta team will make their homework and astonish us with new frontier model next time.
+                    - 'article "Comment thread level 1: Reply from autisticit 2 hours ago" [ref=f65e1341]':
+                      - generic [ref=f65e1342] [cursor=pointer]:
+                        - link "autisticit's profile --- avatar" [ref=f65e1348]:
+                          - /url: https://www.reddit.com/user/autisticit/
+                          - img "u/autisticit avatar" [ref=f65e1351]
+                        - generic [ref=f65e1354]:
+                          - generic [ref=f65e1355]:
+                            - link "autisticit's profile" [ref=f65e1359]:
+                              - /url: https://www.reddit.com/user/autisticit/
+                              - text: autisticit
+                            - generic [ref=f65e1360]: •
+                            - link [ref=f65e1362]:
+                              - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pd83q/
+                              - time [ref=f65e1364]: 2h ago
+                          - generic [ref=f65e1367]:
+                            - img "Profile Badge for the Achievement Top 1% Commenter" [ref=f65e1368]
+                            - text: Top 1% Commenter
+                      - generic [ref=f65e1370]:
+                        - paragraph [ref=f65e1374]: I wonder if the US is still in the race for small models?
+                        - 'article "Comment thread level 2: Reply from hyperrealists 48 minutes ago" [ref=f65e1379]':
+                          - generic [ref=f65e1380] [cursor=pointer]:
+                            - link "hyperrealists's profile --- avatar" [ref=f65e1386]:
+                              - /url: https://www.reddit.com/user/hyperrealists/
+                              - img "u/hyperrealists avatar" [ref=f65e1389]
+                            - generic [ref=f65e1392]:
+                              - generic [ref=f65e1393]:
+                                - link "hyperrealists's profile" [ref=f65e1397]:
+                                  - /url: https://www.reddit.com/user/hyperrealists/
+                                  - text: hyperrealists
+                                - generic [ref=f65e1398]: •
+                                - link [ref=f65e1400]:
+                                  - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3ppzcb/
+                                  - time [ref=f65e1402]: 48m ago
+                              - generic [ref=f65e1405]:
+                                - img "Profile Badge for the Achievement Top 1% Commenter" [ref=f65e1406]
+                                - text: Top 1% Commenter
+                          - generic [ref=f65e1408]:
+                            - paragraph [ref=f65e1412]: Small models trend died with Jeffrey
+                            - 'article "Comment thread level 3: Reply from autisticit 47 minutes ago" [ref=f65e1417]':
+                              - generic [ref=f65e1418] [cursor=pointer]:
+                                - link "autisticit's profile --- avatar" [ref=f65e1424]:
+                                  - /url: https://www.reddit.com/user/autisticit/
+                                  - img "u/autisticit avatar" [ref=f65e1427]
+                                - generic [ref=f65e1430]:
+                                  - generic [ref=f65e1431]:
+                                    - link "autisticit's profile" [ref=f65e1435]:
+                                      - /url: https://www.reddit.com/user/autisticit/
+                                      - text: autisticit
+                                    - generic [ref=f65e1436]: •
+                                    - link [ref=f65e1438]:
+                                      - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pqdks/
+                                      - time [ref=f65e1440]: 47m ago
+                                  - generic [ref=f65e1443]:
+                                    - img "Profile Badge for the Achievement Top 1% Commenter" [ref=f65e1444]
+                                    - text: Top 1% Commenter
+                              - paragraph [ref=f65e1450]: Dude... Can't upvote this. Also can't downvote. WTF
+                - generic "Generating 3D with AI is easy. Getting the details right is harder." [ref=f65e1454]:
+                  - generic [ref=f65e1455]:
+                    - 'generic "Advertisement: Generating 3D with AI is easy. Getting the details right is harder." [ref=f65e1456]':
+                      - 'link "Advertisement: Generating 3D with AI is easy. Getting the details right is harder." [ref=f65e1457] [cursor=pointer]':
+                        - /url: https://alb.reddit.com/cr?za=YA6tzL2TX-850ezMjVrVe3hzm0LPlGy_51Xd6Dm3rhiPzTXzT5-cw8DKqMu2IR1wrt8I_VrB-lhzniFFcm-vnpFOhfLrKe13r4ATSFaxYWKCkJiXdSAfQIVyud7kSd1KnEyFGTZPQFYuqP6WP_i0SSSF5MtB2Q70pYPeikCAQl3IXTggl2aS3KkpMYm72UqL9DMxDMtrAxVi6-3zjXoyjbIJTYcwQb7A2NLTQh3rD1qYB1XUyRcZ67Kc3-kPx2kBRV3hEhRB28S6rrK_sZvb6waMA2xje6V6_BN9kNeepCzID-fXVO1j1t0-pNgt04HQ_oYxIKiCsiquWR8Qq-96LaYgli3VfvuRz-VXjABoSDE4VGbumEl7_o9FKNkUyAWzyygNsxnrEtWkdM7lXWMaGKk93UkH8kyVxIQAXKvgOwMEPDV0Jpqy-9isyEvAdk3g4HuwcbmXGpuBjPSzRw5rSnciTVyeu5FUanZjlZeu-XJXqwgpXC_0NEXnBAOK5-R3nm_Y4JI5AQXWV5NWQlsXl1tZ1Nf1GQmE2T9AGsY9zE_WHU8BxJVY3aW-o8rEoppJAeDu7sVjLbip4oe4l49tgSE-vTdobNU3WfLtFI5EhX0CaKgX_YVAKJTkBd_VGpWL6znRa8ZXUBqKeRCFtzofXwMl9eZRIsw35O13CMWF8CDA1HRsmEQlUYE0sgZc1wbxZrxIa8k433Kj3mCbokFoXMQpx4uSjJN21OmuroOZ3RVmyA&zp=_a6EwWH4cojjZpYdVF6jzKztFtcp7gM9oYuwD2fUv1kWuPaeZV53avHxJxk0sH-DuRQjieU_2ozQ2Uia6vCR0MFFsvTt4gm6miGNGtNYEfWUs-jLkzbpLOjCE1GrYytP3W7nJ9BMIH2fbppvnTCQ4-3MBO6F4izs0R6sVLlVmSzwSf-Npy7LRXgta2dpnMKiSSv5n7tQaDdHAYBMoQe5gwhNVsC_NDFeqO0nvVvwkTyoOCwBpkJmaIRRKFS-DwXBc1aHDE8XqjF1ceozhF1T9Ofatviov28YNGSY_g
+                    - generic [ref=f65e1458]:
+                      - generic [ref=f65e1459]:
+                        - link "u/Hyper3D_RodinAI" [ref=f65e1462] [cursor=pointer]:
+                          - /url: /user/Hyper3D_RodinAI/
+                          - img "u/Hyper3D_RodinAI avatar" [ref=f65e1465]
+                        - generic [ref=f65e1467]: •
+                        - link "Promoted" [ref=f65e1469] [cursor=pointer]:
+                          - /url: /user/Hyper3D_RodinAI/
+                        - link [ref=f65e1472] [cursor=pointer]:
+                          - /url: https://alb.reddit.com/cr?za=YA6tzL2TX-850ezMjVrVe3hzm0LPlGy_51Xd6Dm3rhiPzTXzT5-cw8DKqMu2IR1wrt8I_VrB-lhzniFFcm-vnpFOhfLrKe13r4ATSFaxYWKCkJiXdSAfQIVyud7kSd1KnEyFGTZPQFYuqP6WP_i0SSSF5MtB2Q70pYPeikCAQl3IXTggl2aS3KkpMYm72UqL9DMxDMtrAxVi6-3zjXoyjbIJTYcwQb7A2NLTQh3rD1qYB1XUyRcZ67Kc3-kPx2kBRV3hEhRB28S6rrK_sZvb6waMA2xje6V6_BN9kNeepCzID-fXVO1j1t0-pNgt04HQ_oYxIKiCsiquWR8Qq-96LaYgli3VfvuRz-VXjABoSDE4VGbumEl7_o9FKNkUyAWzyygNsxnrEtWkdM7lXWMaGKk93UkH8kyVxIQAXKvgOwMEPDV0Jpqy-9isyEvAdk3g4HuwcbmXGpuBjPSzRw5rSnciTVyeu5FUanZjlZeu-XJXqwgpXC_0NEXnBAOK5-R3nm_Y4JI5AQXWV5NWQlsXl1tZ1Nf1GQmE2T9AGsY9zE_WHU8BxJVY3aW-o8rEoppJAeDu7sVjLbip4oe4l49tgSE-vTdobNU3WfLtFI5EhX0CaKgX_YVAKJTkBd_VGpWL6znRa8ZXUBqKeRCFtzofXwMl9eZRIsw35O13CMWF8CDA1HRsmEQlUYE0sgZc1wbxZrxIa8k433Kj3mCbokFoXMQpx4uSjJN21OmuroOZ3RVmyA&zp=_a6EwWH4cojjZpYdVF6jzKztFtcp7gM9oYuwD2fUv1kWuPaeZV53avHxJxk0sH-DuRQjieU_2ozQ2Uia6vCR0MFFsvTt4gm6miGNGtNYEfWUs-jLkzbpLOjCE1GrYytP3W7nJ9BMIH2fbppvnTCQ4-3MBO6F4izs0R6sVLlVmSzwSf-Npy7LRXgta2dpnMKiSSv5n7tQaDdHAYBMoQe5gwhNVsC_NDFeqO0nvVvwkTyoOCwBpkJmaIRRKFS-DwXBc1aHDE8XqjF1ceozhF1T9Ofatviov28YNGSY_g
+                      - button "Open user actions" [ref=f65e1478] [cursor=pointer]
+                    - generic [ref=f65e1483]:
+                      - link "Generating 3D with AI is easy. Getting the details right is harder." [ref=f65e1485] [cursor=pointer]:
+                        - /url: https://alb.reddit.com/cr?za=YA6tzL2TX-850ezMjVrVe3hzm0LPlGy_51Xd6Dm3rhiPzTXzT5-cw8DKqMu2IR1wrt8I_VrB-lhzniFFcm-vnpFOhfLrKe13r4ATSFaxYWKCkJiXdSAfQIVyud7kSd1KnEyFGTZPQFYuqP6WP_i0SSSF5MtB2Q70pYPeikCAQl3IXTggl2aS3KkpMYm72UqL9DMxDMtrAxVi6-3zjXoyjbIJTYcwQb7A2NLTQh3rD1qYB1XUyRcZ67Kc3-kPx2kBRV3hEhRB28S6rrK_sZvb6waMA2xje6V6_BN9kNeepCzID-fXVO1j1t0-pNgt04HQ_oYxIKiCsiquWR8Qq-96LaYgli3VfvuRz-VXjABoSDE4VGbumEl7_o9FKNkUyAWzyygNsxnrEtWkdM7lXWMaGKk93UkH8kyVxIQAXKvgOwMEPDV0Jpqy-9isyEvAdk3g4HuwcbmXGpuBjPSzRw5rSnciTVyeu5FUanZjlZeu-XJXqwgpXC_0NEXnBAOK5-R3nm_Y4JI5AQXWV5NWQlsXl1tZ1Nf1GQmE2T9AGsY9zE_WHU8BxJVY3aW-o8rEoppJAeDu7sVjLbip4oe4l49tgSE-vTdobNU3WfLtFI5EhX0CaKgX_YVAKJTkBd_VGpWL6znRa8ZXUBqKeRCFtzofXwMl9eZRIsw35O13CMWF8CDA1HRsmEQlUYE0sgZc1wbxZrxIa8k433Kj3mCbokFoXMQpx4uSjJN21OmuroOZ3RVmyA&zp=_a6EwWH4cojjZpYdVF6jzKztFtcp7gM9oYuwD2fUv1kWuPaeZV53avHxJxk0sH-DuRQjieU_2ozQ2Uia6vCR0MFFsvTt4gm6miGNGtNYEfWUs-jLkzbpLOjCE1GrYytP3W7nJ9BMIH2fbppvnTCQ4-3MBO6F4izs0R6sVLlVmSzwSf-Npy7LRXgta2dpnMKiSSv5n7tQaDdHAYBMoQe5gwhNVsC_NDFeqO0nvVvwkTyoOCwBpkJmaIRRKFS-DwXBc1aHDE8XqjF1ceozhF1T9Ofatviov28YNGSY_g
+                      - list [ref=f65e1489]:
+                        - generic:
+                          - listitem [ref=f65e1490]:
+                            - generic [ref=f65e1491]:
+                              - link [ref=f65e1493] [cursor=pointer]:
+                                - /url: https://alb.reddit.com/cr?za=YA6tzL2TX-850ezMjVrVe3hzm0LPlGy_51Xd6Dm3rhiPzTXzT5-cw8DKqMu2IR1wrt8I_VrB-lhzniFFcm-vnpFOhfLrKe13r4ATSFaxYWKCkJiXdSAfQIVyud7kSd1KnEyFGTZPQFYuqP6WP_i0SSSF5MtB2Q70pYPeikCAQl3IXTggl2aS3KkpMYm72UqL9DMxDMtrAxVi6-3zjXoyjbIJTYcwQb7A2NLTQh3rD1qYB1XUyRcZ67Kc3-kPx2kBRV3hEhRB28S6rrK_sZvb6waMA2xje6V6_BN9kNeepCzID-fXVO1j1t0-pNgt04HQ_oYxIKiCsiquWR8Qq-96LaYgli3VfvuRz-VXjABoSDE4VGbumEl7_o9FKNkUyAWzyygNsxnrEtWkdM7lXWMaGKk93UkH8kyVxIQAXKvgOwMEPDV0Jpqy-9isyEvAdk3g4HuwcbmXGpuBjPSzRw5rSnciTVyeu5FUanZjlZeu-XJXqwgpXC_0NEXnBAOK5-R3nm_Y4JI5AQXWV5NWQlsXl1tZ1Nf1GQmE2T9AGsY9zE_WHU8BxJVY3aW-o8rEoppJAeDu7sVjLbip4oe4l49tgSE-vTdobNU3WfLtFI5EhX0CaKgX_YVAKJTkBd_VGpWL6znRa8ZXUBqKeRCFtzofXwMl9eZRIsw35O13CMWF8CDA1HRsmEQlUYE0sgZc1wbxZrxIa8k433Kj3mCbokFoXMQpx4uSjJN21OmuroOZ3RVmyA&zp=_a6EwWH4cojjZpYdVF6jzKztFtcp7gM9oYuwD2fUv1kWuPaeZV53avHxJxk0sH-DuRQjieU_2ozQ2Uia6vCR0MFFsvTt4gm6miGNGtNYEfWUs-jLkzbpLOjCE1GrYytP3W7nJ9BMIH2fbppvnTCQ4-3MBO6F4izs0R6sVLlVmSzwSf-Npy7LRXgta2dpnMKiSSv5n7tQaDdHAYBMoQe5gwhNVsC_NDFeqO0nvVvwkTyoOCwBpkJmaIRRKFS-DwXBc1aHDE8XqjF1ceozhF1T9Ofatviov28YNGSY_g
+                              - link [ref=f65e1495] [cursor=pointer]:
+                                - /url: https://alb.reddit.com/cr?za=YA6tzL2TX-850ezMjVrVe3hzm0LPlGy_51Xd6Dm3rhiPzTXzT5-cw8DKqMu2IR1wrt8I_VrB-lhzniFFcm-vnpFOhfLrKe13r4ATSFaxYWKCkJiXdSAfQIVyud7kSd1KnEyFGTZPQFYuqP6WP_i0SSSF5MtB2Q70pYPeikCAQl3IXTggl2aS3KkpMYm72UqL9DMxDMtrAxVi6-3zjXoyjbIJTYcwQb7A2NLTQh3rD1qYB1XUyRcZ67Kc3-kPx2kBRV3hEhRB28S6rrK_sZvb6waMA2xje6V6_BN9kNeepCzID-fXVO1j1t0-pNgt04HQ_oYxIKiCsiquWR8Qq-96LaYgli3VfvuRz-VXjABoSDE4VGbumEl7_o9FKNkUyAWzyygNsxnrEtWkdM7lXWMaGKk93UkH8kyVxIQAXKvgOwMEPDV0Jpqy-9isyEvAdk3g4HuwcbmXGpuBjPSzRw5rSnciTVyeu5FUanZjlZeu-XJXqwgpXC_0NEXnBAOK5-R3nm_Y4JI5AQXWV5NWQlsXl1tZ1Nf1GQmE2T9AGsY9zE_WHU8BxJVY3aW-o8rEoppJAeDu7sVjLbip4oe4l49tgSE-vTdobNU3WfLtFI5EhX0CaKgX_YVAKJTkBd_VGpWL6znRa8ZXUBqKeRCFtzofXwMl9eZRIsw35O13CMWF8CDA1HRsmEQlUYE0sgZc1wbxZrxIa8k433Kj3mCbokFoXMQpx4uSjJN21OmuroOZ3RVmyA&zp=_a6EwWH4cojjZpYdVF6jzKztFtcp7gM9oYuwD2fUv1kWuPaeZV53avHxJxk0sH-DuRQjieU_2ozQ2Uia6vCR0MFFsvTt4gm6miGNGtNYEfWUs-jLkzbpLOjCE1GrYytP3W7nJ9BMIH2fbppvnTCQ4-3MBO6F4izs0R6sVLlVmSzwSf-Npy7LRXgta2dpnMKiSSv5n7tQaDdHAYBMoQe5gwhNVsC_NDFeqO0nvVvwkTyoOCwBpkJmaIRRKFS-DwXBc1aHDE8XqjF1ceozhF1T9Ofatviov28YNGSY_g
+                                - img "Use Code RtRODIN for 14-day Free Trial" [ref=f65e1496]
+                          - listitem [ref=f65e1497]:
+                            - generic [ref=f65e1498]:
+                              - link [ref=f65e1500] [cursor=pointer]:
+                                - /url: https://alb.reddit.com/cr?za=YA6tzL2TX-850ezMjVrVe3hzm0LPlGy_51Xd6Dm3rhiPzTXzT5-cw8DKqMu2IR1wrt8I_VrB-lhzniFFcm-vnpFOhfLrKe13r4ATSFaxYWKCkJiXdSAfQIVyud7kSd1KnEyFGTZPQFYuqP6WP_i0SSSF5MtB2Q70pYPeikCAQl3IXTggl2aS3KkpMYm72UqL9DMxDMtrAxVi6-3zjXoyjbIJTYcwQb7A2NLTQh3rD1qYB1XUyRcZ67Kc3-kPx2kBRV3hEhRB28S6rrK_sZvb6waMA2xje6V6_BN9kNeepCzID-fXVO1j1t0-pNgt04HQ_oYxIKiCsiquWR8Qq-96LaYgli3VfvuRz-VXjABoSDE4VGbumEl7_o9FKNkUyAWzyygNsxnrEtWkdM7lXWMaGKk93UkH8kyVxIQAXKvgOwMEPDV0Jpqy-9isyEvAdk3g4HuwcbmXGpuBjPSzRw5rSnciTVyeu5FUanZjlZeu-XJXqwgpXC_0NEXnBAOK5-R3nm_Y4JI5AQXWV5NWQlsXl1tZ1Nf1GQmE2T9AGsY9zE_WHU8BxJVY3aW-o8rEoppJAeDu7sVjLbip4oe4l49tgSE-vTdobNU3WfLtFI5EhX0CaKgX_YVAKJTkBd_VGpWL6znRa8ZXUBqKeRCFtzofXwMl9eZRIsw35O13CMWF8CDA1HRsmEQlUYE0sgZc1wbxZrxIa8k433Kj3mCbokFoXMQpx4uSjJN21OmuroOZ3RVmyA&zp=HzrypBoWa1alfoD_YVJM3jDvV9t3eM0VfCF0MlggHN37xM-EKHIbqWTHZw7nsNDLZimtcpYOMLD61NO68OJLs4JSa2atzudyqVGZiQs0FwTRRbw17mvq9hIG9CMIOxqYT2tw4aLGpQlUEpQCuNgeM0yVfgyR2fmOuiP0VjXaTmQdftPjdmFYa-LwQTl0ZhDv9jbkk1e0KFvDitPCHtDBOhHFBU9irrOKaVgHzI1GLNu_Bie3CGJuq5f7OAfHNOjn34zPg6zilNGOtu_Vm8gu1V-6lgpMtlvf4fEXRg
+                              - link [ref=f65e1502] [cursor=pointer]:
+                                - /url: https://alb.reddit.com/cr?za=YA6tzL2TX-850ezMjVrVe3hzm0LPlGy_51Xd6Dm3rhiPzTXzT5-cw8DKqMu2IR1wrt8I_VrB-lhzniFFcm-vnpFOhfLrKe13r4ATSFaxYWKCkJiXdSAfQIVyud7kSd1KnEyFGTZPQFYuqP6WP_i0SSSF5MtB2Q70pYPeikCAQl3IXTggl2aS3KkpMYm72UqL9DMxDMtrAxVi6-3zjXoyjbIJTYcwQb7A2NLTQh3rD1qYB1XUyRcZ67Kc3-kPx2kBRV3hEhRB28S6rrK_sZvb6waMA2xje6V6_BN9kNeepCzID-fXVO1j1t0-pNgt04HQ_oYxIKiCsiquWR8Qq-96LaYgli3VfvuRz-VXjABoSDE4VGbumEl7_o9FKNkUyAWzyygNsxnrEtWkdM7lXWMaGKk93UkH8kyVxIQAXKvgOwMEPDV0Jpqy-9isyEvAdk3g4HuwcbmXGpuBjPSzRw5rSnciTVyeu5FUanZjlZeu-XJXqwgpXC_0NEXnBAOK5-R3nm_Y4JI5AQXWV5NWQlsXl1tZ1Nf1GQmE2T9AGsY9zE_WHU8BxJVY3aW-o8rEoppJAeDu7sVjLbip4oe4l49tgSE-vTdobNU3WfLtFI5EhX0CaKgX_YVAKJTkBd_VGpWL6znRa8ZXUBqKeRCFtzofXwMl9eZRIsw35O13CMWF8CDA1HRsmEQlUYE0sgZc1wbxZrxIa8k433Kj3mCbokFoXMQpx4uSjJN21OmuroOZ3RVmyA&zp=HzrypBoWa1alfoD_YVJM3jDvV9t3eM0VfCF0MlggHN37xM-EKHIbqWTHZw7nsNDLZimtcpYOMLD61NO68OJLs4JSa2atzudyqVGZiQs0FwTRRbw17mvq9hIG9CMIOxqYT2tw4aLGpQlUEpQCuNgeM0yVfgyR2fmOuiP0VjXaTmQdftPjdmFYa-LwQTl0ZhDv9jbkk1e0KFvDitPCHtDBOhHFBU9irrOKaVgHzI1GLNu_Bie3CGJuq5f7OAfHNOjn34zPg6zilNGOtu_Vm8gu1V-6lgpMtlvf4fEXRg
+                                - img "Generating 3D with AI is easy. Getting the details right is harder." [ref=f65e1503]
+                          - listitem [ref=f65e1504]:
+                            - generic [ref=f65e1505]:
+                              - link [ref=f65e1507] [cursor=pointer]:
+                                - /url: https://alb.reddit.com/cr?za=YA6tzL2TX-850ezMjVrVe3hzm0LPlGy_51Xd6Dm3rhiPzTXzT5-cw8DKqMu2IR1wrt8I_VrB-lhzniFFcm-vnpFOhfLrKe13r4ATSFaxYWKCkJiXdSAfQIVyud7kSd1KnEyFGTZPQFYuqP6WP_i0SSSF5MtB2Q70pYPeikCAQl3IXTggl2aS3KkpMYm72UqL9DMxDMtrAxVi6-3zjXoyjbIJTYcwQb7A2NLTQh3rD1qYB1XUyRcZ67Kc3-kPx2kBRV3hEhRB28S6rrK_sZvb6waMA2xje6V6_BN9kNeepCzID-fXVO1j1t0-pNgt04HQ_oYxIKiCsiquWR8Qq-96LaYgli3VfvuRz-VXjABoSDE4VGbumEl7_o9FKNkUyAWzyygNsxnrEtWkdM7lXWMaGKk93UkH8kyVxIQAXKvgOwMEPDV0Jpqy-9isyEvAdk3g4HuwcbmXGpuBjPSzRw5rSnciTVyeu5FUanZjlZeu-XJXqwgpXC_0NEXnBAOK5-R3nm_Y4JI5AQXWV5NWQlsXl1tZ1Nf1GQmE2T9AGsY9zE_WHU8BxJVY3aW-o8rEoppJAeDu7sVjLbip4oe4l49tgSE-vTdobNU3WfLtFI5EhX0CaKgX_YVAKJTkBd_VGpWL6znRa8ZXUBqKeRCFtzofXwMl9eZRIsw35O13CMWF8CDA1HRsmEQlUYE0sgZc1wbxZrxIa8k433Kj3mCbokFoXMQpx4uSjJN21OmuroOZ3RVmyA&zp=DtRRmka6KcczznAls2ofPDshXVLFxJdgw5D556xklXMzAjxCC8Xm463B2--ibq9XD-_DbuW_Bk0AhG8nNTe5l1Bxx5BFgVpzaBseHgPeJxJgAE6k2pEF6C-eKWUtD6vpD1bDulBqxnqz5hhEXgMCeeMT8fR-_CWjEHyIPpu8wQhvJsxlhg5oISJIa8TIeF6y9jhI0C0mG4STGzT8UbTaZHcvXcqmPqWNJ-8Q4b7YpoNw5N29WmnEXbnN7MECiGS_XaCylWcgc1fkvsUGqSpBehFpeggNcSK0pR4AYg
+                              - link [ref=f65e1509] [cursor=pointer]:
+                                - /url: https://alb.reddit.com/cr?za=YA6tzL2TX-850ezMjVrVe3hzm0LPlGy_51Xd6Dm3rhiPzTXzT5-cw8DKqMu2IR1wrt8I_VrB-lhzniFFcm-vnpFOhfLrKe13r4ATSFaxYWKCkJiXdSAfQIVyud7kSd1KnEyFGTZPQFYuqP6WP_i0SSSF5MtB2Q70pYPeikCAQl3IXTggl2aS3KkpMYm72UqL9DMxDMtrAxVi6-3zjXoyjbIJTYcwQb7A2NLTQh3rD1qYB1XUyRcZ67Kc3-kPx2kBRV3hEhRB28S6rrK_sZvb6waMA2xje6V6_BN9kNeepCzID-fXVO1j1t0-pNgt04HQ_oYxIKiCsiquWR8Qq-96LaYgli3VfvuRz-VXjABoSDE4VGbumEl7_o9FKNkUyAWzyygNsxnrEtWkdM7lXWMaGKk93UkH8kyVxIQAXKvgOwMEPDV0Jpqy-9isyEvAdk3g4HuwcbmXGpuBjPSzRw5rSnciTVyeu5FUanZjlZeu-XJXqwgpXC_0NEXnBAOK5-R3nm_Y4JI5AQXWV5NWQlsXl1tZ1Nf1GQmE2T9AGsY9zE_WHU8BxJVY3aW-o8rEoppJAeDu7sVjLbip4oe4l49tgSE-vTdobNU3WfLtFI5EhX0CaKgX_YVAKJTkBd_VGpWL6znRa8ZXUBqKeRCFtzofXwMl9eZRIsw35O13CMWF8CDA1HRsmEQlUYE0sgZc1wbxZrxIa8k433Kj3mCbokFoXMQpx4uSjJN21OmuroOZ3RVmyA&zp=DtRRmka6KcczznAls2ofPDshXVLFxJdgw5D556xklXMzAjxCC8Xm463B2--ibq9XD-_DbuW_Bk0AhG8nNTe5l1Bxx5BFgVpzaBseHgPeJxJgAE6k2pEF6C-eKWUtD6vpD1bDulBqxnqz5hhEXgMCeeMT8fR-_CWjEHyIPpu8wQhvJsxlhg5oISJIa8TIeF6y9jhI0C0mG4STGzT8UbTaZHcvXcqmPqWNJ-8Q4b7YpoNw5N29WmnEXbnN7MECiGS_XaCylWcgc1fkvsUGqSpBehFpeggNcSK0pR4AYg
+                                - img "Generating 3D with AI is easy. Getting the details right is harder." [ref=f65e1510]
+                          - listitem [ref=f65e1511]:
+                            - generic [ref=f65e1512]:
+                              - link [ref=f65e1514] [cursor=pointer]:
+                                - /url: https://alb.reddit.com/cr?za=YA6tzL2TX-850ezMjVrVe3hzm0LPlGy_51Xd6Dm3rhiPzTXzT5-cw8DKqMu2IR1wrt8I_VrB-lhzniFFcm-vnpFOhfLrKe13r4ATSFaxYWKCkJiXdSAfQIVyud7kSd1KnEyFGTZPQFYuqP6WP_i0SSSF5MtB2Q70pYPeikCAQl3IXTggl2aS3KkpMYm72UqL9DMxDMtrAxVi6-3zjXoyjbIJTYcwQb7A2NLTQh3rD1qYB1XUyRcZ67Kc3-kPx2kBRV3hEhRB28S6rrK_sZvb6waMA2xje6V6_BN9kNeepCzID-fXVO1j1t0-pNgt04HQ_oYxIKiCsiquWR8Qq-96LaYgli3VfvuRz-VXjABoSDE4VGbumEl7_o9FKNkUyAWzyygNsxnrEtWkdM7lXWMaGKk93UkH8kyVxIQAXKvgOwMEPDV0Jpqy-9isyEvAdk3g4HuwcbmXGpuBjPSzRw5rSnciTVyeu5FUanZjlZeu-XJXqwgpXC_0NEXnBAOK5-R3nm_Y4JI5AQXWV5NWQlsXl1tZ1Nf1GQmE2T9AGsY9zE_WHU8BxJVY3aW-o8rEoppJAeDu7sVjLbip4oe4l49tgSE-vTdobNU3WfLtFI5EhX0CaKgX_YVAKJTkBd_VGpWL6znRa8ZXUBqKeRCFtzofXwMl9eZRIsw35O13CMWF8CDA1HRsmEQlUYE0sgZc1wbxZrxIa8k433Kj3mCbokFoXMQpx4uSjJN21OmuroOZ3RVmyA&zp=EsJGNZymlOhw-7MZ3rcIKs9P7uzCqee6_sZJqevSGrk6DdY8F-9cgPX7O1u0yRSmIOGPp6X2m1TtUpiGWZ5nqAQUTbDIMQe0V_SKzAwgF1ypWkHmxss1CpLq4MahiAZUDZavqYA3gkT3NITacRpcxDcFLnqvOBTjMEXUnCNb7Mdd9hrvRx5X4xWLUEZrmZp3vsrfiEY4y4rRWuE5kxk5lziPnrRglFU2QV-OkRAr83X562TX_Iy9aDYWYZZ_q4kR1mq5FLUhtSE9y576_UklUCMIaBkJrIZY8tpcaA
+                              - link [ref=f65e1516] [cursor=pointer]:
+                                - /url: https://alb.reddit.com/cr?za=YA6tzL2TX-850ezMjVrVe3hzm0LPlGy_51Xd6Dm3rhiPzTXzT5-cw8DKqMu2IR1wrt8I_VrB-lhzniFFcm-vnpFOhfLrKe13r4ATSFaxYWKCkJiXdSAfQIVyud7kSd1KnEyFGTZPQFYuqP6WP_i0SSSF5MtB2Q70pYPeikCAQl3IXTggl2aS3KkpMYm72UqL9DMxDMtrAxVi6-3zjXoyjbIJTYcwQb7A2NLTQh3rD1qYB1XUyRcZ67Kc3-kPx2kBRV3hEhRB28S6rrK_sZvb6waMA2xje6V6_BN9kNeepCzID-fXVO1j1t0-pNgt04HQ_oYxIKiCsiquWR8Qq-96LaYgli3VfvuRz-VXjABoSDE4VGbumEl7_o9FKNkUyAWzyygNsxnrEtWkdM7lXWMaGKk93UkH8kyVxIQAXKvgOwMEPDV0Jpqy-9isyEvAdk3g4HuwcbmXGpuBjPSzRw5rSnciTVyeu5FUanZjlZeu-XJXqwgpXC_0NEXnBAOK5-R3nm_Y4JI5AQXWV5NWQlsXl1tZ1Nf1GQmE2T9AGsY9zE_WHU8BxJVY3aW-o8rEoppJAeDu7sVjLbip4oe4l49tgSE-vTdobNU3WfLtFI5EhX0CaKgX_YVAKJTkBd_VGpWL6znRa8ZXUBqKeRCFtzofXwMl9eZRIsw35O13CMWF8CDA1HRsmEQlUYE0sgZc1wbxZrxIa8k433Kj3mCbokFoXMQpx4uSjJN21OmuroOZ3RVmyA&zp=EsJGNZymlOhw-7MZ3rcIKs9P7uzCqee6_sZJqevSGrk6DdY8F-9cgPX7O1u0yRSmIOGPp6X2m1TtUpiGWZ5nqAQUTbDIMQe0V_SKzAwgF1ypWkHmxss1CpLq4MahiAZUDZavqYA3gkT3NITacRpcxDcFLnqvOBTjMEXUnCNb7Mdd9hrvRx5X4xWLUEZrmZp3vsrfiEY4y4rRWuE5kxk5lziPnrRglFU2QV-OkRAr83X562TX_Iy9aDYWYZZ_q4kR1mq5FLUhtSE9y576_UklUCMIaBkJrIZY8tpcaA
+                                - img "Generating 3D with AI is easy. Getting the details right is harder." [ref=f65e1517]
+                          - listitem [ref=f65e1518]:
+                            - generic [ref=f65e1519]:
+                              - link [ref=f65e1521] [cursor=pointer]:
+                                - /url: https://alb.reddit.com/cr?za=YA6tzL2TX-850ezMjVrVe3hzm0LPlGy_51Xd6Dm3rhiPzTXzT5-cw8DKqMu2IR1wrt8I_VrB-lhzniFFcm-vnpFOhfLrKe13r4ATSFaxYWKCkJiXdSAfQIVyud7kSd1KnEyFGTZPQFYuqP6WP_i0SSSF5MtB2Q70pYPeikCAQl3IXTggl2aS3KkpMYm72UqL9DMxDMtrAxVi6-3zjXoyjbIJTYcwQb7A2NLTQh3rD1qYB1XUyRcZ67Kc3-kPx2kBRV3hEhRB28S6rrK_sZvb6waMA2xje6V6_BN9kNeepCzID-fXVO1j1t0-pNgt04HQ_oYxIKiCsiquWR8Qq-96LaYgli3VfvuRz-VXjABoSDE4VGbumEl7_o9FKNkUyAWzyygNsxnrEtWkdM7lXWMaGKk93UkH8kyVxIQAXKvgOwMEPDV0Jpqy-9isyEvAdk3g4HuwcbmXGpuBjPSzRw5rSnciTVyeu5FUanZjlZeu-XJXqwgpXC_0NEXnBAOK5-R3nm_Y4JI5AQXWV5NWQlsXl1tZ1Nf1GQmE2T9AGsY9zE_WHU8BxJVY3aW-o8rEoppJAeDu7sVjLbip4oe4l49tgSE-vTdobNU3WfLtFI5EhX0CaKgX_YVAKJTkBd_VGpWL6znRa8ZXUBqKeRCFtzofXwMl9eZRIsw35O13CMWF8CDA1HRsmEQlUYE0sgZc1wbxZrxIa8k433Kj3mCbokFoXMQpx4uSjJN21OmuroOZ3RVmyA&zp=kZ6l5AnWDZ6XzqQZL9s-CH-VJ_EHAOQOXjMiCff4cRgZnksQbShvLlDNYy1Raj5_9MK3-LpLvAxd-m3JPqdodV99VLOm3SXgo9jOLlKqm4ikJW8ZvKGeMMVqaGoCKa2W9xOXSb_DNnWt56u7paLcCzVmqwQq6X_OTn6D7foXys6A2oHI-zb43OJpuXkGrvtVHZo8FCw_4X9ZAFggcXByp7rN8CzYb7svTimhH3Q5ZhuFn3qWyB-Z1PeOh3QjeY32DyidR6SY9OeAKwUKIFM3LbifljDGbsOkyEPVTg
+                              - link [ref=f65e1523] [cursor=pointer]:
+                                - /url: https://alb.reddit.com/cr?za=YA6tzL2TX-850ezMjVrVe3hzm0LPlGy_51Xd6Dm3rhiPzTXzT5-cw8DKqMu2IR1wrt8I_VrB-lhzniFFcm-vnpFOhfLrKe13r4ATSFaxYWKCkJiXdSAfQIVyud7kSd1KnEyFGTZPQFYuqP6WP_i0SSSF5MtB2Q70pYPeikCAQl3IXTggl2aS3KkpMYm72UqL9DMxDMtrAxVi6-3zjXoyjbIJTYcwQb7A2NLTQh3rD1qYB1XUyRcZ67Kc3-kPx2kBRV3hEhRB28S6rrK_sZvb6waMA2xje6V6_BN9kNeepCzID-fXVO1j1t0-pNgt04HQ_oYxIKiCsiquWR8Qq-96LaYgli3VfvuRz-VXjABoSDE4VGbumEl7_o9FKNkUyAWzyygNsxnrEtWkdM7lXWMaGKk93UkH8kyVxIQAXKvgOwMEPDV0Jpqy-9isyEvAdk3g4HuwcbmXGpuBjPSzRw5rSnciTVyeu5FUanZjlZeu-XJXqwgpXC_0NEXnBAOK5-R3nm_Y4JI5AQXWV5NWQlsXl1tZ1Nf1GQmE2T9AGsY9zE_WHU8BxJVY3aW-o8rEoppJAeDu7sVjLbip4oe4l49tgSE-vTdobNU3WfLtFI5EhX0CaKgX_YVAKJTkBd_VGpWL6znRa8ZXUBqKeRCFtzofXwMl9eZRIsw35O13CMWF8CDA1HRsmEQlUYE0sgZc1wbxZrxIa8k433Kj3mCbokFoXMQpx4uSjJN21OmuroOZ3RVmyA&zp=kZ6l5AnWDZ6XzqQZL9s-CH-VJ_EHAOQOXjMiCff4cRgZnksQbShvLlDNYy1Raj5_9MK3-LpLvAxd-m3JPqdodV99VLOm3SXgo9jOLlKqm4ikJW8ZvKGeMMVqaGoCKa2W9xOXSb_DNnWt56u7paLcCzVmqwQq6X_OTn6D7foXys6A2oHI-zb43OJpuXkGrvtVHZo8FCw_4X9ZAFggcXByp7rN8CzYb7svTimhH3Q5ZhuFn3qWyB-Z1PeOh3QjeY32DyidR6SY9OeAKwUKIFM3LbifljDGbsOkyEPVTg
+                                - img "Generating 3D with AI is easy. Getting the details right is harder." [ref=f65e1524]
+                          - listitem [ref=f65e1525]:
+                            - generic [ref=f65e1526]:
+                              - link [ref=f65e1528] [cursor=pointer]:
+                                - /url: https://alb.reddit.com/cr?za=YA6tzL2TX-850ezMjVrVe3hzm0LPlGy_51Xd6Dm3rhiPzTXzT5-cw8DKqMu2IR1wrt8I_VrB-lhzniFFcm-vnpFOhfLrKe13r4ATSFaxYWKCkJiXdSAfQIVyud7kSd1KnEyFGTZPQFYuqP6WP_i0SSSF5MtB2Q70pYPeikCAQl3IXTggl2aS3KkpMYm72UqL9DMxDMtrAxVi6-3zjXoyjbIJTYcwQb7A2NLTQh3rD1qYB1XUyRcZ67Kc3-kPx2kBRV3hEhRB28S6rrK_sZvb6waMA2xje6V6_BN9kNeepCzID-fXVO1j1t0-pNgt04HQ_oYxIKiCsiquWR8Qq-96LaYgli3VfvuRz-VXjABoSDE4VGbumEl7_o9FKNkUyAWzyygNsxnrEtWkdM7lXWMaGKk93UkH8kyVxIQAXKvgOwMEPDV0Jpqy-9isyEvAdk3g4HuwcbmXGpuBjPSzRw5rSnciTVyeu5FUanZjlZeu-XJXqwgpXC_0NEXnBAOK5-R3nm_Y4JI5AQXWV5NWQlsXl1tZ1Nf1GQmE2T9AGsY9zE_WHU8BxJVY3aW-o8rEoppJAeDu7sVjLbip4oe4l49tgSE-vTdobNU3WfLtFI5EhX0CaKgX_YVAKJTkBd_VGpWL6znRa8ZXUBqKeRCFtzofXwMl9eZRIsw35O13CMWF8CDA1HRsmEQlUYE0sgZc1wbxZrxIa8k433Kj3mCbokFoXMQpx4uSjJN21OmuroOZ3RVmyA&zp=komyRuYZp-4_sieEb9ZfgHnhPU1y0Ec-kJhgWcd7uLHDgEz5R-BUrmtaaGFoqO1FP3i8mvy4YazZIO7iNvDKbvvnezF8JIVHfbRt6F-31g70N5H-Ocm1VDGhrf0Tq2KfzRPITcSLTzwfmBU8wjcxaRVU3YPIq9QcsKplqdLiXGB7n50vlHkXAqIUD5lbO9IpqE-QTxGGzhB3A2fwd-l24V_pqS8ybd9ffwa4OyWCDEe2FyQbMwD_uAwdjwWhdhHfIq4Fg4mi3ova4I3dLJJfW0L2DsXfXDdFZ7VgYQ
+                              - link [ref=f65e1530] [cursor=pointer]:
+                                - /url: https://alb.reddit.com/cr?za=YA6tzL2TX-850ezMjVrVe3hzm0LPlGy_51Xd6Dm3rhiPzTXzT5-cw8DKqMu2IR1wrt8I_VrB-lhzniFFcm-vnpFOhfLrKe13r4ATSFaxYWKCkJiXdSAfQIVyud7kSd1KnEyFGTZPQFYuqP6WP_i0SSSF5MtB2Q70pYPeikCAQl3IXTggl2aS3KkpMYm72UqL9DMxDMtrAxVi6-3zjXoyjbIJTYcwQb7A2NLTQh3rD1qYB1XUyRcZ67Kc3-kPx2kBRV3hEhRB28S6rrK_sZvb6waMA2xje6V6_BN9kNeepCzID-fXVO1j1t0-pNgt04HQ_oYxIKiCsiquWR8Qq-96LaYgli3VfvuRz-VXjABoSDE4VGbumEl7_o9FKNkUyAWzyygNsxnrEtWkdM7lXWMaGKk93UkH8kyVxIQAXKvgOwMEPDV0Jpqy-9isyEvAdk3g4HuwcbmXGpuBjPSzRw5rSnciTVyeu5FUanZjlZeu-XJXqwgpXC_0NEXnBAOK5-R3nm_Y4JI5AQXWV5NWQlsXl1tZ1Nf1GQmE2T9AGsY9zE_WHU8BxJVY3aW-o8rEoppJAeDu7sVjLbip4oe4l49tgSE-vTdobNU3WfLtFI5EhX0CaKgX_YVAKJTkBd_VGpWL6znRa8ZXUBqKeRCFtzofXwMl9eZRIsw35O13CMWF8CDA1HRsmEQlUYE0sgZc1wbxZrxIa8k433Kj3mCbokFoXMQpx4uSjJN21OmuroOZ3RVmyA&zp=komyRuYZp-4_sieEb9ZfgHnhPU1y0Ec-kJhgWcd7uLHDgEz5R-BUrmtaaGFoqO1FP3i8mvy4YazZIO7iNvDKbvvnezF8JIVHfbRt6F-31g70N5H-Ocm1VDGhrf0Tq2KfzRPITcSLTzwfmBU8wjcxaRVU3YPIq9QcsKplqdLiXGB7n50vlHkXAqIUD5lbO9IpqE-QTxGGzhB3A2fwd-l24V_pqS8ybd9ffwa4OyWCDEe2FyQbMwD_uAwdjwWhdhHfIq4Fg4mi3ova4I3dLJJfW0L2DsXfXDdFZ7VgYQ
+                                - img "Generating 3D with AI is easy. Getting the details right is harder." [ref=f65e1531]
+                      - generic [ref=f65e1532]:
+                        - link [ref=f65e1534] [cursor=pointer]:
+                          - /url: https://alb.reddit.com/cr?za=YA6tzL2TX-850ezMjVrVe3hzm0LPlGy_51Xd6Dm3rhiPzTXzT5-cw8DKqMu2IR1wrt8I_VrB-lhzniFFcm-vnpFOhfLrKe13r4ATSFaxYWKCkJiXdSAfQIVyud7kSd1KnEyFGTZPQFYuqP6WP_i0SSSF5MtB2Q70pYPeikCAQl3IXTggl2aS3KkpMYm72UqL9DMxDMtrAxVi6-3zjXoyjbIJTYcwQb7A2NLTQh3rD1qYB1XUyRcZ67Kc3-kPx2kBRV3hEhRB28S6rrK_sZvb6waMA2xje6V6_BN9kNeepCzID-fXVO1j1t0-pNgt04HQ_oYxIKiCsiquWR8Qq-96LaYgli3VfvuRz-VXjABoSDE4VGbumEl7_o9FKNkUyAWzyygNsxnrEtWkdM7lXWMaGKk93UkH8kyVxIQAXKvgOwMEPDV0Jpqy-9isyEvAdk3g4HuwcbmXGpuBjPSzRw5rSnciTVyeu5FUanZjlZeu-XJXqwgpXC_0NEXnBAOK5-R3nm_Y4JI5AQXWV5NWQlsXl1tZ1Nf1GQmE2T9AGsY9zE_WHU8BxJVY3aW-o8rEoppJAeDu7sVjLbip4oe4l49tgSE-vTdobNU3WfLtFI5EhX0CaKgX_YVAKJTkBd_VGpWL6znRa8ZXUBqKeRCFtzofXwMl9eZRIsw35O13CMWF8CDA1HRsmEQlUYE0sgZc1wbxZrxIa8k433Kj3mCbokFoXMQpx4uSjJN21OmuroOZ3RVmyA&zp=_a6EwWH4cojjZpYdVF6jzKztFtcp7gM9oYuwD2fUv1kWuPaeZV53avHxJxk0sH-DuRQjieU_2ozQ2Uia6vCR0MFFsvTt4gm6miGNGtNYEfWUs-jLkzbpLOjCE1GrYytP3W7nJ9BMIH2fbppvnTCQ4-3MBO6F4izs0R6sVLlVmSzwSf-Npy7LRXgta2dpnMKiSSv5n7tQaDdHAYBMoQe5gwhNVsC_NDFeqO0nvVvwkTyoOCwBpkJmaIRRKFS-DwXBc1aHDE8XqjF1ceozhF1T9Ofatviov28YNGSY_g
+                        - generic [ref=f65e1535]:
+                          - link "hyper3d.ai" [ref=f65e1539] [cursor=pointer]:
+                            - /url: https://alb.reddit.com/cr?za=YA6tzL2TX-850ezMjVrVe3hzm0LPlGy_51Xd6Dm3rhiPzTXzT5-cw8DKqMu2IR1wrt8I_VrB-lhzniFFcm-vnpFOhfLrKe13r4ATSFaxYWKCkJiXdSAfQIVyud7kSd1KnEyFGTZPQFYuqP6WP_i0SSSF5MtB2Q70pYPeikCAQl3IXTggl2aS3KkpMYm72UqL9DMxDMtrAxVi6-3zjXoyjbIJTYcwQb7A2NLTQh3rD1qYB1XUyRcZ67Kc3-kPx2kBRV3hEhRB28S6rrK_sZvb6waMA2xje6V6_BN9kNeepCzID-fXVO1j1t0-pNgt04HQ_oYxIKiCsiquWR8Qq-96LaYgli3VfvuRz-VXjABoSDE4VGbumEl7_o9FKNkUyAWzyygNsxnrEtWkdM7lXWMaGKk93UkH8kyVxIQAXKvgOwMEPDV0Jpqy-9isyEvAdk3g4HuwcbmXGpuBjPSzRw5rSnciTVyeu5FUanZjlZeu-XJXqwgpXC_0NEXnBAOK5-R3nm_Y4JI5AQXWV5NWQlsXl1tZ1Nf1GQmE2T9AGsY9zE_WHU8BxJVY3aW-o8rEoppJAeDu7sVjLbip4oe4l49tgSE-vTdobNU3WfLtFI5EhX0CaKgX_YVAKJTkBd_VGpWL6znRa8ZXUBqKeRCFtzofXwMl9eZRIsw35O13CMWF8CDA1HRsmEQlUYE0sgZc1wbxZrxIa8k433Kj3mCbokFoXMQpx4uSjJN21OmuroOZ3RVmyA&zp=_a6EwWH4cojjZpYdVF6jzKztFtcp7gM9oYuwD2fUv1kWuPaeZV53avHxJxk0sH-DuRQjieU_2ozQ2Uia6vCR0MFFsvTt4gm6miGNGtNYEfWUs-jLkzbpLOjCE1GrYytP3W7nJ9BMIH2fbppvnTCQ4-3MBO6F4izs0R6sVLlVmSzwSf-Npy7LRXgta2dpnMKiSSv5n7tQaDdHAYBMoQe5gwhNVsC_NDFeqO0nvVvwkTyoOCwBpkJmaIRRKFS-DwXBc1aHDE8XqjF1ceozhF1T9Ofatviov28YNGSY_g
+                          - link "Order Now" [ref=f65e1541] [cursor=pointer]:
+                            - /url: https://alb.reddit.com/cr?za=YA6tzL2TX-850ezMjVrVe3hzm0LPlGy_51Xd6Dm3rhiPzTXzT5-cw8DKqMu2IR1wrt8I_VrB-lhzniFFcm-vnpFOhfLrKe13r4ATSFaxYWKCkJiXdSAfQIVyud7kSd1KnEyFGTZPQFYuqP6WP_i0SSSF5MtB2Q70pYPeikCAQl3IXTggl2aS3KkpMYm72UqL9DMxDMtrAxVi6-3zjXoyjbIJTYcwQb7A2NLTQh3rD1qYB1XUyRcZ67Kc3-kPx2kBRV3hEhRB28S6rrK_sZvb6waMA2xje6V6_BN9kNeepCzID-fXVO1j1t0-pNgt04HQ_oYxIKiCsiquWR8Qq-96LaYgli3VfvuRz-VXjABoSDE4VGbumEl7_o9FKNkUyAWzyygNsxnrEtWkdM7lXWMaGKk93UkH8kyVxIQAXKvgOwMEPDV0Jpqy-9isyEvAdk3g4HuwcbmXGpuBjPSzRw5rSnciTVyeu5FUanZjlZeu-XJXqwgpXC_0NEXnBAOK5-R3nm_Y4JI5AQXWV5NWQlsXl1tZ1Nf1GQmE2T9AGsY9zE_WHU8BxJVY3aW-o8rEoppJAeDu7sVjLbip4oe4l49tgSE-vTdobNU3WfLtFI5EhX0CaKgX_YVAKJTkBd_VGpWL6znRa8ZXUBqKeRCFtzofXwMl9eZRIsw35O13CMWF8CDA1HRsmEQlUYE0sgZc1wbxZrxIa8k433Kj3mCbokFoXMQpx4uSjJN21OmuroOZ3RVmyA&zp=_a6EwWH4cojjZpYdVF6jzKztFtcp7gM9oYuwD2fUv1kWuPaeZV53avHxJxk0sH-DuRQjieU_2ozQ2Uia6vCR0MFFsvTt4gm6miGNGtNYEfWUs-jLkzbpLOjCE1GrYytP3W7nJ9BMIH2fbppvnTCQ4-3MBO6F4izs0R6sVLlVmSzwSf-Npy7LRXgta2dpnMKiSSv5n7tQaDdHAYBMoQe5gwhNVsC_NDFeqO0nvVvwkTyoOCwBpkJmaIRRKFS-DwXBc1aHDE8XqjF1ceozhF1T9Ofatviov28YNGSY_g
+                - article "Comment from Zeeplankton 1 hour ago" [ref=f65e1545]:
+                  - generic "Zeeplankton's profile --- avatar Zeeplankton's profile 1h ago" [ref=f65e1546] [cursor=pointer]:
+                    - link "Zeeplankton's profile --- avatar" [ref=f65e1552]:
+                      - /url: https://www.reddit.com/user/Zeeplankton/
+                      - img "u/Zeeplankton avatar" [ref=f65e1555]
+                    - generic [ref=f65e1559]:
+                      - link "Zeeplankton's profile" [ref=f65e1563]:
+                        - /url: https://www.reddit.com/user/Zeeplankton/
+                        - text: Zeeplankton
+                      - generic [ref=f65e1564]: •
+                      - link [ref=f65e1566]:
+                        - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3plnpz/
+                        - time [ref=f65e1568]: 1h ago
+                  - generic [ref=f65e1571]:
+                    - paragraph [ref=f65e1575]: Glimmer is great. I feel like people only use Qwen by one shotting some complicated code question? Literally any other use case qwen is autistic
+                    - generic [ref=f65e1578]:
+                      - 'article "Comment thread level 1: Reply from arbv 39 minutes ago" [ref=f65e1580]':
+                        - generic "arbv's profile --- avatar arbv's profile 39m ago" [ref=f65e1581] [cursor=pointer]:
+                          - link "arbv's profile --- avatar" [ref=f65e1587]:
+                            - /url: https://www.reddit.com/user/arbv/
+                          - generic [ref=f65e1597]:
+                            - link "arbv's profile" [ref=f65e1601]:
+                              - /url: https://www.reddit.com/user/arbv/
+                              - text: arbv
+                            - generic [ref=f65e1602]: •
+                            - link [ref=f65e1604]:
+                              - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3przlj/
+                              - time [ref=f65e1606]: 39m ago
+                        - generic [ref=f65e1612]:
+                          - paragraph [ref=f65e1613]: Muse Glimmer is a better rounded model for sure.
+                          - paragraph [ref=f65e1614]: Not to say that Qwen is bad, but Muse Glimmer is indeed made for VRAM poor - it fits 24GB VRAM with full context, vision tower, and the speculator.
+                          - paragraph [ref=f65e1615]: Well the Qwen fits at 75K context with no goodies - no MTP, vision tower in RAM. It is not for me, a VRAM poor.
+                      - 'article "Comment thread level 1: Reply from fallingdowndizzyvr 16 minutes ago" [ref=f65e1619]':
+                        - generic [ref=f65e1620] [cursor=pointer]:
+                          - link "fallingdowndizzyvr's profile --- avatar" [ref=f65e1626]:
+                            - /url: https://www.reddit.com/user/fallingdowndizzyvr/
+                            - img "u/fallingdowndizzyvr avatar" [ref=f65e1629]
+                          - generic [ref=f65e1632]:
+                            - generic [ref=f65e1633]:
+                              - link "fallingdowndizzyvr's profile" [ref=f65e1637]:
+                                - /url: https://www.reddit.com/user/fallingdowndizzyvr/
+                                - text: fallingdowndizzyvr
+                              - generic [ref=f65e1638]: •
+                              - link [ref=f65e1640]:
+                                - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3px470/
+                                - time [ref=f65e1642]: 16m ago
+                            - 'generic "Flair: :Discord:" [ref=f65e1646]'
+                        - generic [ref=f65e1654]:
+                          - blockquote [ref=f65e1655]:
+                            - paragraph [ref=f65e1656]: Literally any other use case qwen is autistic
+                          - paragraph [ref=f65e1657]: No it's not. I've asked plenty of LLMs about soundproofing over the last 2 years. When I asked 27B, it brought it something that none of the others did. Even frontier models. Then when I went back and asked other bigger models, they were like "Oh yeah, there's that too."
+                          - paragraph [ref=f65e1658]: So it definitely is not autistic. Not in the way you mean it at least. I guess you don't realize that many of the brightest minds ever were on the spectrum.
+                - article "Comment from armeg 2 hours ago" [ref=f65e1662]:
+                  - generic "armeg's profile --- avatar armeg's profile 2h ago" [ref=f65e1663] [cursor=pointer]:
+                    - link "armeg's profile --- avatar" [ref=f65e1669]:
+                      - /url: https://www.reddit.com/user/armeg/
+                    - generic [ref=f65e1685]:
+                      - link "armeg's profile" [ref=f65e1689]:
+                        - /url: https://www.reddit.com/user/armeg/
+                        - text: armeg
+                      - generic [ref=f65e1690]: •
+                      - link [ref=f65e1692]:
+                        - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3p8mgl/
+                        - time [ref=f65e1694]: 2h ago
+                  - generic [ref=f65e1697]:
+                    - paragraph [ref=f65e1701]: What's the name of that Qwen specific inference engine that targets 5090s? I can't remember at this point.
+                    - generic [ref=f65e1704]:
+                      - 'article "Comment thread level 1: Reply from _lhz- 2 hours ago" [ref=f65e1706]':
+                        - generic "_lhz-'s profile --- avatar _lhz-'s profile 2h ago" [ref=f65e1707] [cursor=pointer]:
+                          - link "_lhz-'s profile --- avatar" [ref=f65e1713]:
+                            - /url: https://www.reddit.com/user/_lhz-/
+                          - generic [ref=f65e1723]:
+                            - link "_lhz-'s profile" [ref=f65e1727]:
+                              - /url: https://www.reddit.com/user/_lhz-/
+                              - text: _lhz-
+                            - generic [ref=f65e1728]: •
+                            - link [ref=f65e1730]:
+                              - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3p9olo/
+                              - time [ref=f65e1732]: 2h ago
+                        - generic [ref=f65e1735]:
+                          - paragraph [ref=f65e1739]:
+                            - text: NInfer
+                            - link "https://huggingface.co/neroued/Qwen3.8-27B-NInfer" [ref=f65e1740] [cursor=pointer]:
+                              - /url: https://huggingface.co/neroued/Qwen3.8-27B-NInfer
+                          - 'article "Comment thread level 2: Reply from armeg 2 hours ago" [ref=f65e1745]':
+                            - generic "armeg's profile --- avatar armeg's profile 2h ago" [ref=f65e1746] [cursor=pointer]:
+                              - link "armeg's profile --- avatar" [ref=f65e1752]:
+                                - /url: https://www.reddit.com/user/armeg/
+                              - generic [ref=f65e1768]:
+                                - link "armeg's profile" [ref=f65e1772]:
+                                  - /url: https://www.reddit.com/user/armeg/
+                                  - text: armeg
+                                - generic [ref=f65e1773]: •
+                                - link [ref=f65e1775]:
+                                  - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pbap3/
+                                  - time [ref=f65e1777]: 2h ago
+                            - paragraph [ref=f65e1784]: Thanks I was trying so hard to google for it, going to save it.
+                      - 'article "Comment thread level 1: Reply from SailbadTheSinner 31 minutes ago" [ref=f65e1788]':
+                        - generic "SailbadTheSinner's profile --- avatar SailbadTheSinner's profile 31m ago" [ref=f65e1789] [cursor=pointer]:
+                          - link "SailbadTheSinner's profile --- avatar" [ref=f65e1795]:
+                            - /url: https://www.reddit.com/user/SailbadTheSinner/
+                            - img "u/SailbadTheSinner avatar" [ref=f65e1798]
+                          - generic [ref=f65e1802]:
+                            - link "SailbadTheSinner's profile" [ref=f65e1806]:
+                              - /url: https://www.reddit.com/user/SailbadTheSinner/
+                              - text: SailbadTheSinner
+                            - generic [ref=f65e1807]: •
+                            - link [ref=f65e1809]:
+                              - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3ptr21/
+                              - time [ref=f65e1811]: 31m ago
+                        - generic [ref=f65e1817]:
+                          - paragraph [ref=f65e1818]: There is a 3090 fork as well for my fellow 3090 brethren
+                          - paragraph [ref=f65e1819]:
+                            - link "https://github.com/Don-Chad/ninfer-3090" [ref=f65e1820] [cursor=pointer]:
+                              - /url: https://github.com/Don-Chad/ninfer-3090
+                - article "Comment from kashthealien 2 hours ago" [ref=f65e1824]:
+                  - generic "kashthealien's profile --- avatar kashthealien's profile 2h ago" [ref=f65e1825] [cursor=pointer]:
+                    - link "kashthealien's profile --- avatar" [ref=f65e1831]:
+                      - /url: https://www.reddit.com/user/kashthealien/
+                    - generic [ref=f65e1841]:
+                      - link "kashthealien's profile" [ref=f65e1845]:
+                        - /url: https://www.reddit.com/user/kashthealien/
+                        - text: kashthealien
+                      - generic [ref=f65e1846]: •
+                      - link [ref=f65e1848]:
+                        - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3p92et/
+                        - time [ref=f65e1850]: 2h ago
+                  - generic [ref=f65e1853]:
+                    - paragraph [ref=f65e1857]: Muse Glimmer came with speculative decoding and achieved a higher TPS, Is there something similar for Qwen?
+                    - generic [ref=f65e1860]:
+                      - 'article "Comment thread level 1: Reply from RoroTitiFR 2 hours ago" [ref=f65e1862]':
+                        - generic "RoroTitiFR's profile --- avatar RoroTitiFR's profile 2h ago" [ref=f65e1863] [cursor=pointer]:
+                          - link "RoroTitiFR's profile --- avatar" [ref=f65e1869]:
+                            - /url: https://www.reddit.com/user/RoroTitiFR/
+                          - generic [ref=f65e1879]:
+                            - link "RoroTitiFR's profile" [ref=f65e1883]:
+                              - /url: https://www.reddit.com/user/RoroTitiFR/
+                              - text: RoroTitiFR
+                            - generic [ref=f65e1884]: •
+                            - link [ref=f65e1886]:
+                              - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pacmh/
+                              - time [ref=f65e1888]: 2h ago
+                        - paragraph [ref=f65e1895]: Qwen has MTP built-in
+                      - 'article "Comment thread level 1: Reply from Zeeplankton 1 hour ago" [ref=f65e1899]':
+                        - generic "Zeeplankton's profile --- avatar Zeeplankton's profile 1h ago" [ref=f65e1900] [cursor=pointer]:
+                          - link "Zeeplankton's profile --- avatar" [ref=f65e1906]:
+                            - /url: https://www.reddit.com/user/Zeeplankton/
+                            - img "u/Zeeplankton avatar" [ref=f65e1909]
+                          - generic [ref=f65e1913]:
+                            - link "Zeeplankton's profile" [ref=f65e1917]:
+                              - /url: https://www.reddit.com/user/Zeeplankton/
+                              - text: Zeeplankton
+                            - generic [ref=f65e1918]: •
+                            - link [ref=f65e1920]:
+                              - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pltzf/
+                              - time [ref=f65e1922]: 1h ago
+                        - paragraph [ref=f65e1929]: Muse definitely runs faster on my m3 max
+                      - 'article "Comment thread level 1: Reply from arbv 1 hour ago" [ref=f65e1933]':
+                        - generic "arbv's profile --- avatar arbv's profile 1h ago" [ref=f65e1934] [cursor=pointer]:
+                          - link "arbv's profile --- avatar" [ref=f65e1940]:
+                            - /url: https://www.reddit.com/user/arbv/
+                          - generic [ref=f65e1950]:
+                            - link "arbv's profile" [ref=f65e1954]:
+                              - /url: https://www.reddit.com/user/arbv/
+                              - text: arbv
+                            - generic [ref=f65e1955]: •
+                            - link [ref=f65e1957]:
+                              - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pk1bn/
+                              - time [ref=f65e1959]: 1h ago
+                        - generic [ref=f65e1962]:
+                          - paragraph [ref=f65e1966]: It has builtin MTP - but it is not as fast as Muse's DFLash. I am better without it, for example. YMMV.
+                          - 'article "Comment thread level 2: Reply from RoroTitiFR 44 minutes ago" [ref=f65e1971]':
+                            - generic "RoroTitiFR's profile --- avatar RoroTitiFR's profile 44m ago" [ref=f65e1972] [cursor=pointer]:
+                              - link "RoroTitiFR's profile --- avatar" [ref=f65e1978]:
+                                - /url: https://www.reddit.com/user/RoroTitiFR/
+                              - generic [ref=f65e1988]:
+                                - link "RoroTitiFR's profile" [ref=f65e1992]:
+                                  - /url: https://www.reddit.com/user/RoroTitiFR/
+                                  - text: RoroTitiFR
+                                - generic [ref=f65e1993]: •
+                                - link [ref=f65e1995]:
+                                  - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pr1yr/
+                                  - time [ref=f65e1997]: 44m ago
+                            - paragraph [ref=f65e2004]: I agree with youI’m also getting faster Muse with DFlash than Qwen with DFlash (I mainly use DFlash as it’s faster for coding than MTP in various benchmarks)
+                - generic "Spent 4 hours sculpting a mini in ZBrush last week. Then tried the same thing in Meshy. 90 seconds. The quality gap is closing fast." [ref=f65e2008]:
+                  - generic [ref=f65e2009]:
+                    - 'generic "Advertisement: Spent 4 hours sculpting a mini in ZBrush last week. Then tried the same thing in Meshy. 90 seconds. The quality gap is closing fast." [ref=f65e2010]':
+                      - 'link "Advertisement: Spent 4 hours sculpting a mini in ZBrush last week. Then tried the same thing in Meshy. 90 seconds. The quality gap is closing fast." [ref=f65e2011] [cursor=pointer]':
+                        - /url: https://alb.reddit.com/cr?za=AyzlAaOXoVmoOQblPevIzoW95PZDCsZCl0XVz1_6kM-cGFPtp80zHwDGaPYk_LnynHkElAMkZpbfgKNe6Nokqt31xWiz1oqhjXcLBKLJliJTPy_THvi0X63fRm7bFAz-QXm73nplU5pkA9MGIY3QxUkhxkpfOMYW5rwP7I-t6pNyl35n4l2w1T5_iZSuAS2Tn6xuq7PJNfvn4Md8bbop6Plz63Hy0Oy8amK1tNrWLBmWPH84VsRrm9bxTQpWtwg4UTG6HX3kEPa2ArEwQ8qhOZAU6FqLZ0KpFokjStL2CQ48Q6IAQkLomUH6Cc4zhoz-ZzDyzgL2g0kzvqJLHWpHfEt9l7faA0Z44LZ5isFMQjCv9fMrrZFYM0gfkhd6NxtW8DSIcBgLrHkfKxBu9gN02AU4sl9Bu8d53XoTwm4ryg5sCUGojpraHEQNrKH4CzJIakI1uWXtlSr7f_L0QuNp3N1vj42bkwtHG2ydQ9dJntvg-9pdyopMsgi-3OxlhkxPAdiGkzGCMoKdT4NyQnvZo_vULR3dJpkHw8-1kLf19P_tP9yx98eI4U5pk6AbGekBFAyuYkNBRVV0WLCOKt5KqS0wTShNDrskld4zpWT8l92dfCXYzgJceu00li0JwJ1iic84i8gCAhi7GQxNpklPqmGHvhLdQ-22Xbvm_dkhQd6WaWl162plmzAgiIioIomNbtpcjClC_NfQ4DYmfAlleaHnzDc8ZQHnGWLscy6d3YJZOQ&zp=tgxpvzlLK1WuEnrqurxzUQr59NYTJzG0a_QScMBCpnqSm9iDUlMop917fOshKREpt8b7WKUghjQTGEHLNdfDfTHLPwHtQCHwETa8qMAPW7_r07UIHawXbAgUjOAfGCOA5u9KxJUIFOnpRwXwmUNPVnKQ0qPLkqCVFifSjziecE60qSyH2sgA5q0714wjSysgdgnCMbz7Kbjebxnb9U6rzKd-s_PgRSUwLteZ5hGv0iK7c1VCpXzK0m6RjRZ7NRhzn2avNKVXs8BOmHUWLpyGOOUGICnMkCoJ3xL_4obOOMHvJYnm45FqV_y7e0b2UHOlOKwKbz54l418QzKPfTck8Zra60iOp9znydqcsox9HjHjevZ_pBUAz6JC5tH9BWfs0368OZaBoxk4OiykBme_67CRV9xbbaXPvBdnIlcOTxf6KhhKmiK4VFx8pKUP
+                    - generic [ref=f65e2012]:
+                      - generic [ref=f65e2013]:
+                        - link "u/Meshyai" [ref=f65e2016] [cursor=pointer]:
+                          - /url: /user/Meshyai/
+                          - img "u/Meshyai avatar" [ref=f65e2019]
+                        - generic [ref=f65e2021]: •
+                        - link "Promoted" [ref=f65e2023] [cursor=pointer]:
+                          - /url: /user/Meshyai/
+                        - link [ref=f65e2026] [cursor=pointer]:
+                          - /url: https://alb.reddit.com/cr?za=AyzlAaOXoVmoOQblPevIzoW95PZDCsZCl0XVz1_6kM-cGFPtp80zHwDGaPYk_LnynHkElAMkZpbfgKNe6Nokqt31xWiz1oqhjXcLBKLJliJTPy_THvi0X63fRm7bFAz-QXm73nplU5pkA9MGIY3QxUkhxkpfOMYW5rwP7I-t6pNyl35n4l2w1T5_iZSuAS2Tn6xuq7PJNfvn4Md8bbop6Plz63Hy0Oy8amK1tNrWLBmWPH84VsRrm9bxTQpWtwg4UTG6HX3kEPa2ArEwQ8qhOZAU6FqLZ0KpFokjStL2CQ48Q6IAQkLomUH6Cc4zhoz-ZzDyzgL2g0kzvqJLHWpHfEt9l7faA0Z44LZ5isFMQjCv9fMrrZFYM0gfkhd6NxtW8DSIcBgLrHkfKxBu9gN02AU4sl9Bu8d53XoTwm4ryg5sCUGojpraHEQNrKH4CzJIakI1uWXtlSr7f_L0QuNp3N1vj42bkwtHG2ydQ9dJntvg-9pdyopMsgi-3OxlhkxPAdiGkzGCMoKdT4NyQnvZo_vULR3dJpkHw8-1kLf19P_tP9yx98eI4U5pk6AbGekBFAyuYkNBRVV0WLCOKt5KqS0wTShNDrskld4zpWT8l92dfCXYzgJceu00li0JwJ1iic84i8gCAhi7GQxNpklPqmGHvhLdQ-22Xbvm_dkhQd6WaWl162plmzAgiIioIomNbtpcjClC_NfQ4DYmfAlleaHnzDc8ZQHnGWLscy6d3YJZOQ&zp=tgxpvzlLK1WuEnrqurxzUQr59NYTJzG0a_QScMBCpnqSm9iDUlMop917fOshKREpt8b7WKUghjQTGEHLNdfDfTHLPwHtQCHwETa8qMAPW7_r07UIHawXbAgUjOAfGCOA5u9KxJUIFOnpRwXwmUNPVnKQ0qPLkqCVFifSjziecE60qSyH2sgA5q0714wjSysgdgnCMbz7Kbjebxnb9U6rzKd-s_PgRSUwLteZ5hGv0iK7c1VCpXzK0m6RjRZ7NRhzn2avNKVXs8BOmHUWLpyGOOUGICnMkCoJ3xL_4obOOMHvJYnm45FqV_y7e0b2UHOlOKwKbz54l418QzKPfTck8Zra60iOp9znydqcsox9HjHjevZ_pBUAz6JC5tH9BWfs0368OZaBoxk4OiykBme_67CRV9xbbaXPvBdnIlcOTxf6KhhKmiK4VFx8pKUP
+                      - button "Open user actions" [ref=f65e2032] [cursor=pointer]
+                    - generic [ref=f65e2038]:
+                      - generic [ref=f65e2039]:
+                        - link "Spent 4 hours sculpting a mini in ZBrush last week. Then tried the same thing in Meshy. 90 seconds. The quality gap is closing fast." [ref=f65e2041] [cursor=pointer]:
+                          - /url: https://alb.reddit.com/cr?za=AyzlAaOXoVmoOQblPevIzoW95PZDCsZCl0XVz1_6kM-cGFPtp80zHwDGaPYk_LnynHkElAMkZpbfgKNe6Nokqt31xWiz1oqhjXcLBKLJliJTPy_THvi0X63fRm7bFAz-QXm73nplU5pkA9MGIY3QxUkhxkpfOMYW5rwP7I-t6pNyl35n4l2w1T5_iZSuAS2Tn6xuq7PJNfvn4Md8bbop6Plz63Hy0Oy8amK1tNrWLBmWPH84VsRrm9bxTQpWtwg4UTG6HX3kEPa2ArEwQ8qhOZAU6FqLZ0KpFokjStL2CQ48Q6IAQkLomUH6Cc4zhoz-ZzDyzgL2g0kzvqJLHWpHfEt9l7faA0Z44LZ5isFMQjCv9fMrrZFYM0gfkhd6NxtW8DSIcBgLrHkfKxBu9gN02AU4sl9Bu8d53XoTwm4ryg5sCUGojpraHEQNrKH4CzJIakI1uWXtlSr7f_L0QuNp3N1vj42bkwtHG2ydQ9dJntvg-9pdyopMsgi-3OxlhkxPAdiGkzGCMoKdT4NyQnvZo_vULR3dJpkHw8-1kLf19P_tP9yx98eI4U5pk6AbGekBFAyuYkNBRVV0WLCOKt5KqS0wTShNDrskld4zpWT8l92dfCXYzgJceu00li0JwJ1iic84i8gCAhi7GQxNpklPqmGHvhLdQ-22Xbvm_dkhQd6WaWl162plmzAgiIioIomNbtpcjClC_NfQ4DYmfAlleaHnzDc8ZQHnGWLscy6d3YJZOQ&zp=tgxpvzlLK1WuEnrqurxzUQr59NYTJzG0a_QScMBCpnqSm9iDUlMop917fOshKREpt8b7WKUghjQTGEHLNdfDfTHLPwHtQCHwETa8qMAPW7_r07UIHawXbAgUjOAfGCOA5u9KxJUIFOnpRwXwmUNPVnKQ0qPLkqCVFifSjziecE60qSyH2sgA5q0714wjSysgdgnCMbz7Kbjebxnb9U6rzKd-s_PgRSUwLteZ5hGv0iK7c1VCpXzK0m6RjRZ7NRhzn2avNKVXs8BOmHUWLpyGOOUGICnMkCoJ3xL_4obOOMHvJYnm45FqV_y7e0b2UHOlOKwKbz54l418QzKPfTck8Zra60iOp9znydqcsox9HjHjevZ_pBUAz6JC5tH9BWfs0368OZaBoxk4OiykBme_67CRV9xbbaXPvBdnIlcOTxf6KhhKmiK4VFx8pKUP
+                        - generic [ref=f65e2042]:
+                          - link [ref=f65e2044] [cursor=pointer]:
+                            - /url: https://alb.reddit.com/cr?za=AyzlAaOXoVmoOQblPevIzoW95PZDCsZCl0XVz1_6kM-cGFPtp80zHwDGaPYk_LnynHkElAMkZpbfgKNe6Nokqt31xWiz1oqhjXcLBKLJliJTPy_THvi0X63fRm7bFAz-QXm73nplU5pkA9MGIY3QxUkhxkpfOMYW5rwP7I-t6pNyl35n4l2w1T5_iZSuAS2Tn6xuq7PJNfvn4Md8bbop6Plz63Hy0Oy8amK1tNrWLBmWPH84VsRrm9bxTQpWtwg4UTG6HX3kEPa2ArEwQ8qhOZAU6FqLZ0KpFokjStL2CQ48Q6IAQkLomUH6Cc4zhoz-ZzDyzgL2g0kzvqJLHWpHfEt9l7faA0Z44LZ5isFMQjCv9fMrrZFYM0gfkhd6NxtW8DSIcBgLrHkfKxBu9gN02AU4sl9Bu8d53XoTwm4ryg5sCUGojpraHEQNrKH4CzJIakI1uWXtlSr7f_L0QuNp3N1vj42bkwtHG2ydQ9dJntvg-9pdyopMsgi-3OxlhkxPAdiGkzGCMoKdT4NyQnvZo_vULR3dJpkHw8-1kLf19P_tP9yx98eI4U5pk6AbGekBFAyuYkNBRVV0WLCOKt5KqS0wTShNDrskld4zpWT8l92dfCXYzgJceu00li0JwJ1iic84i8gCAhi7GQxNpklPqmGHvhLdQ-22Xbvm_dkhQd6WaWl162plmzAgiIioIomNbtpcjClC_NfQ4DYmfAlleaHnzDc8ZQHnGWLscy6d3YJZOQ&zp=tgxpvzlLK1WuEnrqurxzUQr59NYTJzG0a_QScMBCpnqSm9iDUlMop917fOshKREpt8b7WKUghjQTGEHLNdfDfTHLPwHtQCHwETa8qMAPW7_r07UIHawXbAgUjOAfGCOA5u9KxJUIFOnpRwXwmUNPVnKQ0qPLkqCVFifSjziecE60qSyH2sgA5q0714wjSysgdgnCMbz7Kbjebxnb9U6rzKd-s_PgRSUwLteZ5hGv0iK7c1VCpXzK0m6RjRZ7NRhzn2avNKVXs8BOmHUWLpyGOOUGICnMkCoJ3xL_4obOOMHvJYnm45FqV_y7e0b2UHOlOKwKbz54l418QzKPfTck8Zra60iOp9znydqcsox9HjHjevZ_pBUAz6JC5tH9BWfs0368OZaBoxk4OiykBme_67CRV9xbbaXPvBdnIlcOTxf6KhhKmiK4VFx8pKUP
+                          - generic [ref=f65e2045]:
+                            - link "View More" [ref=f65e2047] [cursor=pointer]:
+                              - /url: https://alb.reddit.com/cr?za=AyzlAaOXoVmoOQblPevIzoW95PZDCsZCl0XVz1_6kM-cGFPtp80zHwDGaPYk_LnynHkElAMkZpbfgKNe6Nokqt31xWiz1oqhjXcLBKLJliJTPy_THvi0X63fRm7bFAz-QXm73nplU5pkA9MGIY3QxUkhxkpfOMYW5rwP7I-t6pNyl35n4l2w1T5_iZSuAS2Tn6xuq7PJNfvn4Md8bbop6Plz63Hy0Oy8amK1tNrWLBmWPH84VsRrm9bxTQpWtwg4UTG6HX3kEPa2ArEwQ8qhOZAU6FqLZ0KpFokjStL2CQ48Q6IAQkLomUH6Cc4zhoz-ZzDyzgL2g0kzvqJLHWpHfEt9l7faA0Z44LZ5isFMQjCv9fMrrZFYM0gfkhd6NxtW8DSIcBgLrHkfKxBu9gN02AU4sl9Bu8d53XoTwm4ryg5sCUGojpraHEQNrKH4CzJIakI1uWXtlSr7f_L0QuNp3N1vj42bkwtHG2ydQ9dJntvg-9pdyopMsgi-3OxlhkxPAdiGkzGCMoKdT4NyQnvZo_vULR3dJpkHw8-1kLf19P_tP9yx98eI4U5pk6AbGekBFAyuYkNBRVV0WLCOKt5KqS0wTShNDrskld4zpWT8l92dfCXYzgJceu00li0JwJ1iic84i8gCAhi7GQxNpklPqmGHvhLdQ-22Xbvm_dkhQd6WaWl162plmzAgiIioIomNbtpcjClC_NfQ4DYmfAlleaHnzDc8ZQHnGWLscy6d3YJZOQ&zp=tgxpvzlLK1WuEnrqurxzUQr59NYTJzG0a_QScMBCpnqSm9iDUlMop917fOshKREpt8b7WKUghjQTGEHLNdfDfTHLPwHtQCHwETa8qMAPW7_r07UIHawXbAgUjOAfGCOA5u9KxJUIFOnpRwXwmUNPVnKQ0qPLkqCVFifSjziecE60qSyH2sgA5q0714wjSysgdgnCMbz7Kbjebxnb9U6rzKd-s_PgRSUwLteZ5hGv0iK7c1VCpXzK0m6RjRZ7NRhzn2avNKVXs8BOmHUWLpyGOOUGICnMkCoJ3xL_4obOOMHvJYnm45FqV_y7e0b2UHOlOKwKbz54l418QzKPfTck8Zra60iOp9znydqcsox9HjHjevZ_pBUAz6JC5tH9BWfs0368OZaBoxk4OiykBme_67CRV9xbbaXPvBdnIlcOTxf6KhhKmiK4VFx8pKUP
+                            - link "meshy.ai" [ref=f65e2052] [cursor=pointer]:
+                              - /url: https://alb.reddit.com/cr?za=AyzlAaOXoVmoOQblPevIzoW95PZDCsZCl0XVz1_6kM-cGFPtp80zHwDGaPYk_LnynHkElAMkZpbfgKNe6Nokqt31xWiz1oqhjXcLBKLJliJTPy_THvi0X63fRm7bFAz-QXm73nplU5pkA9MGIY3QxUkhxkpfOMYW5rwP7I-t6pNyl35n4l2w1T5_iZSuAS2Tn6xuq7PJNfvn4Md8bbop6Plz63Hy0Oy8amK1tNrWLBmWPH84VsRrm9bxTQpWtwg4UTG6HX3kEPa2ArEwQ8qhOZAU6FqLZ0KpFokjStL2CQ48Q6IAQkLomUH6Cc4zhoz-ZzDyzgL2g0kzvqJLHWpHfEt9l7faA0Z44LZ5isFMQjCv9fMrrZFYM0gfkhd6NxtW8DSIcBgLrHkfKxBu9gN02AU4sl9Bu8d53XoTwm4ryg5sCUGojpraHEQNrKH4CzJIakI1uWXtlSr7f_L0QuNp3N1vj42bkwtHG2ydQ9dJntvg-9pdyopMsgi-3OxlhkxPAdiGkzGCMoKdT4NyQnvZo_vULR3dJpkHw8-1kLf19P_tP9yx98eI4U5pk6AbGekBFAyuYkNBRVV0WLCOKt5KqS0wTShNDrskld4zpWT8l92dfCXYzgJceu00li0JwJ1iic84i8gCAhi7GQxNpklPqmGHvhLdQ-22Xbvm_dkhQd6WaWl162plmzAgiIioIomNbtpcjClC_NfQ4DYmfAlleaHnzDc8ZQHnGWLscy6d3YJZOQ&zp=tgxpvzlLK1WuEnrqurxzUQr59NYTJzG0a_QScMBCpnqSm9iDUlMop917fOshKREpt8b7WKUghjQTGEHLNdfDfTHLPwHtQCHwETa8qMAPW7_r07UIHawXbAgUjOAfGCOA5u9KxJUIFOnpRwXwmUNPVnKQ0qPLkqCVFifSjziecE60qSyH2sgA5q0714wjSysgdgnCMbz7Kbjebxnb9U6rzKd-s_PgRSUwLteZ5hGv0iK7c1VCpXzK0m6RjRZ7NRhzn2avNKVXs8BOmHUWLpyGOOUGICnMkCoJ3xL_4obOOMHvJYnm45FqV_y7e0b2UHOlOKwKbz54l418QzKPfTck8Zra60iOp9znydqcsox9HjHjevZ_pBUAz6JC5tH9BWfs0368OZaBoxk4OiykBme_67CRV9xbbaXPvBdnIlcOTxf6KhhKmiK4VFx8pKUP
+                      - link [ref=f65e2055] [cursor=pointer]:
+                        - /url: https://alb.reddit.com/cr?za=AyzlAaOXoVmoOQblPevIzoW95PZDCsZCl0XVz1_6kM-cGFPtp80zHwDGaPYk_LnynHkElAMkZpbfgKNe6Nokqt31xWiz1oqhjXcLBKLJliJTPy_THvi0X63fRm7bFAz-QXm73nplU5pkA9MGIY3QxUkhxkpfOMYW5rwP7I-t6pNyl35n4l2w1T5_iZSuAS2Tn6xuq7PJNfvn4Md8bbop6Plz63Hy0Oy8amK1tNrWLBmWPH84VsRrm9bxTQpWtwg4UTG6HX3kEPa2ArEwQ8qhOZAU6FqLZ0KpFokjStL2CQ48Q6IAQkLomUH6Cc4zhoz-ZzDyzgL2g0kzvqJLHWpHfEt9l7faA0Z44LZ5isFMQjCv9fMrrZFYM0gfkhd6NxtW8DSIcBgLrHkfKxBu9gN02AU4sl9Bu8d53XoTwm4ryg5sCUGojpraHEQNrKH4CzJIakI1uWXtlSr7f_L0QuNp3N1vj42bkwtHG2ydQ9dJntvg-9pdyopMsgi-3OxlhkxPAdiGkzGCMoKdT4NyQnvZo_vULR3dJpkHw8-1kLf19P_tP9yx98eI4U5pk6AbGekBFAyuYkNBRVV0WLCOKt5KqS0wTShNDrskld4zpWT8l92dfCXYzgJceu00li0JwJ1iic84i8gCAhi7GQxNpklPqmGHvhLdQ-22Xbvm_dkhQd6WaWl162plmzAgiIioIomNbtpcjClC_NfQ4DYmfAlleaHnzDc8ZQHnGWLscy6d3YJZOQ&zp=tgxpvzlLK1WuEnrqurxzUQr59NYTJzG0a_QScMBCpnqSm9iDUlMop917fOshKREpt8b7WKUghjQTGEHLNdfDfTHLPwHtQCHwETa8qMAPW7_r07UIHawXbAgUjOAfGCOA5u9KxJUIFOnpRwXwmUNPVnKQ0qPLkqCVFifSjziecE60qSyH2sgA5q0714wjSysgdgnCMbz7Kbjebxnb9U6rzKd-s_PgRSUwLteZ5hGv0iK7c1VCpXzK0m6RjRZ7NRhzn2avNKVXs8BOmHUWLpyGOOUGICnMkCoJ3xL_4obOOMHvJYnm45FqV_y7e0b2UHOlOKwKbz54l418QzKPfTck8Zra60iOp9znydqcsox9HjHjevZ_pBUAz6JC5tH9BWfs0368OZaBoxk4OiykBme_67CRV9xbbaXPvBdnIlcOTxf6KhhKmiK4VFx8pKUP
+                        - 'img "Thumbnail image: Spent 4 hours sculpting a mini in ZBrush last week. Then tried the same thing in Meshy. 90 seconds. The quality gap is closing fast." [ref=f65e2056]'
+                - article "Comment from InternationalGap3698 2 hours ago" [ref=f65e2058]:
+                  - generic [ref=f65e2059] [cursor=pointer]:
+                    - link "InternationalGap3698's profile --- avatar" [ref=f65e2065]:
+                      - /url: https://www.reddit.com/user/InternationalGap3698/
+                      - img "u/InternationalGap3698 avatar" [ref=f65e2068]
+                    - generic [ref=f65e2071]:
+                      - generic [ref=f65e2072]:
+                        - link "InternationalGap3698's profile" [ref=f65e2076]:
+                          - /url: https://www.reddit.com/user/InternationalGap3698/
+                          - text: InternationalGap3698
+                        - generic "Comment distinguished as the original poster" [ref=f65e2079]: OP
+                        - generic [ref=f65e2080]: •
+                        - link [ref=f65e2082]:
+                          - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3p6nbg/
+                          - time [ref=f65e2084]: 2h ago
+                      - generic [ref=f65e2085]:
+                        - 'generic "Flair: :Discord:" [ref=f65e2088]'
+                        - generic [ref=f65e2093]:
+                          - img "Profile Badge for the Achievement Top 1% Poster" [ref=f65e2094]
+                          - text: Top 1% Poster
+                  - paragraph [ref=f65e2100]:
+                    - link "https://x.com/Alibaba_Qwen/status/2088280188362867185/photo/1" [ref=f65e2101] [cursor=pointer]:
+                      - /url: https://x.com/Alibaba_Qwen/status/2088280188362867185/photo/1
+                - article "Comment from arbv 1 hour ago" [ref=f65e2105]:
+                  - generic "arbv's profile --- avatar arbv's profile 1h ago" [ref=f65e2106] [cursor=pointer]:
+                    - link "arbv's profile --- avatar" [ref=f65e2112]:
+                      - /url: https://www.reddit.com/user/arbv/
+                    - generic [ref=f65e2122]:
+                      - link "arbv's profile" [ref=f65e2126]:
+                        - /url: https://www.reddit.com/user/arbv/
+                        - text: arbv
+                      - generic [ref=f65e2127]: •
+                      - link [ref=f65e2129]:
+                        - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pjlpq/
+                        - time [ref=f65e2131]: 1h ago
+                  - generic [ref=f65e2137]:
+                    - paragraph [ref=f65e2138]: I can run the Muse with the official K-Quant GGUF with full context, multimedia projections and DFLash drafter fully in VRAM (24GB) at 40-45 t/s TG.
+                    - paragraph [ref=f65e2139]: I can run Qwen 3.8 Q4_K_M at 75K context without multimedia projections, no MTP, at 30 t/s. For example - I can run a much larger (120B) MoE at 25 t/s at full context with partial RAM offload.
+                    - paragraph [ref=f65e2140]: And Qwen overthinks and is not even consistent with its thinking format + it is terrible at my native language.
+                    - paragraph [ref=f65e2141]: Given that - the Muse is just a better model for me. It is much more polished model.
+                - article "Comment from a_beautiful_rhind 2 hours ago" [ref=f65e2145]:
+                  - generic [ref=f65e2146] [cursor=pointer]:
+                    - link "a_beautiful_rhind's profile --- avatar" [ref=f65e2152]:
+                      - /url: https://www.reddit.com/user/a_beautiful_rhind/
+                    - generic [ref=f65e2161]:
+                      - generic [ref=f65e2162]:
+                        - link "a_beautiful_rhind's profile" [ref=f65e2166]:
+                          - /url: https://www.reddit.com/user/a_beautiful_rhind/
+                          - text: a_beautiful_rhind
+                        - generic [ref=f65e2167]: •
+                        - link [ref=f65e2169]:
+                          - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pc5rx/
+                          - time [ref=f65e2171]: 2h ago
+                      - generic [ref=f65e2174]:
+                        - img "Profile Badge for the Achievement Top 1% Commenter" [ref=f65e2175]
+                        - text: Top 1% Commenter
+                  - generic [ref=f65e2177]:
+                    - generic [ref=f65e2180]:
+                      - paragraph [ref=f65e2181]: my opinion on glimmer is that it's temu gemma. meta == beta.
+                      - paragraph [ref=f65e2182]: I'm not the biggest fan of how qwen writes but I've never seen it make the kind of cognitive mistakes that glimmer makes.
+                      - paragraph [ref=f65e2183]: A good chunk of the reasoning ended up being arguing about content policy that isn't in any of my prompts. Then it decides on something in the reasoning and does the opposite thing anyways. sad.
+                    - generic [ref=f65e2186]:
+                      - 'article "Comment thread level 1: Reply from silenceimpaired 2 hours ago" [ref=f65e2188]':
+                        - generic "silenceimpaired's profile --- avatar silenceimpaired's profile 2h ago" [ref=f65e2189] [cursor=pointer]:
+                          - link "silenceimpaired's profile --- avatar" [ref=f65e2195]:
+                            - /url: https://www.reddit.com/user/silenceimpaired/
+                            - img "u/silenceimpaired avatar" [ref=f65e2198]
+                          - generic [ref=f65e2202]:
+                            - link "silenceimpaired's profile" [ref=f65e2206]:
+                              - /url: https://www.reddit.com/user/silenceimpaired/
+                              - text: silenceimpaired
+                            - generic [ref=f65e2207]: •
+                            - link [ref=f65e2209]:
+                              - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pcmac/
+                              - time [ref=f65e2211]: 2h ago
+                        - generic [ref=f65e2214]:
+                          - paragraph [ref=f65e2218]: Sounds like GPT-OSS all over again. I really want to find a good heretic version of both these models.
+                          - 'article "Comment thread level 2: Reply from a_beautiful_rhind 2 hours ago" [ref=f65e2223]':
+                            - generic [ref=f65e2224] [cursor=pointer]:
+                              - link "a_beautiful_rhind's profile --- avatar" [ref=f65e2230]:
+                                - /url: https://www.reddit.com/user/a_beautiful_rhind/
+                              - generic [ref=f65e2239]:
+                                - generic [ref=f65e2240]:
+                                  - link "a_beautiful_rhind's profile" [ref=f65e2244]:
+                                    - /url: https://www.reddit.com/user/a_beautiful_rhind/
+                                    - text: a_beautiful_rhind
+                                  - generic [ref=f65e2245]: •
+                                  - link [ref=f65e2247]:
+                                    - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pf0am/
+                                    - time [ref=f65e2249]: 2h ago
+                                - generic [ref=f65e2252]:
+                                  - img "Profile Badge for the Achievement Top 1% Commenter" [ref=f65e2253]
+                                  - text: Top 1% Commenter
+                            - generic [ref=f65e2255]:
+                              - paragraph [ref=f65e2259]: Not as bad as OSS. OSS-lite. From trying some abliterated tunes, I'm not quite sold. They turn into pushovers.
+                              - 'article "Comment thread level 3: Reply from silenceimpaired 2 hours ago" [ref=f65e2264]':
+                                - generic "silenceimpaired's profile --- avatar silenceimpaired's profile 2h ago" [ref=f65e2265] [cursor=pointer]:
+                                  - link "silenceimpaired's profile --- avatar" [ref=f65e2271]:
+                                    - /url: https://www.reddit.com/user/silenceimpaired/
+                                    - img "u/silenceimpaired avatar" [ref=f65e2274]
+                                  - generic [ref=f65e2278]:
+                                    - link "silenceimpaired's profile" [ref=f65e2282]:
+                                      - /url: https://www.reddit.com/user/silenceimpaired/
+                                      - text: silenceimpaired
+                                    - generic [ref=f65e2283]: •
+                                    - link [ref=f65e2285]:
+                                      - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pff0t/
+                                      - time [ref=f65e2287]: 2h ago
+                                - generic [ref=f65e2290]:
+                                  - paragraph [ref=f65e2294]: Yeah, that is unfortunate.
+                                  - 'article "Comment thread level 4: Reply from a_beautiful_rhind 2 hours ago" [ref=f65e2299]':
+                                    - generic [ref=f65e2300] [cursor=pointer]:
+                                      - link "a_beautiful_rhind's profile --- avatar" [ref=f65e2306]:
+                                        - /url: https://www.reddit.com/user/a_beautiful_rhind/
+                                      - generic [ref=f65e2315]:
+                                        - generic [ref=f65e2316]:
+                                          - link "a_beautiful_rhind's profile" [ref=f65e2320]:
+                                            - /url: https://www.reddit.com/user/a_beautiful_rhind/
+                                            - text: a_beautiful_rhind
+                                          - generic [ref=f65e2321]: •
+                                          - link [ref=f65e2323]:
+                                            - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pg7k0/
+                                            - time [ref=f65e2325]: 2h ago
+                                        - generic [ref=f65e2328]:
+                                          - img "Profile Badge for the Achievement Top 1% Commenter" [ref=f65e2329]
+                                          - text: Top 1% Commenter
+                                    - generic [ref=f65e2331]:
+                                      - generic [ref=f65e2334]:
+                                        - list [ref=f65e2335]:
+                                          - listitem [ref=f65e2336]:
+                                            - paragraph [ref=f65e2337]: be excited for model
+                                          - listitem [ref=f65e2338]:
+                                            - paragraph [ref=f65e2339]: download model
+                                          - listitem [ref=f65e2340]:
+                                            - paragraph [ref=f65e2341]: update/implement stuff in backends
+                                          - listitem [ref=f65e2342]:
+                                            - paragraph [ref=f65e2343]: use model
+                                          - listitem [ref=f65e2344]:
+                                            - paragraph [ref=f65e2345]: be disappointed
+                                          - listitem [ref=f65e2346]:
+                                            - paragraph [ref=f65e2347]: get excited for the next release
+                                        - paragraph [ref=f65e2348]: It's viscious cycle this year.
+                                      - 'article "Comment thread level 5: Reply from silenceimpaired 55 minutes ago" [ref=f65e2353]':
+                                        - generic "silenceimpaired's profile --- avatar silenceimpaired's profile 55m ago" [ref=f65e2354] [cursor=pointer]:
+                                          - link "silenceimpaired's profile --- avatar" [ref=f65e2360]:
+                                            - /url: https://www.reddit.com/user/silenceimpaired/
+                                            - img "u/silenceimpaired avatar" [ref=f65e2363]
+                                          - generic [ref=f65e2367]:
+                                            - link "silenceimpaired's profile" [ref=f65e2371]:
+                                              - /url: https://www.reddit.com/user/silenceimpaired/
+                                              - text: silenceimpaired
+                                            - generic [ref=f65e2372]: •
+                                            - link [ref=f65e2374]:
+                                              - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3poikv/
+                                              - time [ref=f65e2376]: 55m ago
+                                        - generic [ref=f65e2382]:
+                                          - paragraph [ref=f65e2383]: Haha. So true.
+                                          - paragraph [ref=f65e2384]: I tend to use KoboldCPP so I don’t have to figure out how to compile Llama.cpp with Cuda in Linux… and I’m constantly checking for their next update. Still waiting for Glimmer support. Unsloth Studio always is updated for models but so far it just doesn’t work as well.
+                                          - paragraph [ref=f65e2385]: I need to stop being lazy and figure out compiling for llama.cpp.
+                                          - paragraph [ref=f65e2386]: I mean… how hard is it to type, “okay, AI, make a set of instructions to compile llama.cpp with Cuda support on Linux”. Apparently fairly easy since I just did it.
+                      - 'article "Comment thread level 1: Reply from silenceimpaired 2 hours ago" [ref=f65e2390]':
+                        - generic "silenceimpaired's profile --- avatar silenceimpaired's profile 2h ago" [ref=f65e2391] [cursor=pointer]:
+                          - link "silenceimpaired's profile --- avatar" [ref=f65e2397]:
+                            - /url: https://www.reddit.com/user/silenceimpaired/
+                            - img "u/silenceimpaired avatar" [ref=f65e2400]
+                          - generic [ref=f65e2404]:
+                            - link "silenceimpaired's profile" [ref=f65e2408]:
+                              - /url: https://www.reddit.com/user/silenceimpaired/
+                              - text: silenceimpaired
+                            - generic [ref=f65e2409]: •
+                            - link [ref=f65e2411]:
+                              - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pcq02/
+                              - time [ref=f65e2413]: 2h ago
+                        - generic [ref=f65e2416]:
+                          - paragraph [ref=f65e2420]: What was the cognitive mistake?
+                          - 'article "Comment thread level 2: Reply from a_beautiful_rhind 2 hours ago" [ref=f65e2425]':
+                            - generic [ref=f65e2426] [cursor=pointer]:
+                              - link "a_beautiful_rhind's profile --- avatar" [ref=f65e2432]:
+                                - /url: https://www.reddit.com/user/a_beautiful_rhind/
+                              - generic [ref=f65e2441]:
+                                - generic [ref=f65e2442]:
+                                  - link "a_beautiful_rhind's profile" [ref=f65e2446]:
+                                    - /url: https://www.reddit.com/user/a_beautiful_rhind/
+                                    - text: a_beautiful_rhind
+                                  - generic [ref=f65e2447]: •
+                                  - link [ref=f65e2449]:
+                                    - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pdm1x/
+                                    - time [ref=f65e2451]: 2h ago
+                                - generic [ref=f65e2454]:
+                                  - img "Profile Badge for the Achievement Top 1% Commenter" [ref=f65e2455]
+                                  - text: Top 1% Commenter
+                            - paragraph [ref=f65e2461]: It confuses who is who and who said what. Repeats what I said to it but clearly doesn't understand it. Plus the template is kinda janky.. assistant to=user, assistant to=self. WTF.
+                - article "Comment from mattrs1101 2 hours ago" [ref=f65e2465]:
+                  - generic "mattrs1101's profile --- avatar mattrs1101's profile 2h ago Edited 2h ago" [ref=f65e2466] [cursor=pointer]:
+                    - link "mattrs1101's profile --- avatar" [ref=f65e2472]:
+                      - /url: https://www.reddit.com/user/mattrs1101/
+                    - generic [ref=f65e2482]:
+                      - link "mattrs1101's profile" [ref=f65e2486]:
+                        - /url: https://www.reddit.com/user/mattrs1101/
+                        - text: mattrs1101
+                      - generic [ref=f65e2487]: •
+                      - link [ref=f65e2489]:
+                        - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3p7c7i/
+                        - time [ref=f65e2491]: 2h ago
+                      - generic [ref=f65e2492]: •
+                      - generic [ref=f65e2493]:
+                        - text: Edited
+                        - time [ref=f65e2495]: 2h ago
+                  - generic [ref=f65e2498]:
+                    - paragraph [ref=f65e2502]: Glimmer still outperforms qwen 3.8 at q2xl vs q2xl and by a lot, both in tps and quality
+                    - generic [ref=f65e2505]:
+                      - 'article "Comment thread level 1: Reply from seamonn 2 hours ago" [ref=f65e2507]':
+                        - generic [ref=f65e2508] [cursor=pointer]:
+                          - link "seamonn's profile --- avatar" [ref=f65e2514]:
+                            - /url: https://www.reddit.com/user/seamonn/
+                            - img "u/seamonn avatar" [ref=f65e2517]
+                          - generic [ref=f65e2520]:
+                            - generic [ref=f65e2521]:
+                              - link "seamonn's profile" [ref=f65e2525]:
+                                - /url: https://www.reddit.com/user/seamonn/
+                                - text: seamonn
+                              - generic [ref=f65e2526]: •
+                              - link [ref=f65e2528]:
+                                - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3p8xux/
+                                - time [ref=f65e2530]: 2h ago
+                            - generic [ref=f65e2531]:
+                              - 'generic "Flair: :Discord:" [ref=f65e2534]'
+                              - generic [ref=f65e2539]:
+                                - img "Profile Badge for the Achievement Top 1% Commenter" [ref=f65e2540]
+                                - text: Top 1% Commenter
+                        - generic [ref=f65e2545]:
+                          - blockquote [ref=f65e2546]:
+                            - paragraph [ref=f65e2547]: q2xl vs q2
+                          - paragraph [ref=f65e2548]: ...
+                      - 'article "Comment thread level 1: Reply from silenceimpaired 2 hours ago" [ref=f65e2552]':
+                        - generic "silenceimpaired's profile --- avatar silenceimpaired's profile 2h ago" [ref=f65e2553] [cursor=pointer]:
+                          - link "silenceimpaired's profile --- avatar" [ref=f65e2559]:
+                            - /url: https://www.reddit.com/user/silenceimpaired/
+                            - img "u/silenceimpaired avatar" [ref=f65e2562]
+                          - generic [ref=f65e2566]:
+                            - link "silenceimpaired's profile" [ref=f65e2570]:
+                              - /url: https://www.reddit.com/user/silenceimpaired/
+                              - text: silenceimpaired
+                            - generic [ref=f65e2571]: •
+                            - link [ref=f65e2573]:
+                              - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pddmr/
+                              - time [ref=f65e2575]: 2h ago
+                        - paragraph [ref=f65e2582]: What are you running it on inference wise?
+                - article "Comment from seamonn 2 hours ago" [ref=f65e2586]:
+                  - generic [ref=f65e2587] [cursor=pointer]:
+                    - link "seamonn's profile --- avatar" [ref=f65e2593]:
+                      - /url: https://www.reddit.com/user/seamonn/
+                      - img "u/seamonn avatar" [ref=f65e2596]
+                    - generic [ref=f65e2599]:
+                      - generic [ref=f65e2600]:
+                        - link "seamonn's profile" [ref=f65e2604]:
+                          - /url: https://www.reddit.com/user/seamonn/
+                          - text: seamonn
+                        - generic [ref=f65e2605]: •
+                        - link [ref=f65e2607]:
+                          - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3p90yt/
+                          - time [ref=f65e2609]: 2h ago
+                      - generic [ref=f65e2610]:
+                        - 'generic "Flair: :Discord:" [ref=f65e2613]'
+                        - generic [ref=f65e2618]:
+                          - img "Profile Badge for the Achievement Top 1% Commenter" [ref=f65e2619]
+                          - text: Top 1% Commenter
+                  - paragraph [ref=f65e2625]: Amercan labs can't keep up
+                - article "Comment from Boogertard 44 minutes ago" [ref=f65e2629]:
+                  - generic "Boogertard's profile --- avatar Boogertard's profile 44m ago" [ref=f65e2630] [cursor=pointer]:
+                    - link "Boogertard's profile --- avatar" [ref=f65e2636]:
+                      - /url: https://www.reddit.com/user/Boogertard/
+                    - generic [ref=f65e2646]:
+                      - link "Boogertard's profile" [ref=f65e2650]:
+                        - /url: https://www.reddit.com/user/Boogertard/
+                        - text: Boogertard
+                      - generic [ref=f65e2651]: •
+                      - link [ref=f65e2653]:
+                        - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pqxac/
+                        - time [ref=f65e2655]: 44m ago
+                  - generic [ref=f65e2661]:
+                    - paragraph [ref=f65e2662]: It was not, it was dumber than Qwen 3.6 27B in my tests. Only the shills on this subs said otherwise. Garbage model.
+                    - paragraph [ref=f65e2663]: I recalled the same shills shilling for the Gemma garbage too.
+                - article "Comment from Scared_Basket_7183 1 hour ago" [ref=f65e2667]:
+                  - generic "Scared_Basket_7183's profile --- avatar Scared_Basket_7183's profile 1h ago" [ref=f65e2668] [cursor=pointer]:
+                    - link "Scared_Basket_7183's profile --- avatar" [ref=f65e2674]:
+                      - /url: https://www.reddit.com/user/Scared_Basket_7183/
+                      - img "u/Scared_Basket_7183 avatar" [ref=f65e2677]
+                    - generic [ref=f65e2681]:
+                      - link "Scared_Basket_7183's profile" [ref=f65e2685]:
+                        - /url: https://www.reddit.com/user/Scared_Basket_7183/
+                        - text: Scared_Basket_7183
+                      - generic [ref=f65e2686]: •
+                      - link [ref=f65e2688]:
+                        - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3ph9jb/
+                        - time [ref=f65e2690]: 1h ago
+                  - paragraph [ref=f65e2697]: Hi could you please help me to run qwen 3.6 27b model on TPU V5E-8?
+                - article "Comment from GregoryfromtheHood 25 minutes ago" [ref=f65e2701]:
+                  - generic "GregoryfromtheHood's profile --- avatar GregoryfromtheHood's profile 25m ago" [ref=f65e2702] [cursor=pointer]:
+                    - link "GregoryfromtheHood's profile --- avatar" [ref=f65e2708]:
+                      - /url: https://www.reddit.com/user/GregoryfromtheHood/
+                    - generic [ref=f65e2718]:
+                      - link "GregoryfromtheHood's profile" [ref=f65e2722]:
+                        - /url: https://www.reddit.com/user/GregoryfromtheHood/
+                        - text: GregoryfromtheHood
+                      - generic [ref=f65e2723]: •
+                      - link [ref=f65e2725]:
+                        - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pv8pa/
+                        - time [ref=f65e2727]: 25m ago
+                  - paragraph [ref=f65e2734]: I'm still using Muse Glimmer because it completes tasks so much faster and is absolutely amazing at tool calls and following agentic flows. I've got a process that requires going back and updating a progress tracking doc that models like deepseek v4 and even glm 5.2 struggle with always remembering to do. Glimmer does it perfectly every time.
+                - article "Comment from fbms2 14 minutes ago" [ref=f65e2738]:
+                  - generic "fbms2's profile --- avatar fbms2's profile 14m ago" [ref=f65e2739] [cursor=pointer]:
+                    - link "fbms2's profile --- avatar" [ref=f65e2745]:
+                      - /url: https://www.reddit.com/user/fbms2/
+                    - generic [ref=f65e2755]:
+                      - link "fbms2's profile" [ref=f65e2759]:
+                        - /url: https://www.reddit.com/user/fbms2/
+                        - text: fbms2
+                      - generic [ref=f65e2760]: •
+                      - link [ref=f65e2762]:
+                        - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pxm1s/
+                        - time [ref=f65e2764]: 14m ago
+                  - paragraph [ref=f65e2771]: No, it wasn't.
+                - article "Comment from Long_comment_san 2 hours ago" [ref=f65e2775]:
+                  - generic [ref=f65e2776] [cursor=pointer]:
+                    - link "Long_comment_san's profile --- avatar" [ref=f65e2782]:
+                      - /url: https://www.reddit.com/user/Long_comment_san/
+                      - img "u/Long_comment_san avatar" [ref=f65e2785]
+                    - generic [ref=f65e2788]:
+                      - generic [ref=f65e2789]:
+                        - link "Long_comment_san's profile" [ref=f65e2793]:
+                          - /url: https://www.reddit.com/user/Long_comment_san/
+                          - text: Long_comment_san
+                        - generic [ref=f65e2794]: •
+                        - link [ref=f65e2796]:
+                          - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pc8sb/
+                          - time [ref=f65e2798]: 2h ago
+                      - 'generic "Flair: :hf:" [ref=f65e2802]'
+                  - generic [ref=f65e2807]:
+                    - paragraph [ref=f65e2811]: isn't muse Moe? >_> sorry don't remember for sure
+                    - 'article "Comment thread level 1: Reply from Hot_Needleworker_275 2 hours ago" [ref=f65e2816]':
+                      - generic "Hot_Needleworker_275's profile --- avatar Hot_Needleworker_275's profile 2h ago" [ref=f65e2817] [cursor=pointer]:
+                        - link "Hot_Needleworker_275's profile --- avatar" [ref=f65e2823]:
+                          - /url: https://www.reddit.com/user/Hot_Needleworker_275/
+                        - generic [ref=f65e2833]:
+                          - link "Hot_Needleworker_275's profile" [ref=f65e2837]:
+                            - /url: https://www.reddit.com/user/Hot_Needleworker_275/
+                            - text: Hot_Needleworker_275
+                          - generic [ref=f65e2838]: •
+                          - link [ref=f65e2840]:
+                            - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pefyh/
+                            - time [ref=f65e2842]: 2h ago
+                      - generic [ref=f65e2845]:
+                        - paragraph [ref=f65e2849]: Nop, is dense
+                        - 'article "Comment thread level 2: Reply from Long_comment_san 1 hour ago" [ref=f65e2854]':
+                          - generic [ref=f65e2855] [cursor=pointer]:
+                            - link "Long_comment_san's profile --- avatar" [ref=f65e2861]:
+                              - /url: https://www.reddit.com/user/Long_comment_san/
+                              - img "u/Long_comment_san avatar" [ref=f65e2864]
+                            - generic [ref=f65e2867]:
+                              - generic [ref=f65e2868]:
+                                - link "Long_comment_san's profile" [ref=f65e2872]:
+                                  - /url: https://www.reddit.com/user/Long_comment_san/
+                                  - text: Long_comment_san
+                                - generic [ref=f65e2873]: •
+                                - link [ref=f65e2875]:
+                                  - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vofnnf/comment/p3pm4du/
+                                  - time [ref=f65e2877]: 1h ago
+                              - 'generic "Flair: :hf:" [ref=f65e2881]'
+                          - generic [ref=f65e2889]:
+                            - paragraph [ref=f65e2890]: Then...
+                            - paragraph [ref=f65e2891]: Mission failed (Good effort)
+            - generic [ref=f65e2894]:
+              - complementary "Community information" [ref=f65e2898]:
+                - generic [ref=f65e2899]:
+                  - generic [ref=f65e2901]:
+                    - heading "Community Info Section" [level=1] [ref=f65e2902]
+                    - generic [ref=f65e2903]:
+                      - generic [ref=f65e2904]:
+                        - link "r/LocalLLaMA" [ref=f65e2905] [cursor=pointer]:
+                          - /url: /r/LocalLLaMA/
+                        - 'button "Community status: https://x.com/localllamasub" [ref=f65e2909] [cursor=pointer]':
+                          - img "Llama" [ref=f65e2910]
+                      - button "Joined" [ref=f65e2914] [cursor=pointer]
+                    - generic [ref=f65e2915]:
+                      - generic [ref=f65e2916]: LocalLlama
+                      - generic [ref=f65e2917]: Subreddit to discuss locally hostable AI.
+                      - generic [ref=f65e2918]:
+                        - generic [ref=f65e2919]: Created Mar 10, 2023
+                        - generic [ref=f65e2923]: Public
+                      - button "Community Guide" [ref=f65e2928] [cursor=pointer]
+                    - generic [ref=f65e2935]:
+                      - generic [ref=f65e2936]:
+                        - strong [ref=f65e2938]:
+                          - generic: 912K
+                        - generic [ref=f65e2939]: Llamas
+                      - generic [ref=f65e2940]:
+                        - strong [ref=f65e2942]:
+                          - generic: 19K
+                        - generic [ref=f65e2943]: Weekly contributions
+                  - separator [ref=f65e2944]
+                  - generic [ref=f65e2945]:
+                    - heading "User flair" [level=2] [ref=f65e2947]
+                    - button "Competitive-Lime9105" [ref=f65e2950]
+                  - separator [ref=f65e2963]
+                  - generic [ref=f65e2964]:
+                    - heading "Community Bookmarks" [level=2] [ref=f65e2966]
+                    - generic [ref=f65e2968]:
+                      - link "Wiki" [ref=f65e2970] [cursor=pointer]:
+                        - /url: /r/LocalLLaMA/wiki/index/
+                      - link "Best LLMs Megathread" [ref=f65e2975] [cursor=pointer]:
+                        - /url: https://www.reddit.com/r/LocalLLaMA/comments/1sknx6n/best_local_llms_apr_2026/
+                      - link "Best VLMs Megathread" [ref=f65e2980] [cursor=pointer]:
+                        - /url: https://www.reddit.com/r/LocalLLaMA/comments/1p5retd/best_local_vlms_november_2025/
+                      - link "Best TTS/STT Models" [ref=f65e2985] [cursor=pointer]:
+                        - /url: https://www.reddit.com/r/LocalLLaMA/comments/1r7bsfd/best_audio_models_feb_2026/
+                  - separator [ref=f65e2989]
+                  - generic [ref=f65e2990]:
+                    - heading "r/LocalLLaMA Rules" [level=2] [ref=f65e2992]
+                    - generic [ref=f65e2994]:
+                      - group [ref=f65e2996]:
+                        - generic "1 Please search before asking" [ref=f65e2997] [cursor=pointer]:
+                          - generic [ref=f65e3000]:
+                            - generic [ref=f65e3001]: "1"
+                            - heading "Please search before asking" [level=2] [ref=f65e3006]
+                      - group [ref=f65e3012]:
+                        - generic "2 Off-Topic Posts" [ref=f65e3013] [cursor=pointer]:
+                          - generic [ref=f65e3016]:
+                            - generic [ref=f65e3017]: "2"
+                            - heading "Off-Topic Posts" [level=2] [ref=f65e3022]
+                      - group [ref=f65e3028]:
+                        - generic "3 Low Effort Posts" [ref=f65e3029] [cursor=pointer]:
+                          - generic [ref=f65e3032]:
+                            - generic [ref=f65e3033]: "3"
+                            - heading "Low Effort Posts" [level=2] [ref=f65e3038]
+                      - group [ref=f65e3044]:
+                        - generic "4 Limit Self-Promotion" [ref=f65e3045] [cursor=pointer]:
+                          - generic [ref=f65e3048]:
+                            - generic [ref=f65e3049]: "4"
+                            - heading "Limit Self-Promotion" [level=2] [ref=f65e3054]
+                      - group [ref=f65e3060]:
+                        - generic "5 Follow Reddit's Content Policy" [ref=f65e3061] [cursor=pointer]:
+                          - generic [ref=f65e3064]:
+                            - generic [ref=f65e3065]: "5"
+                            - heading "Follow Reddit's Content Policy" [level=2] [ref=f65e3070]
+                  - separator [ref=f65e3075]
+                  - generic [ref=f65e3076]:
+                    - heading "Socials" [level=2] [ref=f65e3078]
+                    - link [ref=f65e3080] [cursor=pointer]:
+                      - /url: https://discord.gg/ru9RYpx6Gp
+                  - separator [ref=f65e3081]
+                  - generic [ref=f65e3082]:
+                    - heading "AMA" [level=2] [ref=f65e3084]
+                    - link [ref=f65e3086] [cursor=pointer]:
+                      - /url: https://discord.gg/4R7xS5hMdN
+                  - separator [ref=f65e3087]
+                  - generic [ref=f65e3088]:
+                    - heading "Moderators" [level=2] [ref=f65e3090]
+                    - link "Message Mods" [ref=f65e3092] [cursor=pointer]:
+                      - /url: https://www.reddit.com/message/compose?to=r/LocalLLaMA
+                    - generic [ref=f65e3099]:
+                      - img "u/HOLUPREDICTIONS avatar" [ref=f65e3104]
+                      - generic [ref=f65e3105]:
+                        - generic [ref=f65e3107]:
+                          - link "u/HOLUPREDICTIONS" [ref=f65e3108] [cursor=pointer]:
+                            - /url: /user/HOLUPREDICTIONS/
+                          - 'generic "Flair: :X: Sorcerer Supreme" [ref=f65e3111]': Sorcerer Supreme
+                        - generic [ref=f65e3115]: Yo
+                    - generic [ref=f65e3118]:
+                      - img "u/AskGrok avatar" [ref=f65e3123]
+                      - generic [ref=f65e3124]:
+                        - link "u/AskGrok" [ref=f65e3127] [cursor=pointer]:
+                          - /url: /user/AskGrok/
+                        - generic [ref=f65e3129]: Grok
+                    - link "u/ArcaneThoughts" [ref=f65e3144] [cursor=pointer]:
+                      - /url: /user/ArcaneThoughts/
+                    - generic [ref=f65e3147]:
+                      - img "u/Lissanro avatar" [ref=f65e3152]
+                      - link "u/Lissanro" [ref=f65e3156] [cursor=pointer]:
+                        - /url: /user/Lissanro/
+                    - link "u/townofsalemfangay" [ref=f65e3177] [cursor=pointer]:
+                      - /url: /user/townofsalemfangay/
+                    - generic [ref=f65e3180]:
+                      - img "u/XMasterrrr avatar" [ref=f65e3185]
+                      - generic [ref=f65e3186]:
+                        - generic [ref=f65e3188]:
+                          - link "u/XMasterrrr" [ref=f65e3189] [cursor=pointer]:
+                            - /url: /user/XMasterrrr/
+                          - 'generic "Flair: LocalLLaMA Home Server Final Boss 😎" [ref=f65e3192]': LocalLLaMA Home Server Final Boss 😎
+                        - generic [ref=f65e3193]: "@TheAhmadOsman"
+                    - generic [ref=f65e3207]:
+                      - link "u/rm-rf-rm" [ref=f65e3208] [cursor=pointer]:
+                        - /url: /user/rm-rf-rm/
+                      - 'generic "Flair: :Discord:" [ref=f65e3211]'
+                    - generic [ref=f65e3216]:
+                      - img "u/WithoutReason1729 avatar" [ref=f65e3221]
+                      - link "u/WithoutReason1729" [ref=f65e3225] [cursor=pointer]:
+                        - /url: /user/WithoutReason1729/
+                    - generic [ref=f65e3245]:
+                      - link "u/No_Afternoon_4260" [ref=f65e3246] [cursor=pointer]:
+                        - /url: /user/No_Afternoon_4260/
+                      - 'generic "Flair: llama.cpp" [ref=f65e3249]': llama.cpp
+                    - generic [ref=f65e3251]:
+                      - img "u/ttkciar avatar" [ref=f65e3256]
+                      - generic [ref=f65e3259]:
+                        - link "u/ttkciar" [ref=f65e3260] [cursor=pointer]:
+                          - /url: /user/ttkciar/
+                        - 'generic "Flair: llama.cpp" [ref=f65e3263]': llama.cpp
+                    - link "View all moderators" [ref=f65e3264] [cursor=pointer]:
+                      - /url: /mod/LocalLLaMA/moderators/
+                  - separator [ref=f65e3267]
+                  - generic [ref=f65e3268]:
+                    - heading "Installed Apps" [level=2] [ref=f65e3270]
+                    - link "Admin Tattler" [ref=f65e3272] [cursor=pointer]:
+                      - /url: https://developers.reddit.com/apps/admin-tattler
+                    - link "Bot Bouncer" [ref=f65e3280] [cursor=pointer]:
+                      - /url: https://developers.reddit.com/apps/bot-bouncer
+              - list [ref=f65e3289]:
+                - listitem [ref=f65e3290]:
+                  - link "Reddit Rules" [ref=f65e3292] [cursor=pointer]:
+                    - /url: https://www.redditinc.com/policies/content-policy
+                - listitem [ref=f65e3293]:
+                  - link "Privacy Policy" [ref=f65e3295] [cursor=pointer]:
+                    - /url: https://www.reddit.com/policies/privacy-policy
+                - listitem [ref=f65e3296]:
+                  - link "User Agreement" [ref=f65e3298] [cursor=pointer]:
+                    - /url: https://www.redditinc.com/policies/user-agreement
+                - listitem [ref=f65e3299]:
+                  - link "Accessibility" [ref=f65e3301] [cursor=pointer]:
+                    - /url: https://support.reddithelp.com/hc/sections/38303584022676-Accessibility
+                - listitem [ref=f65e3302]:
+                  - link "Reddit, Inc. © 2026. All rights reserved." [ref=f65e3303] [cursor=pointer]:
+                    - /url: https://redditinc.com
+        - generic [ref=f65e3305]:
+          - button "Collapse Navigation" [ref=f65e3308] [cursor=pointer]
+          - navigation "Primary" [ref=f65e3318]:
+            - generic [ref=f65e3320]:
+              - link "Home" [ref=f65e3322] [cursor=pointer]:
+                - /url: https://www.reddit.com/?feed=home
+              - link "Popular" [ref=f65e3330] [cursor=pointer]:
+                - /url: https://www.reddit.com/r/popular/
+              - link "News" [ref=f65e3337] [cursor=pointer]:
+                - /url: https://www.reddit.com/news/
+              - link "Explore" [ref=f65e3346] [cursor=pointer]:
+                - /url: https://www.reddit.com/explore/
+              - button "Start a community" [ref=f65e3353] [cursor=pointer]
+            - separator [ref=f65e3360]
+            - group [ref=f65e3364]:
+              - generic "GAMES ON REDDIT" [ref=f65e3365] [cursor=pointer]
+              - generic [ref=f65e3377]:
+                - link "Featured Game" [ref=f65e3381] [cursor=pointer]:
+                  - /url: https://www.reddit.com/r/LETTERSET/comments/1vo43w7?entry_point=games_drawer_featured_game
+                  - generic [ref=f65e3383]:
+                    - generic [ref=f65e3387]:
+                      - heading "LETTERSET" [level=3] [ref=f65e3388]
+                      - paragraph [ref=f65e3389]: Make every letter count!
+                    - generic [ref=f65e3390]: NEW
+                - generic [ref=f65e3393]:
+                  - link "Cozy Spaces" [ref=f65e3395] [cursor=pointer]:
+                    - /url: https://www.reddit.com/r/CozySpacesGame/comments/1vob8wi?entry_point=games_drawer_personalized_game
+                  - link "Hexa Stack" [ref=f65e3407] [cursor=pointer]:
+                    - /url: https://www.reddit.com/r/hexastack/comments/1vnt4oe?entry_point=games_drawer_personalized_game
+                  - link "Rock Bottom" [ref=f65e3419] [cursor=pointer]:
+                    - /url: https://www.reddit.com/r/RockBottomGame/comments/1vm8rez?entry_point=games_drawer_personalized_game
+                - link "Discover More" [ref=f65e3431] [cursor=pointer]:
+                  - /url: /r/GamesOnReddit
+            - separator [ref=f65e3439]
+            - group [ref=f65e3441]:
+              - generic "CUSTOM FEEDS" [ref=f65e3442] [cursor=pointer]
+              - button "Create Custom Feed" [ref=f65e3456] [cursor=pointer]
+            - separator [ref=f65e3463]
+            - group [ref=f65e3466]:
+              - generic "RECENT" [ref=f65e3467] [cursor=pointer]
+              - generic [ref=f65e3477]:
+                - link "r/LocalLLaMA" [ref=f65e3478] [cursor=pointer]:
+                  - /url: /r/LocalLLaMA/
+                - link "r/ChatGPT" [ref=f65e3488] [cursor=pointer]:
+                  - /url: /r/ChatGPT/
+            - group [ref=f65e3499]:
+              - generic "COMMUNITIES" [ref=f65e3500] [cursor=pointer]
+              - generic [ref=f65e3511]:
+                - link "Manage Communities" [ref=f65e3512] [cursor=pointer]:
+                  - /url: /user/Competitive-Lime9105/communities
+                - generic [ref=f65e3520]:
+                  - link "r/announcements" [ref=f65e3522] [cursor=pointer]:
+                    - /url: /r/announcements/
+                    - button "Add community to favorites" [ref=f65e3534]
+                  - link "r/ChatGPT" [ref=f65e3540] [cursor=pointer]:
+                    - /url: /r/ChatGPT/
+                    - button "Add community to favorites" [ref=f65e3552]
+                  - link "r/LocalLLaMA" [ref=f65e3558] [cursor=pointer]:
+                    - /url: /r/LocalLLaMA/
+                    - button "Add community to favorites" [ref=f65e3570]
+                  - link "r/SNKRS" [ref=f65e3576] [cursor=pointer]:
+                    - /url: /r/SNKRS/
+                    - button "Add community to favorites" [ref=f65e3588]
+                  - link "r/vinyl" [ref=f65e3594] [cursor=pointer]:
+                    - /url: /r/vinyl/
+                    - button "Add community to favorites" [ref=f65e3606]
+            - separator [ref=f65e3611]
+            - navigation "Reddit resources" [ref=f65e3612]:
+              - group [ref=f65e3614]:
+                - generic "RESOURCES" [ref=f65e3615] [cursor=pointer]
+                - generic [ref=f65e3626]:
+                  - link "About Reddit" [ref=f65e3628] [cursor=pointer]:
+                    - /url: https://www.redditinc.com
+                  - link "Advertise" [ref=f65e3637] [cursor=pointer]:
+                    - /url: https://ads.reddit.com/register?utm_source=web3x_consumer&utm_name=left_nav_cta
+                  - link "Developer Platform" [ref=f65e3646] [cursor=pointer]:
+                    - /url: https://developers.reddit.com/?utm_source=reddit&utm_medium=left_nav_resources
+                  - link "Reddit Pro BETA" [ref=f65e3655] [cursor=pointer]:
+                    - /url: /reddit-pro?utm_source=reddit&utm_medium=left_nav_resources
+                    - generic [ref=f65e3662]:
+                      - generic [ref=f65e3663]: Reddit Pro
+                      - generic [ref=f65e3664]: BETA
+                  - link "Help" [ref=f65e3666] [cursor=pointer]:
+                    - /url: https://support.reddithelp.com/hc?utm_source=reddit&utm_medium=footer&utm_campaign=evergreen
+                  - link "Blog" [ref=f65e3675] [cursor=pointer]:
+                    - /url: https://redditblog.com/
+                  - link "Careers" [ref=f65e3684] [cursor=pointer]:
+                    - /url: https://www.redditinc.com/careers
+                  - link "Press" [ref=f65e3693] [cursor=pointer]:
+                    - /url: https://www.redditinc.com/press
+                  - separator [ref=f65e3701]
+                  - link "Best of Reddit" [ref=f65e3703] [cursor=pointer]:
+                    - /url: https://www.reddit.com/posts/2026/global/
+                  - separator [ref=f65e3712]
+                  - link "Reddit Rules" [ref=f65e3714] [cursor=pointer]:
+                    - /url: https://www.redditinc.com/policies/content-policy
+                  - link "Privacy Policy" [ref=f65e3723] [cursor=pointer]:
+                    - /url: https://www.reddit.com/policies/privacy-policy
+                  - link "User Agreement" [ref=f65e3732] [cursor=pointer]:
+                    - /url: https://www.redditinc.com/policies/user-agreement
+                  - link "Accessibility" [ref=f65e3741] [cursor=pointer]:
+                    - /url: https://support.reddithelp.com/hc/sections/38303584022676-Accessibility
+            - link "Reddit, Inc. © 2026. All rights reserved." [ref=f65e3751] [cursor=pointer]:
+              - /url: https://redditinc.com
+      - generic: Close

@@ -1,0 +1,120 @@
+- generic [active] [ref=f69e1]:
+  - generic:
+    - generic: Dashboard canale
+    - generic [ref=f69e4]:
+      - banner [ref=f69e6]:
+        - button "Espandi il menu" [ref=f69e7] [cursor=pointer]
+        - link [ref=f69e12] [cursor=pointer]:
+          - /url: /channel/UC5K2Gutzv4IHroCzOCBaOeA
+          - img "Dashboard di YouTube Studio" [ref=f69e13]
+        - button "Salta link di navigazione" [ref=f69e16] [cursor=pointer]
+        - textbox "Cerca in tutto il tuo canale" [ref=f69e27]
+        - generic [ref=f69e29]:
+          - generic [ref=f69e30]:
+            - button "Guida" [ref=f69e32] [cursor=pointer]
+            - button "Chiedi a Studio" [ref=f69e41] [cursor=pointer]
+            - button "Notifiche" [ref=f69e46] [cursor=pointer]
+          - button "Crea" [ref=f69e52] [cursor=pointer]
+          - generic "Account" [ref=f69e61]:
+            - button "Account" [ref=f69e62]:
+              - generic [ref=f69e63] [cursor=pointer]
+      - generic [ref=f69e64]:
+        - navigation [ref=f69e66]:
+          - generic [ref=f69e67]:
+            - generic:
+              - img "barnaba barcellona" [ref=f69e70]
+              - generic [ref=f69e71]:
+                - generic [ref=f69e72]: Il tuo canale
+                - generic [ref=f69e73]: barnaba barcellona
+          - menu [ref=f69e76]:
+            - menuitem "Dashboard" [ref=f69e77] [cursor=pointer]
+            - menuitem "Contenuti" [ref=f69e83] [cursor=pointer]
+            - menuitem "Analytics" [ref=f69e89] [cursor=pointer]
+            - menuitem "Community" [ref=f69e95] [cursor=pointer]
+            - menuitem "Sottotitoli" [ref=f69e101] [cursor=pointer]
+            - menuitem "Rilevamento contenuti" [ref=f69e107] [cursor=pointer]
+            - menuitem "Guadagna" [ref=f69e113] [cursor=pointer]
+            - menuitem "Personalizzazione" [ref=f69e119] [cursor=pointer]
+            - menuitem "Raccolta audio" [ref=f69e125] [cursor=pointer]
+          - list [ref=f69e132]:
+            - listitem [ref=f69e133]:
+              - button [ref=f69e134] [cursor=pointer]
+            - listitem [ref=f69e139]:
+              - button [ref=f69e141] [cursor=pointer]
+        - main [ref=f69e146]:
+          - generic [ref=f69e147]:
+            - generic [ref=f69e149]:
+              - heading "Dashboard canale" [level=1] [ref=f69e150]
+              - generic [ref=f69e151]:
+                - button "Carica video" [ref=f69e153] [cursor=pointer]
+                - link [ref=f69e157] [cursor=pointer]:
+                  - /url: /channel/UC5K2Gutzv4IHroCzOCBaOeA/livestreaming
+                  - button "Vai live" [ref=f69e158]
+                - link [ref=f69e162] [cursor=pointer]:
+                  - /url: https://www.youtube.com/channel/UC5K2Gutzv4IHroCzOCBaOeA/posts?show_create_dialog=1
+                  - button "Crea post" [ref=f69e163]
+            - generic [ref=f69e168]:
+              - generic [ref=f69e174]:
+                - generic [ref=f69e182]:
+                  - paragraph [ref=f69e185]: Vuoi visualizzare le metriche per il tuo video recente? Carica e pubblica un video per iniziare.
+                  - button "Carica video" [ref=f69e190] [cursor=pointer]
+                - generic [ref=f69e201]:
+                  - heading "Analisi del canale" [level=2] [ref=f69e202]
+                  - generic [ref=f69e203]:
+                    - generic [ref=f69e204]: Iscritti attuali
+                    - generic [ref=f69e205]: "0"
+                  - separator [ref=f69e207]
+                  - generic [ref=f69e208]:
+                    - generic [ref=f69e209]: Riepilogo
+                    - generic [ref=f69e210]: Ultimi 28 giorni
+                  - generic [ref=f69e212]:
+                    - generic [ref=f69e213]:
+                      - generic [ref=f69e214]: Visualizzazioni
+                      - generic [ref=f69e215]: "0"
+                      - generic [ref=f69e216]: —
+                    - generic [ref=f69e218]:
+                      - generic [ref=f69e219]: Tempo di visualizzazione (ore)
+                      - generic [ref=f69e220]: 0,0
+                      - generic [ref=f69e221]: —
+                  - separator [ref=f69e224]
+                  - generic [ref=f69e225]:
+                    - text: Contenuti principali
+                    - generic [ref=f69e226]: Ultime 48 ore · Visualizzazioni
+                  - generic:
+                    - table:
+                      - rowgroup
+                  - link [ref=f69e228] [cursor=pointer]:
+                    - /url: /channel/UC5K2Gutzv4IHroCzOCBaOeA/analytics/tab-overview/period-default
+                    - button "Vai all'analisi del canale" [ref=f69e231]
+              - generic [ref=f69e238]:
+                - link "Termini e condizioni d'uso" [ref=f69e240] [cursor=pointer]:
+                  - /url: https://www.youtube.com/t/terms
+                - link "Norme sulla privacy" [ref=f69e242] [cursor=pointer]:
+                  - /url: https://policies.google.com/privacy?hl=it
+                - link "Norme e sicurezza" [ref=f69e244] [cursor=pointer]:
+                  - /url: https://www.youtube.com/yt/policyandsafety/
+    - generic [ref=f69e323]:
+      - generic [ref=f69e325]:
+        - button "Indietro" [ref=f69e329] [cursor=pointer]
+        - heading "Account" [level=2] [ref=f69e333]
+      - generic [ref=f69e334]:
+        - generic [ref=f69e336]:
+          - generic [ref=f69e339]:
+            - generic [ref=f69e340]: barnaba barcellona
+            - generic [ref=f69e341]: barnaba.barcellona@gmail.com
+          - generic [ref=f69e344]:
+            - option "barnaba barcellona @barnababarcellona2619 Nessun iscritto" [ref=f69e346] [cursor=pointer]:
+              - generic [ref=f69e349]:
+                - generic [ref=f69e350]: barnaba barcellona
+                - generic [ref=f69e351]: "@barnababarcellona2619"
+                - generic [ref=f69e352]: Nessun iscritto
+            - option "Hauddy @hauddy_app Nessun iscritto" [ref=f69e357] [cursor=pointer]:
+              - generic [ref=f69e360]:
+                - generic [ref=f69e361]: Hauddy
+                - generic [ref=f69e362]: "@hauddy_app"
+                - generic [ref=f69e363]: Nessun iscritto
+        - generic [ref=f69e366]:
+          - link "Aggiungi account" [ref=f69e368] [cursor=pointer]:
+            - /url: https://accounts.google.com/AddSession?continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dit%26next%3Dhttps%253A%252F%252Fstudio.youtube.com%252F&hl=it&passive=false&service=youtube&uilel=0
+          - link "Esci" [ref=f69e378] [cursor=pointer]:
+            - /url: https://www.youtube.com/logout

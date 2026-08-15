@@ -1,0 +1,278 @@
+- generic [active] [ref=f53e1]:
+  - link "Skip to main content" [ref=f53e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=f53e6]:
+    - generic:
+      - generic: "What are these soft pads on the stomach here? : r/physique"
+      - banner [ref=f53e10]:
+        - navigation [ref=f53e11]:
+          - link "Home" [ref=f53e15] [cursor=pointer]:
+            - /url: https://www.reddit.com/
+          - search [ref=f53e34]:
+            - generic [ref=f53e36]:
+              - generic "Remove r/physique filter and expand search to all of Reddit" [ref=f53e42] [cursor=pointer]:
+                - button [pressed] [ref=f53e43]:
+                  - generic [ref=f53e47]: r/physique
+              - textbox "Remove r/physique filter and expand search to all of Reddit" [ref=f53e54]:
+                - /placeholder: Search in ⁨r/physique⁩
+          - generic [ref=f53e55]:
+            - generic [ref=f53e56]:
+              - link "Advertise on Reddit" [ref=f53e62] [cursor=pointer]:
+                - /url: https://ads.reddit.com/register?utm_source=web3x_consumer&utm_name=nav_cta
+              - button "Open chat" [ref=f53e73] [cursor=pointer]
+              - link "Create post" [ref=f53e83] [cursor=pointer]:
+                - /url: /r/physique/submit/
+                - generic [ref=f53e84]: Create
+              - link "Open inbox" [ref=f53e93] [cursor=pointer]:
+                - /url: /notifications
+            - button "User is online Expand user menu" [ref=f53e103] [cursor=pointer]:
+              - generic "User is online" [ref=f53e115]
+              - generic [ref=f53e116]: Expand user menu
+      - generic [ref=f53e117]:
+        - generic [ref=f53e118]:
+          - generic [ref=f53e119]:
+            - generic:
+              - generic:
+                - link "Skip to Navigation" [ref=f53e120] [cursor=pointer]:
+                  - /url: "#left-sidebar-container"
+                - link "Skip to Right Sidebar" [ref=f53e121] [cursor=pointer]:
+                  - /url: "#right-sidebar-container"
+          - generic [ref=f53e122]:
+            - main [ref=f53e123]:
+              - 'generic "What are these soft pads on the stomach here? : r/physique"'
+              - generic [ref=f53e124]:
+                - generic [ref=f53e125]:
+                  - generic [ref=f53e126]:
+                    - button "Back" [ref=f53e128] [cursor=pointer]
+                    - link "Go to physique" [ref=f53e136] [cursor=pointer]:
+                      - /url: https://www.reddit.com/r/physique/
+                    - group [ref=f53e143]:
+                      - generic [ref=f53e144]:
+                        - link "r/physique" [ref=f53e148] [cursor=pointer]:
+                          - /url: https://www.reddit.com/r/physique/
+                        - generic [ref=f53e149]: •
+                        - time [ref=f53e151]: 2h ago
+                      - generic [ref=f53e152]: "[deleted]"
+                  - button "Open user actions" [ref=f53e161] [cursor=pointer]
+                - 'heading "Post Title: What are these soft pads on the stomach here?" [level=1] [ref=f53e168]': What are these soft pads on the stomach here?
+                - generic: Sorry, this post was deleted by the person who originally posted it.
+                - generic "Actions available for this post" [ref=f53e175]:
+                  - generic [ref=f53e178]:
+                    - button "Upvote" [ref=f53e179] [cursor=pointer]
+                    - generic [ref=f53e184]: "1"
+                    - button "Downvote" [ref=f53e186] [cursor=pointer]
+                  - button "0 Go to comments" [ref=f53e191] [cursor=pointer]:
+                    - generic [ref=f53e192]: "0"
+                    - generic [ref=f53e198]: Go to comments
+                  - button "Share" [ref=f53e202] [cursor=pointer]
+              - generic [ref=f53e211]:
+                - generic:
+                  - separator [ref=f53e212]
+                  - textbox [ref=f53e222]:
+                    - /placeholder: Join the conversation
+              - generic [ref=f53e224]:
+                - generic:
+                  - region "Comments":
+                    - heading "Comments Section" [level=1] [ref=f53e225]
+                - generic [ref=f53e227]:
+                  - img "Snoo Wave" [ref=f53e228]
+                  - generic [ref=f53e229]:
+                    - paragraph [ref=f53e230]: Be the first to comment
+                    - paragraph [ref=f53e231]: Nobody's responded to this post yet. Add your thoughts and get the conversation going.
+            - generic [ref=f53e232]:
+              - complementary "Community information" [ref=f53e236]:
+                - generic [ref=f53e237]:
+                  - generic [ref=f53e239]:
+                    - heading "Community Info Section" [level=1] [ref=f53e240]
+                    - generic [ref=f53e241]:
+                      - link "r/physique" [ref=f53e243] [cursor=pointer]:
+                        - /url: /r/physique/
+                      - button "Join" [ref=f53e248] [cursor=pointer]
+                    - generic [ref=f53e249]:
+                      - generic [ref=f53e250]: Share your physique!
+                      - generic [ref=f53e251]: Place to show off your physique and get feedback from other users
+                      - generic [ref=f53e252]:
+                        - generic [ref=f53e253]: Created Jul 4, 2011
+                        - generic [ref=f53e257]: Public
+                    - generic [ref=f53e261]:
+                      - generic [ref=f53e262]:
+                        - strong [ref=f53e264]:
+                          - generic: 5.8K
+                        - generic [ref=f53e265]: Weekly visitors
+                      - generic [ref=f53e266]:
+                        - strong [ref=f53e268]:
+                          - generic: "546"
+                        - generic [ref=f53e269]: Weekly contributions
+                  - separator [ref=f53e270]
+                  - generic [ref=f53e271]:
+                    - heading "r/physique Rules" [level=2] [ref=f53e273]
+                    - generic [ref=f53e275]:
+                      - generic [ref=f53e277]:
+                        - generic [ref=f53e278]: "1"
+                        - heading "Be kind." [level=2] [ref=f53e283]
+                      - generic [ref=f53e285]:
+                        - generic [ref=f53e286]: "2"
+                        - heading "Photos only, no videos." [level=2] [ref=f53e291]
+                      - generic [ref=f53e293]:
+                        - generic [ref=f53e294]: "3"
+                        - heading "Only post photos of your own physique." [level=2] [ref=f53e299]
+                      - group [ref=f53e301]:
+                        - generic "4 Do not solicit messages from users." [ref=f53e302] [cursor=pointer]:
+                          - generic [ref=f53e305]:
+                            - generic [ref=f53e306]: "4"
+                            - heading "Do not solicit messages from users." [level=2] [ref=f53e311]
+                      - generic [ref=f53e317]:
+                        - generic [ref=f53e318]: "5"
+                        - heading "No nudity." [level=2] [ref=f53e323]
+                      - group [ref=f53e325]:
+                        - generic "6 No OnlyFans advertisements" [ref=f53e326] [cursor=pointer]:
+                          - generic [ref=f53e329]:
+                            - generic [ref=f53e330]: "6"
+                            - heading "No OnlyFans advertisements" [level=2] [ref=f53e335]
+                      - group [ref=f53e341]:
+                        - generic "7 No creepy post history" [ref=f53e342] [cursor=pointer]:
+                          - generic [ref=f53e345]:
+                            - generic [ref=f53e346]: "7"
+                            - heading "No creepy post history" [level=2] [ref=f53e351]
+                      - group [ref=f53e357]:
+                        - generic "8 No minors" [ref=f53e358] [cursor=pointer]:
+                          - generic [ref=f53e361]:
+                            - generic [ref=f53e362]: "8"
+                            - heading "No minors" [level=2] [ref=f53e367]
+                      - group [ref=f53e373]:
+                        - generic "9 No rate requests" [ref=f53e374] [cursor=pointer]:
+                          - generic [ref=f53e377]:
+                            - generic [ref=f53e378]: "9"
+                            - heading "No rate requests" [level=2] [ref=f53e383]
+                  - separator [ref=f53e388]
+                  - generic [ref=f53e389]:
+                    - heading "Moderators" [level=2] [ref=f53e391]
+                    - link "Message Mods" [ref=f53e393] [cursor=pointer]:
+                      - /url: https://www.reddit.com/message/compose?to=r/physique
+                    - link "u/Astroid" [ref=f53e412] [cursor=pointer]:
+                      - /url: /user/Astroid/
+                    - link "u/ABodyInMotion" [ref=f53e433] [cursor=pointer]:
+                      - /url: /user/ABodyInMotion/
+                    - link "View all moderators" [ref=f53e435] [cursor=pointer]:
+                      - /url: /mod/physique/moderators/
+              - list [ref=f53e439]:
+                - listitem [ref=f53e440]:
+                  - link "Reddit Rules" [ref=f53e442] [cursor=pointer]:
+                    - /url: https://www.redditinc.com/policies/content-policy
+                - listitem [ref=f53e443]:
+                  - link "Privacy Policy" [ref=f53e445] [cursor=pointer]:
+                    - /url: https://www.reddit.com/policies/privacy-policy
+                - listitem [ref=f53e446]:
+                  - link "User Agreement" [ref=f53e448] [cursor=pointer]:
+                    - /url: https://www.redditinc.com/policies/user-agreement
+                - listitem [ref=f53e449]:
+                  - link "Accessibility" [ref=f53e451] [cursor=pointer]:
+                    - /url: https://support.reddithelp.com/hc/sections/38303584022676-Accessibility
+                - listitem [ref=f53e452]:
+                  - link "Reddit, Inc. © 2026. All rights reserved." [ref=f53e453] [cursor=pointer]:
+                    - /url: https://redditinc.com
+        - generic [ref=f53e455]:
+          - button "Collapse Navigation" [ref=f53e458] [cursor=pointer]
+          - navigation "Primary" [ref=f53e468]:
+            - generic [ref=f53e470]:
+              - link "Home" [ref=f53e472] [cursor=pointer]:
+                - /url: https://www.reddit.com/?feed=home
+              - link "Popular" [ref=f53e480] [cursor=pointer]:
+                - /url: https://www.reddit.com/r/popular/
+              - link "News" [ref=f53e487] [cursor=pointer]:
+                - /url: https://www.reddit.com/news/
+              - link "Explore" [ref=f53e496] [cursor=pointer]:
+                - /url: https://www.reddit.com/explore/
+              - button "Start a community" [ref=f53e503] [cursor=pointer]
+            - separator [ref=f53e510]
+            - group [ref=f53e514]:
+              - generic "GAMES ON REDDIT" [ref=f53e515] [cursor=pointer]
+              - generic [ref=f53e527]:
+                - link "Featured Game" [ref=f53e531] [cursor=pointer]:
+                  - /url: https://www.reddit.com/r/LETTERSET/comments/1vo43w7?entry_point=games_drawer_featured_game
+                  - generic [ref=f53e533]:
+                    - generic [ref=f53e537]:
+                      - heading "LETTERSET" [level=3] [ref=f53e538]
+                      - paragraph [ref=f53e539]: Make every letter count!
+                    - generic [ref=f53e540]: NEW
+                - generic [ref=f53e543]:
+                  - link "Cozy Spaces" [ref=f53e545] [cursor=pointer]:
+                    - /url: https://www.reddit.com/r/CozySpacesGame/comments/1vob8wi?entry_point=games_drawer_personalized_game
+                  - link "Hexa Stack" [ref=f53e557] [cursor=pointer]:
+                    - /url: https://www.reddit.com/r/hexastack/comments/1vnt4oe?entry_point=games_drawer_personalized_game
+                  - link "Rock Bottom" [ref=f53e569] [cursor=pointer]:
+                    - /url: https://www.reddit.com/r/RockBottomGame/comments/1vm8rez?entry_point=games_drawer_personalized_game
+                - link "Discover More" [ref=f53e581] [cursor=pointer]:
+                  - /url: /r/GamesOnReddit
+            - separator [ref=f53e589]
+            - group [ref=f53e591]:
+              - generic "CUSTOM FEEDS" [ref=f53e592] [cursor=pointer]
+              - button "Create Custom Feed" [ref=f53e606] [cursor=pointer]
+            - separator [ref=f53e613]
+            - group [ref=f53e616]:
+              - generic "RECENT" [ref=f53e617] [cursor=pointer]
+              - generic [ref=f53e627]:
+                - link "r/LocalLLaMA" [ref=f53e628] [cursor=pointer]:
+                  - /url: /r/LocalLLaMA/
+                - link "r/ChatGPT" [ref=f53e638] [cursor=pointer]:
+                  - /url: /r/ChatGPT/
+            - group [ref=f53e649]:
+              - generic "COMMUNITIES" [ref=f53e650] [cursor=pointer]
+              - generic [ref=f53e661]:
+                - link "Manage Communities" [ref=f53e662] [cursor=pointer]:
+                  - /url: /user/Competitive-Lime9105/communities
+                - generic [ref=f53e670]:
+                  - link "r/announcements" [ref=f53e672] [cursor=pointer]:
+                    - /url: /r/announcements/
+                    - button "Add community to favorites" [ref=f53e684]
+                  - link "r/ChatGPT" [ref=f53e690] [cursor=pointer]:
+                    - /url: /r/ChatGPT/
+                    - button "Add community to favorites" [ref=f53e702]
+                  - link "r/LocalLLaMA" [ref=f53e708] [cursor=pointer]:
+                    - /url: /r/LocalLLaMA/
+                    - button "Add community to favorites" [ref=f53e720]
+                  - link "r/SNKRS" [ref=f53e726] [cursor=pointer]:
+                    - /url: /r/SNKRS/
+                    - button "Add community to favorites" [ref=f53e738]
+                  - link "r/vinyl" [ref=f53e744] [cursor=pointer]:
+                    - /url: /r/vinyl/
+                    - button "Add community to favorites" [ref=f53e756]
+            - separator [ref=f53e761]
+            - navigation "Reddit resources" [ref=f53e762]:
+              - group [ref=f53e764]:
+                - generic "RESOURCES" [ref=f53e765] [cursor=pointer]
+                - generic [ref=f53e776]:
+                  - link "About Reddit" [ref=f53e778] [cursor=pointer]:
+                    - /url: https://www.redditinc.com
+                  - link "Advertise" [ref=f53e787] [cursor=pointer]:
+                    - /url: https://ads.reddit.com/register?utm_source=web3x_consumer&utm_name=left_nav_cta
+                  - link "Developer Platform" [ref=f53e796] [cursor=pointer]:
+                    - /url: https://developers.reddit.com/?utm_source=reddit&utm_medium=left_nav_resources
+                  - link "Reddit Pro BETA" [ref=f53e805] [cursor=pointer]:
+                    - /url: /reddit-pro?utm_source=reddit&utm_medium=left_nav_resources
+                    - generic [ref=f53e812]:
+                      - generic [ref=f53e813]: Reddit Pro
+                      - generic [ref=f53e814]: BETA
+                  - link "Help" [ref=f53e816] [cursor=pointer]:
+                    - /url: https://support.reddithelp.com/hc?utm_source=reddit&utm_medium=footer&utm_campaign=evergreen
+                  - link "Blog" [ref=f53e825] [cursor=pointer]:
+                    - /url: https://redditblog.com/
+                  - link "Careers" [ref=f53e834] [cursor=pointer]:
+                    - /url: https://www.redditinc.com/careers
+                  - link "Press" [ref=f53e843] [cursor=pointer]:
+                    - /url: https://www.redditinc.com/press
+                  - separator [ref=f53e851]
+                  - link "Best of Reddit" [ref=f53e853] [cursor=pointer]:
+                    - /url: https://www.reddit.com/posts/2026/global/
+                  - separator [ref=f53e862]
+                  - link "Reddit Rules" [ref=f53e864] [cursor=pointer]:
+                    - /url: https://www.redditinc.com/policies/content-policy
+                  - link "Privacy Policy" [ref=f53e873] [cursor=pointer]:
+                    - /url: https://www.reddit.com/policies/privacy-policy
+                  - link "User Agreement" [ref=f53e882] [cursor=pointer]:
+                    - /url: https://www.redditinc.com/policies/user-agreement
+                  - link "Accessibility" [ref=f53e891] [cursor=pointer]:
+                    - /url: https://support.reddithelp.com/hc/sections/38303584022676-Accessibility
+            - link "Reddit, Inc. © 2026. All rights reserved." [ref=f53e901] [cursor=pointer]:
+              - /url: https://redditinc.com
+      - generic: Close

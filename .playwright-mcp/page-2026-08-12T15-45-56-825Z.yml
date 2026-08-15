@@ -1,0 +1,79 @@
+- generic [ref=f6e2]:
+  - generic:
+    - generic:
+      - generic:
+        - generic [ref=f6e4]:
+          - generic [ref=f6e5]:
+            - generic [ref=f6e6]: Did someone say … cookies?
+            - generic [ref=f6e7]:
+              - text: X and its partners use cookies to provide you with a better, safer and faster service and to support our business. Some cookies are necessary to use our services, improve our services, and make sure they work properly.
+              - button "Show more about your choices." [ref=f6e8]
+          - generic [ref=f6e9]:
+            - button "Accept all cookies" [ref=f6e10] [cursor=pointer]
+            - button "Refuse non-essential cookies" [ref=f6e14] [cursor=pointer]
+        - generic:
+          - generic:
+            - generic:
+              - dialog:
+                - group [active] [ref=f6e18]:
+                  - dialog [ref=f6e20]:
+                    - img "Loading spinner" [ref=f6e26]
+      - main [ref=f6e30]:
+        - generic [ref=f6e32]:
+          - generic [ref=f6e35]:
+            - heading "Happening now." [level=1] [ref=f6e36]
+            - img "Loading spinner" [ref=f6e42]
+          - navigation "Footer" [ref=f6e50]:
+            - generic [ref=f6e51]:
+              - link "About" [ref=f6e52] [cursor=pointer]:
+                - /url: https://about.x.com
+              - generic [ref=f6e53]: ·
+            - generic [ref=f6e54]:
+              - link "Get App" [ref=f6e55] [cursor=pointer]:
+                - /url: https://help.x.com/using-x/download-the-x-app
+              - generic [ref=f6e56]: ·
+            - generic [ref=f6e57]:
+              - link "Grok" [ref=f6e58] [cursor=pointer]:
+                - /url: https://grok.com?referrer=x_footer
+              - generic [ref=f6e59]: ·
+            - generic [ref=f6e60]:
+              - link "Imagine" [ref=f6e61] [cursor=pointer]:
+                - /url: https://grok.com/imagine?referrer=x_footer
+              - generic [ref=f6e62]: ·
+            - generic [ref=f6e63]:
+              - link "Help" [ref=f6e64] [cursor=pointer]:
+                - /url: https://help.x.com
+              - generic [ref=f6e65]: ·
+            - generic [ref=f6e66]:
+              - link "Terms" [ref=f6e67] [cursor=pointer]:
+                - /url: https://x.com/tos
+              - generic [ref=f6e68]: ·
+            - generic [ref=f6e69]:
+              - link "Privacy" [ref=f6e70] [cursor=pointer]:
+                - /url: https://x.com/privacy
+              - generic [ref=f6e71]: ·
+            - generic [ref=f6e72]:
+              - link "Cookies" [ref=f6e73] [cursor=pointer]:
+                - /url: https://support.x.com/articles/20170514
+              - generic [ref=f6e74]: ·
+            - generic [ref=f6e75]:
+              - link "Careers" [ref=f6e76] [cursor=pointer]:
+                - /url: https://careers.x.com
+              - generic [ref=f6e77]: ·
+            - generic [ref=f6e78]:
+              - link "Ads & Business" [ref=f6e79] [cursor=pointer]:
+                - /url: https://business.x.com/advertising?ref=gl-tw-tw-twitter-advertise
+              - generic [ref=f6e80]: ·
+            - generic [ref=f6e81]:
+              - link "Developers" [ref=f6e82] [cursor=pointer]:
+                - /url: https://developer.x.com
+              - generic [ref=f6e83]: ·
+            - generic [ref=f6e84]:
+              - link "News" [ref=f6e85] [cursor=pointer]:
+                - /url: https://x.com/i/jf/stories/home
+              - generic [ref=f6e86]: ·
+            - generic [ref=f6e87]:
+              - link "Accessibility" [ref=f6e88] [cursor=pointer]:
+                - /url: https://help.x.com/resources/accessibility
+              - generic [ref=f6e89]: ·
+            - generic [ref=f6e90]: © 2026 X Corp.

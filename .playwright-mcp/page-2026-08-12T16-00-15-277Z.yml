@@ -1,0 +1,95 @@
+- generic [active] [ref=f56e1]:
+  - generic:
+    - generic: Dashboard canale
+    - generic [ref=f56e4]:
+      - banner [ref=f56e6]:
+        - button "Espandi il menu" [ref=f56e7] [cursor=pointer]
+        - link [ref=f56e12] [cursor=pointer]:
+          - /url: /channel/UC5K2Gutzv4IHroCzOCBaOeA
+          - img "Dashboard di YouTube Studio" [ref=f56e13]
+        - button "Salta link di navigazione" [ref=f56e16] [cursor=pointer]
+        - textbox "Cerca in tutto il tuo canale" [ref=f56e27]
+        - generic [ref=f56e29]:
+          - generic [ref=f56e30]:
+            - button "Guida" [ref=f56e32] [cursor=pointer]
+            - button "Chiedi a Studio" [ref=f56e41] [cursor=pointer]
+            - button "Notifiche" [ref=f56e46] [cursor=pointer]
+          - button "Crea" [ref=f56e52] [cursor=pointer]
+          - generic "Account" [ref=f56e61]:
+            - button "Account" [ref=f56e62]:
+              - generic [ref=f56e63] [cursor=pointer]
+      - generic [ref=f56e64]:
+        - navigation [ref=f56e66]:
+          - generic [ref=f56e67]:
+            - generic:
+              - img "barnaba barcellona" [ref=f56e70]
+              - generic [ref=f56e71]:
+                - generic [ref=f56e72]: Il tuo canale
+                - generic [ref=f56e73]: barnaba barcellona
+          - menu [ref=f56e76]:
+            - menuitem "Dashboard" [ref=f56e77] [cursor=pointer]
+            - menuitem "Contenuti" [ref=f56e83] [cursor=pointer]
+            - menuitem "Analytics" [ref=f56e89] [cursor=pointer]
+            - menuitem "Community" [ref=f56e95] [cursor=pointer]
+            - menuitem "Sottotitoli" [ref=f56e101] [cursor=pointer]
+            - menuitem "Rilevamento contenuti" [ref=f56e107] [cursor=pointer]
+            - menuitem "Guadagna" [ref=f56e113] [cursor=pointer]
+            - menuitem "Personalizzazione" [ref=f56e119] [cursor=pointer]
+            - menuitem "Raccolta audio" [ref=f56e125] [cursor=pointer]
+          - list [ref=f56e132]:
+            - listitem [ref=f56e133]:
+              - button [ref=f56e134] [cursor=pointer]
+            - listitem [ref=f56e139]:
+              - button [ref=f56e141] [cursor=pointer]
+        - main [ref=f56e146]:
+          - generic [ref=f56e147]:
+            - generic [ref=f56e149]:
+              - heading "Dashboard canale" [level=1] [ref=f56e150]
+              - generic [ref=f56e151]:
+                - button "Carica video" [ref=f56e153] [cursor=pointer]
+                - link [ref=f56e157] [cursor=pointer]:
+                  - /url: /channel/UC5K2Gutzv4IHroCzOCBaOeA/livestreaming
+                  - button "Vai live" [ref=f56e158]
+                - link [ref=f56e162] [cursor=pointer]:
+                  - /url: https://www.youtube.com/channel/UC5K2Gutzv4IHroCzOCBaOeA/posts?show_create_dialog=1
+                  - button "Crea post" [ref=f56e163]
+            - generic [ref=f56e168]:
+              - generic [ref=f56e170]:
+                - generic [ref=f56e178]:
+                  - paragraph [ref=f56e181]: Vuoi visualizzare le metriche per il tuo video recente? Carica e pubblica un video per iniziare.
+                  - button "Carica video" [ref=f56e186] [cursor=pointer]
+                - generic [ref=f56e197]:
+                  - heading "Analisi del canale" [level=2] [ref=f56e198]
+                  - generic [ref=f56e199]:
+                    - generic [ref=f56e200]: Iscritti attuali
+                    - generic [ref=f56e201]: "0"
+                  - separator [ref=f56e203]
+                  - generic [ref=f56e204]:
+                    - generic [ref=f56e205]: Riepilogo
+                    - generic [ref=f56e206]: Ultimi 28 giorni
+                  - generic [ref=f56e208]:
+                    - generic [ref=f56e209]:
+                      - generic [ref=f56e210]: Visualizzazioni
+                      - generic [ref=f56e211]: "0"
+                      - generic [ref=f56e212]: —
+                    - generic [ref=f56e214]:
+                      - generic [ref=f56e215]: Tempo di visualizzazione (ore)
+                      - generic [ref=f56e216]: 0,0
+                      - generic [ref=f56e217]: —
+                  - separator [ref=f56e220]
+                  - generic [ref=f56e221]:
+                    - text: Contenuti principali
+                    - generic [ref=f56e222]: Ultime 48 ore · Visualizzazioni
+                  - generic:
+                    - table:
+                      - rowgroup
+                  - link [ref=f56e224] [cursor=pointer]:
+                    - /url: /channel/UC5K2Gutzv4IHroCzOCBaOeA/analytics/tab-overview/period-default
+                    - button "Vai all'analisi del canale" [ref=f56e227]
+              - generic [ref=f56e234]:
+                - link "Termini e condizioni d'uso" [ref=f56e236] [cursor=pointer]:
+                  - /url: https://www.youtube.com/t/terms
+                - link "Norme sulla privacy" [ref=f56e238] [cursor=pointer]:
+                  - /url: https://policies.google.com/privacy?hl=it
+                - link "Norme e sicurezza" [ref=f56e240] [cursor=pointer]:
+                  - /url: https://www.youtube.com/yt/policyandsafety/

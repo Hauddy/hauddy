@@ -1,0 +1,63 @@
+- generic [ref=f17e1]:
+  - generic [ref=f17e2]:
+    - generic:
+      - generic:
+        - heading "To view keyboard shortcuts, press question mark View keyboard shortcuts" [level=2] [ref=f17e3]:
+          - generic [ref=f17e4]: To view keyboard shortcuts, press question mark
+          - link "View keyboard shortcuts" [ref=f17e5] [cursor=pointer]:
+            - /url: /i/keyboard_shortcuts
+        - generic:
+          - generic:
+            - button "Grok" [ref=f17e6] [cursor=pointer]
+            - button "Chat" [ref=f17e10] [cursor=pointer]
+          - generic:
+            - generic:
+              - generic:
+                - dialog:
+                  - group [active] [ref=f17e14]:
+                    - dialog [ref=f17e16]:
+                      - generic [ref=f17e20]:
+                        - generic [ref=f17e21]:
+                          - button [ref=f17e23] [cursor=pointer]:
+                            - paragraph [ref=f17e25]: Skip
+                          - generic [ref=f17e33]:
+                            - generic [ref=f17e34]:
+                              - paragraph [ref=f17e36]: Pick your interests
+                              - paragraph [ref=f17e38]: Select 3 topics to continue
+                            - generic [ref=f17e40]:
+                              - button [ref=f17e41] [cursor=pointer]:
+                                - paragraph [ref=f17e47]: Noticias
+                              - button [ref=f17e48] [cursor=pointer]:
+                                - paragraph [ref=f17e54]: Deportes
+                              - button [ref=f17e55] [cursor=pointer]:
+                                - paragraph [ref=f17e61]: Negocios y Finanzas
+                              - button [ref=f17e62] [cursor=pointer]:
+                                - paragraph [ref=f17e69]: Tecnología
+                              - button [ref=f17e70] [cursor=pointer]:
+                                - paragraph [ref=f17e76]: Política
+                              - button [ref=f17e77] [cursor=pointer]:
+                                - paragraph [ref=f17e84]: Criptomonedas
+                              - button [ref=f17e85] [cursor=pointer]:
+                                - paragraph [ref=f17e91]: Bolsa
+                              - button [ref=f17e92] [cursor=pointer]:
+                                - paragraph [ref=f17e98]: Moda
+                              - button [ref=f17e99] [cursor=pointer]:
+                                - paragraph [ref=f17e108]: Gaming
+                              - button [ref=f17e109] [cursor=pointer]:
+                                - paragraph [ref=f17e115]: Cine y Televisión
+                              - button [ref=f17e116] [cursor=pointer]:
+                                - paragraph [ref=f17e122]: Música
+                              - button [ref=f17e123] [cursor=pointer]:
+                                - paragraph [ref=f17e129]: Viajes
+                              - button [ref=f17e130] [cursor=pointer]:
+                                - paragraph [ref=f17e136]: Comida
+                              - button [ref=f17e137] [cursor=pointer]:
+                                - paragraph [ref=f17e144]: Salud y Fitness
+                              - button [ref=f17e145] [cursor=pointer]:
+                                - paragraph [ref=f17e151]: Fútbol
+                              - button [ref=f17e152] [cursor=pointer]:
+                                - paragraph [ref=f17e160]: Famosos
+                        - paragraph [ref=f17e166]: Continue
+        - main [ref=f17e168]
+  - generic:
+    - region "Notifications alt+T"

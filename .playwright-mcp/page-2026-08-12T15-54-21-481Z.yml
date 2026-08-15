@@ -1,0 +1,36 @@
+- generic [ref=f13e216]:
+  - dialog "Set up your account" [ref=f13e220]:
+    - generic [ref=f13e226]:
+      - generic [ref=f13e227]: Step 2 of 4
+      - generic [ref=f13e228]: What are your interests?
+      - paragraph [ref=f13e229]: Choose at least one. We'll use this to customize your experience. You can change these anytime.
+      - generic [ref=f13e232]:
+        - checkbox "Animals" [ref=f13e233] [cursor=pointer]
+        - checkbox "Art" [ref=f13e236] [cursor=pointer]
+        - checkbox "Books" [ref=f13e239] [cursor=pointer]
+        - checkbox "Comedy" [ref=f13e242] [cursor=pointer]
+        - checkbox "Comics" [ref=f13e245] [cursor=pointer]
+        - checkbox "Culture" [ref=f13e248] [cursor=pointer]
+        - checkbox "Software Dev" [checked] [ref=f13e251] [cursor=pointer]
+        - checkbox "Education" [ref=f13e254] [cursor=pointer]
+        - checkbox "Finance" [ref=f13e257] [cursor=pointer]
+        - checkbox "Food" [ref=f13e260] [cursor=pointer]
+        - checkbox "Video Games" [ref=f13e263] [cursor=pointer]
+        - checkbox "Journalism" [ref=f13e266] [cursor=pointer]
+        - checkbox "Movies" [ref=f13e269] [cursor=pointer]
+        - checkbox "Music" [ref=f13e272] [cursor=pointer]
+        - checkbox "Nature" [ref=f13e275] [cursor=pointer]
+        - checkbox "News" [ref=f13e278] [cursor=pointer]
+        - checkbox "Pets" [ref=f13e281] [cursor=pointer]
+        - checkbox "Photography" [ref=f13e284] [cursor=pointer]
+        - checkbox "Politics" [ref=f13e287] [cursor=pointer]
+        - checkbox "Science" [ref=f13e290] [cursor=pointer]
+        - checkbox "Sports" [ref=f13e293] [cursor=pointer]
+        - checkbox "Tech" [checked] [active] [ref=f13e296] [cursor=pointer]
+        - checkbox "TV" [ref=f13e299] [cursor=pointer]
+        - checkbox "Writers" [ref=f13e302] [cursor=pointer]
+    - generic [ref=f13e306]:
+      - button "Go back to previous step" [ref=f13e307] [cursor=pointer]
+      - button "Continue to next step" [ref=f13e313] [cursor=pointer]:
+        - generic: Continue
+  - region "Notifications alt+T"

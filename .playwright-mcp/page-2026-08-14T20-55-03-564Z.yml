@@ -1,0 +1,489 @@
+- generic [active] [ref=f59e1]:
+  - link "Skip to main content" [ref=f59e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=f59e6]:
+    - generic:
+      - generic: LocalLlama
+      - banner [ref=f59e10]:
+        - navigation [ref=f59e11]:
+          - link "Home" [ref=f59e15] [cursor=pointer]:
+            - /url: https://www.reddit.com/
+          - search [ref=f59e34]:
+            - generic [ref=f59e36]:
+              - generic "Remove r/LocalLLaMA filter and expand search to all of Reddit" [ref=f59e42] [cursor=pointer]:
+                - button [pressed] [ref=f59e43]:
+                  - generic [ref=f59e46]: r/LocalLLaMA
+              - textbox "Remove r/LocalLLaMA filter and expand search to all of Reddit" [ref=f59e53]:
+                - /placeholder: Search in ⁨r/LocalLLaMA⁩
+          - generic [ref=f59e54]:
+            - generic [ref=f59e55]:
+              - link "Advertise on Reddit" [ref=f59e61] [cursor=pointer]:
+                - /url: https://ads.reddit.com/register?utm_source=web3x_consumer&utm_name=nav_cta
+              - button "Open chat" [ref=f59e72] [cursor=pointer]
+              - link "Create post" [ref=f59e82] [cursor=pointer]:
+                - /url: /r/LocalLLaMA/submit/
+              - link "Open inbox" [ref=f59e91] [cursor=pointer]:
+                - /url: /notifications
+            - button "User is online Expand user menu" [ref=f59e101] [cursor=pointer]:
+              - generic "User is online" [ref=f59e113]
+              - generic [ref=f59e114]: Expand user menu
+      - generic [ref=f59e115]:
+        - generic [ref=f59e116]:
+          - region "Community actions" [ref=f59e120]:
+            - generic [ref=f59e121]:
+              - heading [level=1] [ref=f59e127]:
+                - text: r/LocalLLaMA
+                - 'button "Community status: https://x.com/localllamasub" [ref=f59e129] [cursor=pointer]':
+                  - img "Llama" [ref=f59e130]
+              - generic [ref=f59e131]:
+                - link "Create Post" [ref=f59e135] [cursor=pointer]:
+                  - /url: /r/LocalLLaMA/submit
+                - generic [ref=f59e142]:
+                  - button "Notification frequency menu" [ref=f59e145] [cursor=pointer]
+                  - button "Joined" [ref=f59e152] [cursor=pointer]
+                  - button "Open overflow menu" [ref=f59e155] [cursor=pointer]
+          - generic [ref=f59e160]:
+            - generic:
+              - generic:
+                - link "Skip to Navigation" [ref=f59e161] [cursor=pointer]:
+                  - /url: "#left-sidebar-container"
+                - link "Skip to Right Sidebar" [ref=f59e162] [cursor=pointer]:
+                  - /url: "#right-sidebar-container"
+          - generic [ref=f59e163]:
+            - main [ref=f59e164]:
+              - generic [ref=f59e167]:
+                - generic "Sort by" [ref=f59e171]:
+                  - 'button "Sort by: Hot" [ref=f59e173] [cursor=pointer]':
+                    - generic [ref=f59e174]: Hot
+                - generic "View" [ref=f59e181]:
+                  - 'button "View: Card" [ref=f59e183] [cursor=pointer]'
+              - generic [ref=f59e189]:
+                - button "collapse/expand community highlights" [ref=f59e190] [cursor=pointer]:
+                  - heading "Community highlights" [level=3] [ref=f59e191]
+                  - button "collapse/expand community highlights" [ref=f59e196]
+                - list [ref=f59e203]:
+                  - listitem [ref=f59e204]:
+                    - link "Best Local LLMs - August 2026 131 votes • 165 comments" [ref=f59e205] [cursor=pointer]:
+                      - /url: /r/LocalLLaMA/comments/1vkmhyl/best_local_llms_august_2026/
+                      - generic [ref=f59e209]:
+                        - heading "Best Local LLMs - August 2026" [level=2] [ref=f59e211]
+                        - generic [ref=f59e214]:
+                          - generic [ref=f59e215]: "131"
+                          - text: votes •
+                          - generic [ref=f59e216]: "165"
+                          - text: comments
+              - generic [ref=f59e228]:
+                - generic "LocalLlama"
+                - separator [ref=f59e229]
+                - generic [ref=f59e230]:
+                  - heading "Feed" [level=1] [ref=f59e232]
+                  - generic:
+                    - article [ref=f59e233]:
+                      - generic [ref=f59e234] [cursor=pointer]:
+                        - link "IT'S OUT" [ref=f59e235]:
+                          - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vo9mj4/its_out/
+                        - generic [ref=f59e237]:
+                          - generic [ref=f59e239]:
+                            - generic [ref=f59e240]:
+                              - 'link "Author: u/Certain-Cod-1404" [ref=f59e245]':
+                                - /url: https://www.reddit.com/user/Certain-Cod-1404/
+                                - generic [ref=f59e246]:
+                                  - img "u/Certain-Cod-1404 avatar" [ref=f59e249]
+                                  - generic [ref=f59e250]: u/Certain-Cod-1404
+                              - generic [ref=f59e251]: •
+                              - time [ref=f59e253]: 6 hr. ago
+                            - button "Open user actions" [ref=f59e259]
+                          - generic [ref=f59e264]:
+                            - link "IT'S OUT" [ref=f59e266]:
+                              - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vo9mj4/its_out/
+                            - 'link "Flair: New Model" [ref=f59e269]':
+                              - /url: /r/LocalLLaMA/?f=flair_name%3A%22New%20Model%22
+                              - 'generic "Flair: New Model" [ref=f59e271]': New Model
+                            - link "https://huggingface.co/Qwen/Qwen3.8-27B-FP8" [ref=f59e274]:
+                              - /url: https://huggingface.co/Qwen/Qwen3.8-27B-FP8
+                          - link "r/LocalLLaMA - IT'S OUT" [ref=f59e277]:
+                            - /url: https://huggingface.co/Qwen/Qwen3.8-27B-FP8
+                            - img "r/LocalLLaMA - IT'S OUT" [ref=f59e278]
+                        - generic "Actions available for this post" [ref=f59e281]:
+                          - generic [ref=f59e284]:
+                            - button "Upvote" [ref=f59e285]
+                            - generic [ref=f59e290]: 1.5K
+                            - button "Downvote" [ref=f59e292]
+                          - link "486 Go to comments" [ref=f59e297]:
+                            - /url: /r/LocalLLaMA/comments/1vo9mj4/its_out/
+                            - generic [ref=f59e298]: "486"
+                            - generic [ref=f59e304]: Go to comments
+                          - button "1 Repost" [ref=f59e307]:
+                            - generic [ref=f59e308]: "1"
+                            - generic [ref=f59e313]: Repost
+                          - button "Share" [ref=f59e317]
+                    - separator [ref=f59e324]
+                    - generic [ref=f59e325]:
+                      - link [ref=f59e327] [cursor=pointer]:
+                        - /url: https://alb.reddit.com/cr?za=DrKYggRl24KcSvKoBQTsV6VgM08CXupWTeqvsA6d0DhZViP5OiHYqxvvJwUsPByUsbOiO7w6xLoOVVVnss9igIuY82VLZhTjTmmEa4YVh7hC7l1rFM58vVCm68WaVrvRHQ-V93gx3NNup9LO3pWWn2QE6XZEJh1_djng_M51V64XUlw-h8ngPRum6mCRvso9yFR6V31iLvIyGW9zIxeAPgwsbSzdby3xRAxPPC1QBCCqyi-FaI_aIYKewIIJzZjJ_20yNGs4PRlMRhJdC5-BgBs2dl-CpyPueNW-rBvD9dpLKPbPTN1-ryU_WtdFcOzLtkoSWVIhLeKhtcF4d7aZ5ukL3dDfYxT1xEQflPUceZRDNRfJEo3i6kaOF8IHkBHD_OxXIdSVTTV1pfVqTGqX25GBuGlS0pyma8fYgMKemxJ9VvbNv2_qlWfH0jum3czDZ-uyHkcj6BIWxRjobhhkw5FlpA7mH2I6Rb1shw-YUivy_OQBrem9KXy7_Dtnr1zwhQuEvqkge-vXjlP1eBehpXpzkHHoDo9YrR9zsRikcyyFHlIFH3LLm-450JGX3a_88J0W8ZXrdzD-aht-ymMCwnFHEXmQ3inzZqPy3-yIEgyZL6WhSZQNlvmws5YIzgLyfWxo2wNiswBp8Nfnf5e0xdsYw2JvG4d51FCWZD75qZ7oYuNeeMxTOL8mjnkFH3zw7JjQ0b89K4N-gV8mLPahruHg9sElnlkiy8qE4Hyk&zp=NsY8jvxCj_-GmONvahiyQJ7mXiXg9Rn3jovJM4YPyfUt93b3zV5LdmEXFZ2IPTo4Q7gQMlIXTslWsnUQwC426i_XBRu7WadrMIicFGl7qXiwhdxhZ5UnfWBsKzc646vzOj2gA5BqaHtAneb0KXyFIP_NVnbMvyGhKhx5q5WXQJVsOo9p5djAqoqs9ATxlIuxNUsk4-NcYF0EJ8J0YE-1uNcc90x2Yd9Uqiiq7XholO5siJJXjh9ayq04UR2irVTR_ozpyHz9SIYjsw
+                      - generic [ref=f59e329]:
+                        - generic [ref=f59e330]:
+                          - link "u/RedditforBusiness" [ref=f59e333] [cursor=pointer]:
+                            - /url: /user/RedditforBusiness/
+                            - img "u/RedditforBusiness avatar" [ref=f59e336]
+                          - generic [ref=f59e338]: •
+                          - link "Promoted" [ref=f59e340] [cursor=pointer]:
+                            - /url: /user/RedditforBusiness/
+                          - link [ref=f59e343] [cursor=pointer]:
+                            - /url: https://alb.reddit.com/cr?za=DrKYggRl24KcSvKoBQTsV6VgM08CXupWTeqvsA6d0DhZViP5OiHYqxvvJwUsPByUsbOiO7w6xLoOVVVnss9igIuY82VLZhTjTmmEa4YVh7hC7l1rFM58vVCm68WaVrvRHQ-V93gx3NNup9LO3pWWn2QE6XZEJh1_djng_M51V64XUlw-h8ngPRum6mCRvso9yFR6V31iLvIyGW9zIxeAPgwsbSzdby3xRAxPPC1QBCCqyi-FaI_aIYKewIIJzZjJ_20yNGs4PRlMRhJdC5-BgBs2dl-CpyPueNW-rBvD9dpLKPbPTN1-ryU_WtdFcOzLtkoSWVIhLeKhtcF4d7aZ5ukL3dDfYxT1xEQflPUceZRDNRfJEo3i6kaOF8IHkBHD_OxXIdSVTTV1pfVqTGqX25GBuGlS0pyma8fYgMKemxJ9VvbNv2_qlWfH0jum3czDZ-uyHkcj6BIWxRjobhhkw5FlpA7mH2I6Rb1shw-YUivy_OQBrem9KXy7_Dtnr1zwhQuEvqkge-vXjlP1eBehpXpzkHHoDo9YrR9zsRikcyyFHlIFH3LLm-450JGX3a_88J0W8ZXrdzD-aht-ymMCwnFHEXmQ3inzZqPy3-yIEgyZL6WhSZQNlvmws5YIzgLyfWxo2wNiswBp8Nfnf5e0xdsYw2JvG4d51FCWZD75qZ7oYuNeeMxTOL8mjnkFH3zw7JjQ0b89K4N-gV8mLPahruHg9sElnlkiy8qE4Hyk&zp=NsY8jvxCj_-GmONvahiyQJ7mXiXg9Rn3jovJM4YPyfUt93b3zV5LdmEXFZ2IPTo4Q7gQMlIXTslWsnUQwC426i_XBRu7WadrMIicFGl7qXiwhdxhZ5UnfWBsKzc646vzOj2gA5BqaHtAneb0KXyFIP_NVnbMvyGhKhx5q5WXQJVsOo9p5djAqoqs9ATxlIuxNUsk4-NcYF0EJ8J0YE-1uNcc90x2Yd9Uqiiq7XholO5siJJXjh9ayq04UR2irVTR_ozpyHz9SIYjsw
+                        - button "Open user actions" [ref=f59e349] [cursor=pointer]
+                      - heading [level=2] [ref=f59e356]:
+                        - link "Come to play WorldOfWarships and enjoy battleships!" [ref=f59e359] [cursor=pointer]:
+                          - /url: https://alb.reddit.com/cr?za=DrKYggRl24KcSvKoBQTsV6VgM08CXupWTeqvsA6d0DhZViP5OiHYqxvvJwUsPByUsbOiO7w6xLoOVVVnss9igIuY82VLZhTjTmmEa4YVh7hC7l1rFM58vVCm68WaVrvRHQ-V93gx3NNup9LO3pWWn2QE6XZEJh1_djng_M51V64XUlw-h8ngPRum6mCRvso9yFR6V31iLvIyGW9zIxeAPgwsbSzdby3xRAxPPC1QBCCqyi-FaI_aIYKewIIJzZjJ_20yNGs4PRlMRhJdC5-BgBs2dl-CpyPueNW-rBvD9dpLKPbPTN1-ryU_WtdFcOzLtkoSWVIhLeKhtcF4d7aZ5ukL3dDfYxT1xEQflPUceZRDNRfJEo3i6kaOF8IHkBHD_OxXIdSVTTV1pfVqTGqX25GBuGlS0pyma8fYgMKemxJ9VvbNv2_qlWfH0jum3czDZ-uyHkcj6BIWxRjobhhkw5FlpA7mH2I6Rb1shw-YUivy_OQBrem9KXy7_Dtnr1zwhQuEvqkge-vXjlP1eBehpXpzkHHoDo9YrR9zsRikcyyFHlIFH3LLm-450JGX3a_88J0W8ZXrdzD-aht-ymMCwnFHEXmQ3inzZqPy3-yIEgyZL6WhSZQNlvmws5YIzgLyfWxo2wNiswBp8Nfnf5e0xdsYw2JvG4d51FCWZD75qZ7oYuNeeMxTOL8mjnkFH3zw7JjQ0b89K4N-gV8mLPahruHg9sElnlkiy8qE4Hyk&zp=NsY8jvxCj_-GmONvahiyQJ7mXiXg9Rn3jovJM4YPyfUt93b3zV5LdmEXFZ2IPTo4Q7gQMlIXTslWsnUQwC426i_XBRu7WadrMIicFGl7qXiwhdxhZ5UnfWBsKzc646vzOj2gA5BqaHtAneb0KXyFIP_NVnbMvyGhKhx5q5WXQJVsOo9p5djAqoqs9ATxlIuxNUsk4-NcYF0EJ8J0YE-1uNcc90x2Yd9Uqiiq7XholO5siJJXjh9ayq04UR2irVTR_ozpyHz9SIYjsw
+                      - generic [ref=f59e360]:
+                        - link [ref=f59e364] [cursor=pointer]:
+                          - /url: https://alb.reddit.com/cr?za=DrKYggRl24KcSvKoBQTsV6VgM08CXupWTeqvsA6d0DhZViP5OiHYqxvvJwUsPByUsbOiO7w6xLoOVVVnss9igIuY82VLZhTjTmmEa4YVh7hC7l1rFM58vVCm68WaVrvRHQ-V93gx3NNup9LO3pWWn2QE6XZEJh1_djng_M51V64XUlw-h8ngPRum6mCRvso9yFR6V31iLvIyGW9zIxeAPgwsbSzdby3xRAxPPC1QBCCqyi-FaI_aIYKewIIJzZjJ_20yNGs4PRlMRhJdC5-BgBs2dl-CpyPueNW-rBvD9dpLKPbPTN1-ryU_WtdFcOzLtkoSWVIhLeKhtcF4d7aZ5ukL3dDfYxT1xEQflPUceZRDNRfJEo3i6kaOF8IHkBHD_OxXIdSVTTV1pfVqTGqX25GBuGlS0pyma8fYgMKemxJ9VvbNv2_qlWfH0jum3czDZ-uyHkcj6BIWxRjobhhkw5FlpA7mH2I6Rb1shw-YUivy_OQBrem9KXy7_Dtnr1zwhQuEvqkge-vXjlP1eBehpXpzkHHoDo9YrR9zsRikcyyFHlIFH3LLm-450JGX3a_88J0W8ZXrdzD-aht-ymMCwnFHEXmQ3inzZqPy3-yIEgyZL6WhSZQNlvmws5YIzgLyfWxo2wNiswBp8Nfnf5e0xdsYw2JvG4d51FCWZD75qZ7oYuNeeMxTOL8mjnkFH3zw7JjQ0b89K4N-gV8mLPahruHg9sElnlkiy8qE4Hyk&zp=NsY8jvxCj_-GmONvahiyQJ7mXiXg9Rn3jovJM4YPyfUt93b3zV5LdmEXFZ2IPTo4Q7gQMlIXTslWsnUQwC426i_XBRu7WadrMIicFGl7qXiwhdxhZ5UnfWBsKzc646vzOj2gA5BqaHtAneb0KXyFIP_NVnbMvyGhKhx5q5WXQJVsOo9p5djAqoqs9ATxlIuxNUsk4-NcYF0EJ8J0YE-1uNcc90x2Yd9Uqiiq7XholO5siJJXjh9ayq04UR2irVTR_ozpyHz9SIYjsw
+                          - img "Come to play WorldOfWarships and enjoy battleships!" [ref=f59e366]
+                        - separator [ref=f59e367]
+                        - generic [ref=f59e368]:
+                          - link [ref=f59e370] [cursor=pointer]:
+                            - /url: https://alb.reddit.com/cr?za=DrKYggRl24KcSvKoBQTsV6VgM08CXupWTeqvsA6d0DhZViP5OiHYqxvvJwUsPByUsbOiO7w6xLoOVVVnss9igIuY82VLZhTjTmmEa4YVh7hC7l1rFM58vVCm68WaVrvRHQ-V93gx3NNup9LO3pWWn2QE6XZEJh1_djng_M51V64XUlw-h8ngPRum6mCRvso9yFR6V31iLvIyGW9zIxeAPgwsbSzdby3xRAxPPC1QBCCqyi-FaI_aIYKewIIJzZjJ_20yNGs4PRlMRhJdC5-BgBs2dl-CpyPueNW-rBvD9dpLKPbPTN1-ryU_WtdFcOzLtkoSWVIhLeKhtcF4d7aZ5ukL3dDfYxT1xEQflPUceZRDNRfJEo3i6kaOF8IHkBHD_OxXIdSVTTV1pfVqTGqX25GBuGlS0pyma8fYgMKemxJ9VvbNv2_qlWfH0jum3czDZ-uyHkcj6BIWxRjobhhkw5FlpA7mH2I6Rb1shw-YUivy_OQBrem9KXy7_Dtnr1zwhQuEvqkge-vXjlP1eBehpXpzkHHoDo9YrR9zsRikcyyFHlIFH3LLm-450JGX3a_88J0W8ZXrdzD-aht-ymMCwnFHEXmQ3inzZqPy3-yIEgyZL6WhSZQNlvmws5YIzgLyfWxo2wNiswBp8Nfnf5e0xdsYw2JvG4d51FCWZD75qZ7oYuNeeMxTOL8mjnkFH3zw7JjQ0b89K4N-gV8mLPahruHg9sElnlkiy8qE4Hyk&zp=NsY8jvxCj_-GmONvahiyQJ7mXiXg9Rn3jovJM4YPyfUt93b3zV5LdmEXFZ2IPTo4Q7gQMlIXTslWsnUQwC426i_XBRu7WadrMIicFGl7qXiwhdxhZ5UnfWBsKzc646vzOj2gA5BqaHtAneb0KXyFIP_NVnbMvyGhKhx5q5WXQJVsOo9p5djAqoqs9ATxlIuxNUsk4-NcYF0EJ8J0YE-1uNcc90x2Yd9Uqiiq7XholO5siJJXjh9ayq04UR2irVTR_ozpyHz9SIYjsw
+                          - link "worldofwarships.com" [ref=f59e374] [cursor=pointer]:
+                            - /url: https://alb.reddit.com/cr?za=DrKYggRl24KcSvKoBQTsV6VgM08CXupWTeqvsA6d0DhZViP5OiHYqxvvJwUsPByUsbOiO7w6xLoOVVVnss9igIuY82VLZhTjTmmEa4YVh7hC7l1rFM58vVCm68WaVrvRHQ-V93gx3NNup9LO3pWWn2QE6XZEJh1_djng_M51V64XUlw-h8ngPRum6mCRvso9yFR6V31iLvIyGW9zIxeAPgwsbSzdby3xRAxPPC1QBCCqyi-FaI_aIYKewIIJzZjJ_20yNGs4PRlMRhJdC5-BgBs2dl-CpyPueNW-rBvD9dpLKPbPTN1-ryU_WtdFcOzLtkoSWVIhLeKhtcF4d7aZ5ukL3dDfYxT1xEQflPUceZRDNRfJEo3i6kaOF8IHkBHD_OxXIdSVTTV1pfVqTGqX25GBuGlS0pyma8fYgMKemxJ9VvbNv2_qlWfH0jum3czDZ-uyHkcj6BIWxRjobhhkw5FlpA7mH2I6Rb1shw-YUivy_OQBrem9KXy7_Dtnr1zwhQuEvqkge-vXjlP1eBehpXpzkHHoDo9YrR9zsRikcyyFHlIFH3LLm-450JGX3a_88J0W8ZXrdzD-aht-ymMCwnFHEXmQ3inzZqPy3-yIEgyZL6WhSZQNlvmws5YIzgLyfWxo2wNiswBp8Nfnf5e0xdsYw2JvG4d51FCWZD75qZ7oYuNeeMxTOL8mjnkFH3zw7JjQ0b89K4N-gV8mLPahruHg9sElnlkiy8qE4Hyk&zp=NsY8jvxCj_-GmONvahiyQJ7mXiXg9Rn3jovJM4YPyfUt93b3zV5LdmEXFZ2IPTo4Q7gQMlIXTslWsnUQwC426i_XBRu7WadrMIicFGl7qXiwhdxhZ5UnfWBsKzc646vzOj2gA5BqaHtAneb0KXyFIP_NVnbMvyGhKhx5q5WXQJVsOo9p5djAqoqs9ATxlIuxNUsk4-NcYF0EJ8J0YE-1uNcc90x2Yd9Uqiiq7XholO5siJJXjh9ayq04UR2irVTR_ozpyHz9SIYjsw
+                      - generic "Actions available for this post" [ref=f59e376]:
+                        - generic [ref=f59e379]:
+                          - button "Upvote" [ref=f59e380] [cursor=pointer]
+                          - text: Vote
+                          - button "Downvote" [ref=f59e385] [cursor=pointer]
+                        - link "0 Go to comments" [ref=f59e390] [cursor=pointer]:
+                          - /url: /user/RedditforBusiness/comments/1veq03d/come_to_play_worldofwarships_and_enjoy_battleships/?p=1&impressionid=6207131089232730006&ad_label_eligible=1&action_bar_refresh_eligible=1
+                          - generic [ref=f59e391]: "0"
+                          - generic [ref=f59e397]: Go to comments
+                        - button "Share" [ref=f59e401] [cursor=pointer]
+                        - link [ref=f59e409] [cursor=pointer]:
+                          - /url: https://alb.reddit.com/cr?za=DrKYggRl24KcSvKoBQTsV6VgM08CXupWTeqvsA6d0DhZViP5OiHYqxvvJwUsPByUsbOiO7w6xLoOVVVnss9igIuY82VLZhTjTmmEa4YVh7hC7l1rFM58vVCm68WaVrvRHQ-V93gx3NNup9LO3pWWn2QE6XZEJh1_djng_M51V64XUlw-h8ngPRum6mCRvso9yFR6V31iLvIyGW9zIxeAPgwsbSzdby3xRAxPPC1QBCCqyi-FaI_aIYKewIIJzZjJ_20yNGs4PRlMRhJdC5-BgBs2dl-CpyPueNW-rBvD9dpLKPbPTN1-ryU_WtdFcOzLtkoSWVIhLeKhtcF4d7aZ5ukL3dDfYxT1xEQflPUceZRDNRfJEo3i6kaOF8IHkBHD_OxXIdSVTTV1pfVqTGqX25GBuGlS0pyma8fYgMKemxJ9VvbNv2_qlWfH0jum3czDZ-uyHkcj6BIWxRjobhhkw5FlpA7mH2I6Rb1shw-YUivy_OQBrem9KXy7_Dtnr1zwhQuEvqkge-vXjlP1eBehpXpzkHHoDo9YrR9zsRikcyyFHlIFH3LLm-450JGX3a_88J0W8ZXrdzD-aht-ymMCwnFHEXmQ3inzZqPy3-yIEgyZL6WhSZQNlvmws5YIzgLyfWxo2wNiswBp8Nfnf5e0xdsYw2JvG4d51FCWZD75qZ7oYuNeeMxTOL8mjnkFH3zw7JjQ0b89K4N-gV8mLPahruHg9sElnlkiy8qE4Hyk&zp=NsY8jvxCj_-GmONvahiyQJ7mXiXg9Rn3jovJM4YPyfUt93b3zV5LdmEXFZ2IPTo4Q7gQMlIXTslWsnUQwC426i_XBRu7WadrMIicFGl7qXiwhdxhZ5UnfWBsKzc646vzOj2gA5BqaHtAneb0KXyFIP_NVnbMvyGhKhx5q5WXQJVsOo9p5djAqoqs9ATxlIuxNUsk4-NcYF0EJ8J0YE-1uNcc90x2Yd9Uqiiq7XholO5siJJXjh9ayq04UR2irVTR_ozpyHz9SIYjsw
+                    - separator [ref=f59e410]
+                    - article [ref=f59e411]:
+                      - generic [ref=f59e412] [cursor=pointer]:
+                        - link "Qwen/Qwen3.8-27B · released" [ref=f59e413]:
+                          - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vo9nn7/qwenqwen3827b_released/
+                        - generic [ref=f59e415]:
+                          - generic [ref=f59e417]:
+                            - generic [ref=f59e418]:
+                              - 'link "Author: u/de4dee" [ref=f59e423]':
+                                - /url: https://www.reddit.com/user/de4dee/
+                                - generic [ref=f59e424]: u/de4dee
+                              - 'generic "Flair: :Discord:" [ref=f59e434]'
+                              - generic [ref=f59e438]: •
+                              - time [ref=f59e440]: 6 hr. ago
+                            - button "Open user actions" [ref=f59e446]
+                          - generic [ref=f59e451]:
+                            - link "Qwen/Qwen3.8-27B · released" [ref=f59e453]:
+                              - /url: https://www.reddit.com/r/LocalLLaMA/comments/1vo9nn7/qwenqwen3827b_released/
+                            - 'link "Flair: New Model" [ref=f59e456]':
+                              - /url: /r/LocalLLaMA/?f=flair_name%3A%22New%20Model%22
+                              - 'generic "Flair: New Model" [ref=f59e458]': New Model
+                            - link "https://huggingface.co/Qwen/Qwen3.8-27B" [ref=f59e461]:
+                              - /url: https://huggingface.co/Qwen/Qwen3.8-27B
+                          - link "r/LocalLLaMA - Qwen/Qwen3.8-27B · released" [ref=f59e464]:
+                            - /url: https://huggingface.co/Qwen/Qwen3.8-27B
+                            - img "r/LocalLLaMA - Qwen/Qwen3.8-27B · released" [ref=f59e465]
+                        - generic "Actions available for this post" [ref=f59e468]:
+                          - generic [ref=f59e471]:
+                            - button "Upvote" [ref=f59e472]
+                            - generic [ref=f59e477]: "815"
+                            - button "Downvote" [ref=f59e479]
+                          - link "262 Go to comments" [ref=f59e484]:
+                            - /url: /r/LocalLLaMA/comments/1vo9nn7/qwenqwen3827b_released/
+                            - generic [ref=f59e485]: "262"
+                            - generic [ref=f59e491]: Go to comments
+                          - button "Repost" [ref=f59e494]
+                          - button "Share" [ref=f59e503]
+                    - separator [ref=f59e510]
+                    - article [ref=f59e511]:
+                      - generic [ref=f59e512] [cursor=pointer]:
+                        - link "Qwen3.8-27B is identical to Qwen3.6-27B!" [ref=f59e513]:
+                          - /url: https://www.reddit.com/r/LocalLLaMA/comments/1voblcs/qwen3827b_is_identical_to_qwen3627b/
+                        - generic [ref=f59e515]:
+                          - generic [ref=f59e516]:
+                            - 'link "Author: u/Course_Latter" [ref=f59e521]':
+                              - /url: https://www.reddit.com/user/Course_Latter/
+                              - generic [ref=f59e522]:
+                                - img "u/Course_Latter avatar" [ref=f59e525]
+                                - generic [ref=f59e526]: u/Course_Latter
+                            - 'generic "Flair: :Discord:" [ref=f59e529]'
+                            - generic [ref=f59e533]: •
+                            - time [ref=f59e535]: 5 hr. ago
+                          - button "Open user actions" [ref=f59e541]
+                        - generic [ref=f59e547]:
+                          - heading [level=2] [ref=f59e548]:
+                            - link "Qwen3.8-27B is identical to Qwen3.6-27B!" [ref=f59e549]:
+                              - /url: https://www.reddit.com/r/LocalLLaMA/comments/1voblcs/qwen3827b_is_identical_to_qwen3627b/
+                          - 'link "Flair: News" [ref=f59e552]':
+                            - /url: /r/LocalLLaMA/?f=flair_name%3A%22News%22
+                            - 'generic "Flair: News" [ref=f59e554]': News
+                        - generic [ref=f59e560]:
+                          - generic "video player" [ref=f59e561]
+                          - button [disabled] [ref=f59e562]
+                        - generic "Actions available for this post" [ref=f59e566]:
+                          - generic [ref=f59e569]:
+                            - button "Upvote" [ref=f59e570]
+                            - generic [ref=f59e575]: "501"
+                            - button "Downvote" [ref=f59e577]
+                          - link "96 Go to comments" [ref=f59e582]:
+                            - /url: /r/LocalLLaMA/comments/1voblcs/qwen3827b_is_identical_to_qwen3627b/
+                            - generic [ref=f59e583]: "96"
+                            - generic [ref=f59e589]: Go to comments
+                          - button "Repost" [ref=f59e592]
+                          - button "Share" [ref=f59e601]
+                    - separator [ref=f59e608]
+            - generic [ref=f59e627]:
+              - complementary "Community information" [ref=f59e631]:
+                - generic [ref=f59e632]:
+                  - generic [ref=f59e634]:
+                    - heading "Community Info Section" [level=1] [ref=f59e635]
+                    - generic [ref=f59e636]:
+                      - generic [ref=f59e637]: LocalLlama
+                      - generic [ref=f59e638]: Subreddit to discuss locally hostable AI.
+                      - generic [ref=f59e639]:
+                        - generic [ref=f59e640]: Created Mar 10, 2023
+                        - generic [ref=f59e644]: Public
+                      - button "Community Guide" [ref=f59e649] [cursor=pointer]
+                    - generic [ref=f59e656]:
+                      - generic [ref=f59e657]:
+                        - strong [ref=f59e659]:
+                          - generic: 912K
+                        - generic [ref=f59e660]: Llamas
+                      - generic [ref=f59e661]:
+                        - strong [ref=f59e663]:
+                          - generic: 19K
+                        - generic [ref=f59e664]: Weekly contributions
+                  - separator [ref=f59e665]
+                  - generic [ref=f59e666]:
+                    - heading "User flair" [level=2] [ref=f59e668]
+                    - button "Competitive-Lime9105" [ref=f59e671]
+                  - separator [ref=f59e684]
+                  - generic [ref=f59e685]:
+                    - heading "Community Bookmarks" [level=2] [ref=f59e687]
+                    - generic [ref=f59e689]:
+                      - link "Wiki" [ref=f59e691] [cursor=pointer]:
+                        - /url: /r/LocalLLaMA/wiki/index/
+                      - link "Best LLMs Megathread" [ref=f59e696] [cursor=pointer]:
+                        - /url: https://www.reddit.com/r/LocalLLaMA/comments/1sknx6n/best_local_llms_apr_2026/
+                      - link "Best VLMs Megathread" [ref=f59e701] [cursor=pointer]:
+                        - /url: https://www.reddit.com/r/LocalLLaMA/comments/1p5retd/best_local_vlms_november_2025/
+                      - link "Best TTS/STT Models" [ref=f59e706] [cursor=pointer]:
+                        - /url: https://www.reddit.com/r/LocalLLaMA/comments/1r7bsfd/best_audio_models_feb_2026/
+                  - separator [ref=f59e710]
+                  - generic [ref=f59e711]:
+                    - heading "r/LocalLLaMA Rules" [level=2] [ref=f59e713]
+                    - generic [ref=f59e715]:
+                      - group [ref=f59e717]:
+                        - generic "1 Please search before asking" [ref=f59e718] [cursor=pointer]:
+                          - generic [ref=f59e721]:
+                            - generic [ref=f59e722]: "1"
+                            - heading "Please search before asking" [level=2] [ref=f59e727]
+                      - group [ref=f59e733]:
+                        - generic "2 Off-Topic Posts" [ref=f59e734] [cursor=pointer]:
+                          - generic [ref=f59e737]:
+                            - generic [ref=f59e738]: "2"
+                            - heading "Off-Topic Posts" [level=2] [ref=f59e743]
+                      - group [ref=f59e749]:
+                        - generic "3 Low Effort Posts" [ref=f59e750] [cursor=pointer]:
+                          - generic [ref=f59e753]:
+                            - generic [ref=f59e754]: "3"
+                            - heading "Low Effort Posts" [level=2] [ref=f59e759]
+                      - group [ref=f59e765]:
+                        - generic "4 Limit Self-Promotion" [ref=f59e766] [cursor=pointer]:
+                          - generic [ref=f59e769]:
+                            - generic [ref=f59e770]: "4"
+                            - heading "Limit Self-Promotion" [level=2] [ref=f59e775]
+                      - group [ref=f59e781]:
+                        - generic "5 Follow Reddit's Content Policy" [ref=f59e782] [cursor=pointer]:
+                          - generic [ref=f59e785]:
+                            - generic [ref=f59e786]: "5"
+                            - heading "Follow Reddit's Content Policy" [level=2] [ref=f59e791]
+                  - separator [ref=f59e796]
+                  - generic [ref=f59e797]:
+                    - heading "Socials" [level=2] [ref=f59e799]
+                    - link [ref=f59e801] [cursor=pointer]:
+                      - /url: https://discord.gg/ru9RYpx6Gp
+                  - separator [ref=f59e802]
+                  - generic [ref=f59e803]:
+                    - heading "AMA" [level=2] [ref=f59e805]
+                    - link [ref=f59e807] [cursor=pointer]:
+                      - /url: https://discord.gg/4R7xS5hMdN
+                  - separator [ref=f59e808]
+                  - generic [ref=f59e809]:
+                    - heading "Moderators" [level=2] [ref=f59e811]
+                    - link "Message Mods" [ref=f59e813] [cursor=pointer]:
+                      - /url: https://www.reddit.com/message/compose?to=r/LocalLLaMA
+                    - generic [ref=f59e820]:
+                      - img "u/HOLUPREDICTIONS avatar" [ref=f59e825]
+                      - generic [ref=f59e826]:
+                        - generic [ref=f59e828]:
+                          - link "u/HOLUPREDICTIONS" [ref=f59e829] [cursor=pointer]:
+                            - /url: /user/HOLUPREDICTIONS/
+                          - 'generic "Flair: :X: Sorcerer Supreme" [ref=f59e832]': Sorcerer Supreme
+                        - generic [ref=f59e836]: Yo
+                    - generic [ref=f59e839]:
+                      - img "u/AskGrok avatar" [ref=f59e844]
+                      - generic [ref=f59e845]:
+                        - link "u/AskGrok" [ref=f59e848] [cursor=pointer]:
+                          - /url: /user/AskGrok/
+                        - generic [ref=f59e850]: Grok
+                    - link "u/ArcaneThoughts" [ref=f59e865] [cursor=pointer]:
+                      - /url: /user/ArcaneThoughts/
+                    - generic [ref=f59e868]:
+                      - img "u/Lissanro avatar" [ref=f59e873]
+                      - link "u/Lissanro" [ref=f59e877] [cursor=pointer]:
+                        - /url: /user/Lissanro/
+                    - link "u/townofsalemfangay" [ref=f59e898] [cursor=pointer]:
+                      - /url: /user/townofsalemfangay/
+                    - generic [ref=f59e901]:
+                      - img "u/XMasterrrr avatar" [ref=f59e906]
+                      - generic [ref=f59e907]:
+                        - generic [ref=f59e909]:
+                          - link "u/XMasterrrr" [ref=f59e910] [cursor=pointer]:
+                            - /url: /user/XMasterrrr/
+                          - 'generic "Flair: LocalLLaMA Home Server Final Boss 😎" [ref=f59e913]': LocalLLaMA Home Server Final Boss 😎
+                        - generic [ref=f59e914]: "@TheAhmadOsman"
+                    - generic [ref=f59e928]:
+                      - link "u/rm-rf-rm" [ref=f59e929] [cursor=pointer]:
+                        - /url: /user/rm-rf-rm/
+                      - 'generic "Flair: :Discord:" [ref=f59e932]'
+                    - generic [ref=f59e937]:
+                      - img "u/WithoutReason1729 avatar" [ref=f59e942]
+                      - link "u/WithoutReason1729" [ref=f59e946] [cursor=pointer]:
+                        - /url: /user/WithoutReason1729/
+                    - generic [ref=f59e966]:
+                      - link "u/No_Afternoon_4260" [ref=f59e967] [cursor=pointer]:
+                        - /url: /user/No_Afternoon_4260/
+                      - 'generic "Flair: llama.cpp" [ref=f59e970]': llama.cpp
+                    - generic [ref=f59e972]:
+                      - img "u/ttkciar avatar" [ref=f59e977]
+                      - generic [ref=f59e980]:
+                        - link "u/ttkciar" [ref=f59e981] [cursor=pointer]:
+                          - /url: /user/ttkciar/
+                        - 'generic "Flair: llama.cpp" [ref=f59e984]': llama.cpp
+                    - link "View all moderators" [ref=f59e985] [cursor=pointer]:
+                      - /url: /mod/LocalLLaMA/moderators/
+                  - separator [ref=f59e988]
+                  - generic [ref=f59e989]:
+                    - heading "Installed Apps" [level=2] [ref=f59e991]
+                    - link "Admin Tattler" [ref=f59e993] [cursor=pointer]:
+                      - /url: https://developers.reddit.com/apps/admin-tattler
+                    - link "Bot Bouncer" [ref=f59e1001] [cursor=pointer]:
+                      - /url: https://developers.reddit.com/apps/bot-bouncer
+              - list [ref=f59e1010]:
+                - listitem [ref=f59e1011]:
+                  - link "Reddit Rules" [ref=f59e1013] [cursor=pointer]:
+                    - /url: https://www.redditinc.com/policies/content-policy
+                - listitem [ref=f59e1014]:
+                  - link "Privacy Policy" [ref=f59e1016] [cursor=pointer]:
+                    - /url: https://www.reddit.com/policies/privacy-policy
+                - listitem [ref=f59e1017]:
+                  - link "User Agreement" [ref=f59e1019] [cursor=pointer]:
+                    - /url: https://www.redditinc.com/policies/user-agreement
+                - listitem [ref=f59e1020]:
+                  - link "Accessibility" [ref=f59e1022] [cursor=pointer]:
+                    - /url: https://support.reddithelp.com/hc/sections/38303584022676-Accessibility
+                - listitem [ref=f59e1023]:
+                  - link "Reddit, Inc. © 2026. All rights reserved." [ref=f59e1024] [cursor=pointer]:
+                    - /url: https://redditinc.com
+        - generic [ref=f59e1026]:
+          - button "Collapse Navigation" [ref=f59e1029] [cursor=pointer]
+          - navigation "Primary" [ref=f59e1039]:
+            - generic [ref=f59e1041]:
+              - link "Home" [ref=f59e1043] [cursor=pointer]:
+                - /url: https://www.reddit.com/?feed=home
+              - link "Popular" [ref=f59e1051] [cursor=pointer]:
+                - /url: https://www.reddit.com/r/popular/
+              - link "News" [ref=f59e1058] [cursor=pointer]:
+                - /url: https://www.reddit.com/news/
+              - link "Explore" [ref=f59e1067] [cursor=pointer]:
+                - /url: https://www.reddit.com/explore/
+              - button "Start a community" [ref=f59e1074] [cursor=pointer]
+            - separator [ref=f59e1081]
+            - group [ref=f59e1085]:
+              - generic "GAMES ON REDDIT" [ref=f59e1086] [cursor=pointer]
+              - generic [ref=f59e1098]:
+                - link "Featured Game" [ref=f59e1102] [cursor=pointer]:
+                  - /url: https://www.reddit.com/r/LETTERSET/comments/1vo43w7?entry_point=games_drawer_featured_game
+                  - generic [ref=f59e1104]:
+                    - generic [ref=f59e1108]:
+                      - heading "LETTERSET" [level=3] [ref=f59e1109]
+                      - paragraph [ref=f59e1110]: Make every letter count!
+                    - generic [ref=f59e1111]: NEW
+                - generic [ref=f59e1114]:
+                  - link "Cozy Spaces" [ref=f59e1116] [cursor=pointer]:
+                    - /url: https://www.reddit.com/r/CozySpacesGame/comments/1vob8wi?entry_point=games_drawer_personalized_game
+                  - link "Hexa Stack" [ref=f59e1128] [cursor=pointer]:
+                    - /url: https://www.reddit.com/r/hexastack/comments/1vnt4oe?entry_point=games_drawer_personalized_game
+                  - link "Rock Bottom" [ref=f59e1140] [cursor=pointer]:
+                    - /url: https://www.reddit.com/r/RockBottomGame/comments/1vm8rez?entry_point=games_drawer_personalized_game
+                - link "Discover More" [ref=f59e1152] [cursor=pointer]:
+                  - /url: /r/GamesOnReddit
+            - separator [ref=f59e1160]
+            - group [ref=f59e1163]:
+              - generic "RECENT" [ref=f59e1164] [cursor=pointer]
+              - generic [ref=f59e1174]:
+                - link "r/LocalLLaMA" [ref=f59e1175] [cursor=pointer]:
+                  - /url: /r/LocalLLaMA/
+                - link "r/ChatGPT" [ref=f59e1185] [cursor=pointer]:
+                  - /url: /r/ChatGPT/
+            - group [ref=f59e1196]:
+              - generic "COMMUNITIES" [ref=f59e1197] [cursor=pointer]
+              - generic [ref=f59e1208]:
+                - link "Manage Communities" [ref=f59e1209] [cursor=pointer]:
+                  - /url: /user/Competitive-Lime9105/communities
+                - generic [ref=f59e1217]:
+                  - link "r/announcements" [ref=f59e1219] [cursor=pointer]:
+                    - /url: /r/announcements/
+                    - button "Add community to favorites" [ref=f59e1231]
+                  - link "r/ChatGPT" [ref=f59e1237] [cursor=pointer]:
+                    - /url: /r/ChatGPT/
+                    - button "Add community to favorites" [ref=f59e1249]
+                  - link "r/LocalLLaMA" [ref=f59e1255] [cursor=pointer]:
+                    - /url: /r/LocalLLaMA/
+                    - button "Add community to favorites" [ref=f59e1267]
+                  - link "r/SNKRS" [ref=f59e1273] [cursor=pointer]:
+                    - /url: /r/SNKRS/
+                    - button "Add community to favorites" [ref=f59e1285]
+                  - link "r/vinyl" [ref=f59e1291] [cursor=pointer]:
+                    - /url: /r/vinyl/
+                    - button "Add community to favorites" [ref=f59e1303]
+            - separator [ref=f59e1308]
+            - navigation "Reddit resources" [ref=f59e1309]:
+              - group [ref=f59e1311]:
+                - generic "RESOURCES" [ref=f59e1312] [cursor=pointer]
+                - generic [ref=f59e1323]:
+                  - link "About Reddit" [ref=f59e1325] [cursor=pointer]:
+                    - /url: https://www.redditinc.com
+                  - link "Advertise" [ref=f59e1334] [cursor=pointer]:
+                    - /url: https://ads.reddit.com/register?utm_source=web3x_consumer&utm_name=left_nav_cta
+                  - link "Developer Platform" [ref=f59e1343] [cursor=pointer]:
+                    - /url: https://developers.reddit.com/?utm_source=reddit&utm_medium=left_nav_resources
+                  - link "Reddit Pro BETA" [ref=f59e1352] [cursor=pointer]:
+                    - /url: /reddit-pro?utm_source=reddit&utm_medium=left_nav_resources
+                    - generic [ref=f59e1359]:
+                      - generic [ref=f59e1360]: Reddit Pro
+                      - generic [ref=f59e1361]: BETA
+                  - link "Help" [ref=f59e1363] [cursor=pointer]:
+                    - /url: https://support.reddithelp.com/hc?utm_source=reddit&utm_medium=footer&utm_campaign=evergreen
+                  - link "Blog" [ref=f59e1372] [cursor=pointer]:
+                    - /url: https://redditblog.com/
+                  - link "Careers" [ref=f59e1381] [cursor=pointer]:
+                    - /url: https://www.redditinc.com/careers
+                  - link "Press" [ref=f59e1390] [cursor=pointer]:
+                    - /url: https://www.redditinc.com/press
+                  - separator [ref=f59e1398]
+                  - link "Best of Reddit" [ref=f59e1400] [cursor=pointer]:
+                    - /url: https://www.reddit.com/posts/2026/global/
+                  - separator [ref=f59e1409]
+                  - link "Reddit Rules" [ref=f59e1411] [cursor=pointer]:
+                    - /url: https://www.redditinc.com/policies/content-policy
+                  - link "Privacy Policy" [ref=f59e1420] [cursor=pointer]:
+                    - /url: https://www.reddit.com/policies/privacy-policy
+                  - link "User Agreement" [ref=f59e1429] [cursor=pointer]:
+                    - /url: https://www.redditinc.com/policies/user-agreement
+                  - link "Accessibility" [ref=f59e1438] [cursor=pointer]:
+                    - /url: https://support.reddithelp.com/hc/sections/38303584022676-Accessibility
+            - link "Reddit, Inc. © 2026. All rights reserved." [ref=f59e1448] [cursor=pointer]:
+              - /url: https://redditinc.com
+      - generic: Close

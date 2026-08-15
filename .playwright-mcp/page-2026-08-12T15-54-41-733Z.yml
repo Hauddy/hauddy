@@ -1,0 +1,53 @@
+- generic [ref=f13e216]:
+  - dialog "Set up your account" [ref=f13e604]:
+    - generic [ref=f13e610]:
+      - generic [ref=f13e611]: Step 4 of 4
+      - generic [ref=f13e612]: Find people to follow
+      - generic [ref=f13e614]:
+        - generic [ref=f13e616]:
+          - generic [ref=f13e617]: "+8"
+          - generic [ref=f13e689]:
+            - generic [ref=f13e690]:
+              - generic [ref=f13e691]: Art on Bluesky
+              - generic [ref=f13e692]: Art creators, critics, and galleries
+            - button "Follow all" [ref=f13e693] [cursor=pointer]
+        - generic [ref=f13e696]:
+          - generic [ref=f13e697]: "+10"
+          - generic [ref=f13e769]:
+            - generic [ref=f13e770]:
+              - generic [ref=f13e771]: Bluesky Comedians
+              - generic [ref=f13e772]: A collection of professional funny folk
+            - button "Follow all" [ref=f13e773] [cursor=pointer]
+        - generic [ref=f13e776]:
+          - generic [ref=f13e777]: "+12"
+          - generic [ref=f13e849]:
+            - generic [ref=f13e850]:
+              - generic [ref=f13e851]: Film on Bluesky
+              - generic [ref=f13e852]: Featuring studios, critics, actors, and more
+            - button "Follow all" [ref=f13e853] [cursor=pointer]
+        - generic [ref=f13e856]:
+          - generic [ref=f13e857]: "+12"
+          - generic [ref=f13e929]:
+            - generic [ref=f13e930]:
+              - generic [ref=f13e931]: Music on Bluesky
+              - generic [ref=f13e932]: Hear from music publications, reviewers, and musicians
+            - button "Follow all" [ref=f13e933] [cursor=pointer]
+        - generic [ref=f13e936]:
+          - generic [ref=f13e937]: "+21"
+          - generic [ref=f13e1009]:
+            - generic [ref=f13e1010]:
+              - generic [ref=f13e1011]: Writers & Authors
+              - generic [ref=f13e1012]: For fans of literature and book stores
+            - button "Follow all" [ref=f13e1013] [cursor=pointer]
+        - generic [ref=f13e1016]:
+          - generic [ref=f13e1017]: "+24"
+          - generic [ref=f13e1089]:
+            - generic [ref=f13e1090]:
+              - generic [ref=f13e1091]: Comic Books
+              - generic [ref=f13e1092]: Illustrators and writers of comic books and graphic novels
+            - button "Follow all" [ref=f13e1093] [cursor=pointer]
+    - generic [ref=f13e1096]:
+      - button "Go back to previous step" [ref=f13e1097] [cursor=pointer]
+      - button "Continue to next step" [ref=f13e1101] [cursor=pointer]:
+        - generic [ref=f13e1102]: Continue
+  - region "Notifications alt+T"

@@ -1,0 +1,23 @@
+- generic [ref=f13e8]:
+  - generic [ref=f13e91]:
+    - generic [ref=f13e92]:
+      - generic [ref=f13e93]: Create account
+      - generic [ref=f13e94]: We’re so excited to have you join us!
+    - generic [ref=f13e152]:
+      - generic [ref=f13e153]:
+        - generic [ref=f13e154]: Step 2 of 3
+        - generic [ref=f13e155]: Choose your username
+      - combobox ".bsky.social" [active] [ref=f13e160]
+      - generic [ref=f13e164]:
+        - button "Go back to previous step" [ref=f13e165] [cursor=pointer]:
+          - generic [ref=f13e166]: Back
+        - button "Continue to next step" [disabled]:
+          - generic [ref=f13e167]: Next
+      - generic [ref=f13e169]:
+        - combobox "Change app language" [ref=f13e170] [cursor=pointer]:
+          - generic [ref=f13e173]: English
+        - generic [ref=f13e178]:
+          - text: Having trouble?
+          - link "Contact support" [ref=f13e179] [cursor=pointer]:
+            - /url: https://blueskyweb.zendesk.com/hc/en-us/requests/new?tf_anonymous_requester_email=hello%40hauddy.com
+  - region "Notifications alt+T"

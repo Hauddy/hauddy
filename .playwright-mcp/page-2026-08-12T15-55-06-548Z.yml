@@ -1,0 +1,13 @@
+- generic [ref=f13e216]:
+  - dialog "Set up your account" [ref=f13e1104]:
+    - generic [ref=f13e1116]:
+      - generic [ref=f13e1117]: Free your feed
+      - generic [ref=f13e1118]: No more doomscrolling junk-filled algorithms. Find feeds that work for you, not against you.
+    - generic [ref=f13e1120]:
+      - button "Go back to previous step" [ref=f13e1121] [cursor=pointer]
+      - generic [ref=f13e1124]:
+        - button "Skip introduction and start using your account" [disabled]:
+          - generic [ref=f13e1126]: Skip
+        - button "Next" [disabled]:
+          - generic [ref=f13e1128]: Finalizing
+  - region "Notifications alt+T"

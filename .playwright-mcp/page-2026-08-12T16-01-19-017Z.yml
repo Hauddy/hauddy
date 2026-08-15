@@ -1,0 +1,49 @@
+- generic [ref=f82e2]:
+  - banner [ref=f82e4]:
+    - generic [ref=f82e6]:
+      - generic [ref=f82e7]:
+        - button "Guida" [ref=f82e9] [cursor=pointer]
+        - generic [ref=f82e13]:
+          - link "Home page di YouTube" [ref=f82e14] [cursor=pointer]:
+            - /url: /
+          - generic [ref=f82e20]: ES
+        - button "Salta link di navigazione" [ref=f82e24] [cursor=pointer]
+      - generic [ref=f82e28]:
+        - search [ref=f82e29]:
+          - generic [ref=f82e31]:
+            - combobox "Cerca" [expanded] [ref=f82e34]
+            - button "Search" [ref=f82e35] [cursor=pointer]
+        - generic [ref=f82e40]:
+          - button "Esegui una ricerca vocale" [ref=f82e42] [cursor=pointer]
+          - tooltip "tooltip"
+      - generic [ref=f82e47]:
+        - button "Crea" [ref=f82e50] [cursor=pointer]
+        - generic [ref=f82e54]:
+          - button "Notifiche" [ref=f82e56] [cursor=pointer]
+          - tooltip "tooltip"
+        - button "Menu Account" [ref=f82e62]:
+          - img "Immagine avatar" [ref=f82e64] [cursor=pointer]
+  - navigation [ref=f82e65]
+  - generic [ref=f82e66]:
+    - main [ref=f82e67]:
+      - generic [ref=f82e75]:
+        - button "Aggiorna foto del profilo" [ref=f82e82] [cursor=pointer]
+        - generic [ref=f82e85]:
+          - heading "Hauddy" [level=1] [ref=f82e87]
+          - group [ref=f82e89]:
+            - generic [ref=f82e90]: "@hauddy_app"
+          - generic [ref=f82e92] [cursor=pointer]:
+            - generic [ref=f82e93]: Scopri di più su questo canale
+            - button "Descrizione. Scopri di più su questo canale… Tocca per leggere altro." [ref=f82e95]:
+              - generic [ref=f82e96]: ...altro
+          - generic [ref=f82e97]:
+            - link "Personalizza canale" [ref=f82e100] [cursor=pointer]:
+              - /url: https://studio.youtube.com/channel/UCGR49VPOrE7C0cFvzs0Aqbg/editing
+            - link "Gestire i video" [ref=f82e106] [cursor=pointer]:
+              - /url: https://studio.youtube.com/channel/UCGR49VPOrE7C0cFvzs0Aqbg/content
+      - generic [ref=f82e118]:
+        - heading "Crea contenuti su qualsiasi dispositivo" [level=2] [ref=f82e120]
+        - generic [ref=f82e121]: Carica e registra contenuti a casa o ovunque ti trovi. Tutto ciò che rendi pubblico apparirà qui.
+        - link "Crea" [ref=f82e127] [cursor=pointer]:
+          - /url: /upload
+    - text: •

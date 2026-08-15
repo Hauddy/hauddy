@@ -1,0 +1,11 @@
+- generic [ref=f51e2]:
+  - heading "Something went wrong" [level=1] [ref=f51e3]
+  - paragraph [ref=f51e4]
+  - generic [ref=f51e5]:
+    - link "Home page di YouTube ES" [ref=f51e6] [cursor=pointer]:
+      - /url: https://www.youtube.com/
+      - generic "Home page di YouTube" [ref=f51e7]
+      - text: ES
+    - generic [ref=f51e8]:
+      - textbox "Cerca" [ref=f51e10]
+      - button "Cerca" [ref=f51e11] [cursor=pointer]

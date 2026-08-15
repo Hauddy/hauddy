@@ -1,0 +1,48 @@
+- generic [ref=f39e2]:
+  - banner [ref=f39e4]:
+    - generic [ref=f39e6]:
+      - generic [ref=f39e7]:
+        - button "Guida" [ref=f39e9] [cursor=pointer]
+        - generic [ref=f39e13]:
+          - link "Home page di YouTube" [ref=f39e14] [cursor=pointer]:
+            - /url: /
+          - generic [ref=f39e20]: ES
+        - button "Salta link di navigazione" [ref=f39e24] [cursor=pointer]
+      - generic [ref=f39e28]:
+        - search [ref=f39e29]:
+          - generic [ref=f39e31]:
+            - combobox "Cerca" [expanded] [ref=f39e34]
+            - button "Search" [ref=f39e35] [cursor=pointer]
+        - generic [ref=f39e40]:
+          - button "Esegui una ricerca vocale" [ref=f39e42] [cursor=pointer]
+          - tooltip "tooltip"
+      - generic [ref=f39e47]:
+        - button "Crea" [ref=f39e50] [cursor=pointer]
+        - generic [ref=f39e54]:
+          - button "Notifiche" [ref=f39e56] [cursor=pointer]
+          - tooltip "tooltip"
+        - button "Menu Account" [ref=f39e64]:
+          - img "Immagine avatar" [ref=f39e66] [cursor=pointer]
+  - generic [ref=f39e67]:
+    - main [ref=f39e68]:
+      - generic [ref=f39e69]:
+        - generic [ref=f39e70]: Impostazioni
+        - generic [ref=f39e71]:
+          - link "Account" [ref=f39e73] [cursor=pointer]:
+            - /url: /account
+          - link "Notifiche" [ref=f39e79] [cursor=pointer]:
+            - /url: /account_notifications
+          - link "Riproduzione e prestazioni" [ref=f39e85] [cursor=pointer]:
+            - /url: /account_playback
+          - link "Privacy" [ref=f39e91] [cursor=pointer]:
+            - /url: /account_privacy
+          - link "App collegate" [ref=f39e97] [cursor=pointer]:
+            - /url: /account_sharing
+          - link "Fatturazione e pagamenti" [ref=f39e103] [cursor=pointer]:
+            - /url: /account_billing
+          - link "Impostazioni avanzate" [ref=f39e109] [cursor=pointer]:
+            - /url: /account_advanced
+      - generic [ref=f39e120]:
+        - heading "Tutti i canali" [level=2] [ref=f39e123]
+        - generic "loading" [ref=f39e126]
+    - text: •

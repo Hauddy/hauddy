@@ -1,0 +1,1357 @@
+- generic [active] [ref=f10e1]:
+  - link "Skip to main content" [ref=f10e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=f10e6]:
+    - generic:
+      - generic: Bb_all_in (u/Competitive-Lime9105) - Reddit
+      - banner [ref=f10e10]:
+        - navigation [ref=f10e11]:
+          - link "Home" [ref=f10e15] [cursor=pointer]:
+            - /url: https://www.reddit.com/
+          - search [ref=f10e34]:
+            - generic [ref=f10e36]:
+              - textbox "Ask" [ref=f10e43]:
+                - /placeholder: Find anything
+              - separator [ref=f10e44]
+              - link "Ask" [ref=f10e48] [cursor=pointer]:
+                - /url: /answers/
+              - generic: Find anything
+          - generic [ref=f10e54]:
+            - link "Sign Up" [ref=f10e60] [cursor=pointer]:
+              - /url: https://www.reddit.com/register/
+            - link "Log In" [ref=f10e66] [cursor=pointer]:
+              - /url: https://www.reddit.com/login/
+            - button "Expand user menu" [ref=f10e73] [cursor=pointer]
+      - generic [ref=f10e79]:
+        - generic [ref=f10e80]:
+          - generic [ref=f10e81]:
+            - generic:
+              - generic:
+                - link "Skip to Sign up" [ref=f10e82] [cursor=pointer]:
+                  - /url: "#left-sidebar-container"
+                - link "Skip to Right Sidebar" [ref=f10e83] [cursor=pointer]:
+                  - /url: "#right-sidebar-container"
+          - generic [ref=f10e84]:
+            - main [ref=f10e85]:
+              - generic [ref=f10e86]:
+                - generic [ref=f10e88]:
+                  - img "Competitive-Lime9105 u/Competitive-Lime9105 avatar" [ref=f10e90]
+                  - generic [ref=f10e94]:
+                    - heading "Bb_all_in" [level=1] [ref=f10e97]
+                    - paragraph [ref=f10e98]: u/Competitive-Lime9105
+                - generic [ref=f10e99]:
+                  - generic [ref=f10e101]:
+                    - tablist [ref=f10e102]:
+                      - tab [selected] [ref=f10e103]:
+                        - link "Overview" [ref=f10e104] [cursor=pointer]:
+                          - /url: /user/Competitive-Lime9105/
+                      - tab [ref=f10e108]:
+                        - link "Posts" [ref=f10e109] [cursor=pointer]:
+                          - /url: /user/Competitive-Lime9105/submitted/
+                      - tab [ref=f10e113]:
+                        - link "Comments" [ref=f10e114] [cursor=pointer]:
+                          - /url: /user/Competitive-Lime9105/comments/
+                    - button "forward" [ref=f10e119] [cursor=pointer]
+                    - button "back" [ref=f10e126] [cursor=pointer]
+                  - generic:
+                    - generic:
+                      - tabpanel
+                - generic [ref=f10e132]:
+                  - generic "Bb_all_in (u/Competitive-Lime9105) - Reddit"
+                  - button "Feed options" [ref=f10e137] [cursor=pointer]
+                  - separator [ref=f10e142]
+                  - generic [ref=f10e143]:
+                    - heading "Feed" [level=1] [ref=f10e145]
+                    - generic:
+                      - article "[DISCUSSION] Metro Boomin - Heroes & Villains (1 year later)" [ref=f10e146]:
+                        - generic [ref=f10e148] [cursor=pointer]:
+                          - link "Thread for Competitive-Lime9105's comment on [DISCUSSION] Metro Boomin - Heroes & Villains (1 year later)" [ref=f10e149]:
+                            - /url: /r/hiphopheads/comments/188w648/comment/lprzjjq/?context=3
+                          - generic [ref=f10e150]:
+                            - generic [ref=f10e151]:
+                              - generic [ref=f10e152]:
+                                - link [ref=f10e155]:
+                                  - /url: /r/hiphopheads/
+                                - generic [ref=f10e158]:
+                                  - link "r/hiphopheads" [ref=f10e161]:
+                                    - /url: /r/hiphopheads/
+                                  - text: •
+                                  - heading [level=2] [ref=f10e163]:
+                                    - link "[DISCUSSION] Metro Boomin - Heroes & Villains (1 year later)" [ref=f10e164]:
+                                      - /url: /r/hiphopheads/comments/188w648/discussion_metro_boomin_heroes_villains_1_year/
+                              - generic [ref=f10e166]:
+                                - generic [ref=f10e167]:
+                                  - link "Competitive-Lime9105" [ref=f10e169]:
+                                    - /url: /user/Competitive-Lime9105/
+                                  - text: commented
+                                - time [ref=f10e172]: 2 yr. ago
+                            - paragraph [ref=f10e176]: "I might be late on this.. is it just me or the album have a lot of resemblance and quotations from the album: Strange Cloud - B.O.B ? Like not just the Morgan freeman intro, also eg. The Niagara Falls are mentioned in both album in a very similar context"
+                            - generic [ref=f10e181]:
+                              - generic [ref=f10e183]:
+                                - button "Upvote" [ref=f10e184]
+                                - generic [ref=f10e189]: "1"
+                                - button "Downvote" [ref=f10e191]
+                              - button "Reply reply" [ref=f10e197]:
+                                - generic [ref=f10e198]: Reply
+                                - generic [ref=f10e203]: reply
+                              - button "Share" [ref=f10e206]
+                              - button "Open user actions" [ref=f10e216]
+                      - separator [ref=f10e221]
+                      - article "Donda Deluxe (defect)" [ref=f10e222]:
+                        - generic [ref=f10e224] [cursor=pointer]:
+                          - link "Thread for Competitive-Lime9105's comment on Donda Deluxe (defect)" [ref=f10e225]:
+                            - /url: /r/vinyl/comments/14bmu1t/comment/joiik15/?context=3
+                          - generic [ref=f10e226]:
+                            - generic [ref=f10e227]:
+                              - generic [ref=f10e228]:
+                                - link [ref=f10e231]:
+                                  - /url: /r/vinyl/
+                                - generic [ref=f10e234]:
+                                  - link "r/vinyl" [ref=f10e237]:
+                                    - /url: /r/vinyl/
+                                  - text: •
+                                  - heading [level=2] [ref=f10e239]:
+                                    - link "Donda Deluxe (defect)" [ref=f10e240]:
+                                      - /url: /r/vinyl/comments/14bmu1t/donda_deluxe_defect/
+                              - generic [ref=f10e242]:
+                                - generic [ref=f10e243]:
+                                  - link "Competitive-Lime9105" [ref=f10e245]:
+                                    - /url: /user/Competitive-Lime9105/
+                                  - generic "Comment distinguished as the original poster" [ref=f10e248]: OP
+                                  - text: commented
+                                - time [ref=f10e250]: 3 yr. ago
+                            - paragraph [ref=f10e254]: Thanks man, best comment so far 👍
+                            - generic [ref=f10e259]:
+                              - generic [ref=f10e261]:
+                                - button "Upvote" [ref=f10e262]
+                                - generic [ref=f10e267]: "1"
+                                - button "Downvote" [ref=f10e269]
+                              - button "Share" [ref=f10e276]
+                              - button "Open user actions" [ref=f10e286]
+                      - separator [ref=f10e291]
+                      - article "Donda Deluxe (defect)" [ref=f10e292]:
+                        - generic [ref=f10e294] [cursor=pointer]:
+                          - link "Thread for Competitive-Lime9105's comment on Donda Deluxe (defect)" [ref=f10e295]:
+                            - /url: /r/vinyl/comments/14bmu1t/comment/joih81w/?context=3
+                          - generic [ref=f10e296]:
+                            - generic [ref=f10e297]:
+                              - generic [ref=f10e298]:
+                                - link [ref=f10e301]:
+                                  - /url: /r/vinyl/
+                                - generic [ref=f10e304]:
+                                  - link "r/vinyl" [ref=f10e307]:
+                                    - /url: /r/vinyl/
+                                  - text: •
+                                  - heading [level=2] [ref=f10e309]:
+                                    - link "Donda Deluxe (defect)" [ref=f10e310]:
+                                      - /url: /r/vinyl/comments/14bmu1t/donda_deluxe_defect/
+                              - generic [ref=f10e312]:
+                                - generic [ref=f10e313]:
+                                  - link "Competitive-Lime9105" [ref=f10e315]:
+                                    - /url: /user/Competitive-Lime9105/
+                                  - generic "Comment distinguished as the original poster" [ref=f10e318]: OP
+                                  - text: replied to
+                                  - link "V3N0M0US83" [ref=f10e320]:
+                                    - /url: /user/V3N0M0US83/
+                                - time [ref=f10e323]: 3 yr. ago
+                            - paragraph [ref=f10e327]: "To be honest, I find it funny how people feel entitled to have voice on others personal taste.. and this all thing sounds like conservative catholics saying that metal music was satanic in early 90s to me.. but I mean, I understand, it must feel nice to get upvoted for saying something that is not even counterculture anymore as: -“Kanye is racist”… with that being said I could not care less either, and agree bro graduation Kanye was much better.. but I still like and appreciate the way he being experimental and pushing the boundaries of a genre with his latest work, I think is cool and quite unique.."
+                            - generic [ref=f10e332]:
+                              - generic [ref=f10e334]:
+                                - button "Upvote" [ref=f10e335]
+                                - generic [ref=f10e340]: "2"
+                                - button "Downvote" [ref=f10e342]
+                              - button "Share" [ref=f10e349]
+                              - button "Open user actions" [ref=f10e359]
+                      - separator [ref=f10e364]
+                      - article "Donda Deluxe (defect)" [ref=f10e365]:
+                        - generic [ref=f10e367] [cursor=pointer]:
+                          - link "Thread for Competitive-Lime9105's comment on Donda Deluxe (defect)" [ref=f10e368]:
+                            - /url: /r/vinyl/comments/14bmu1t/comment/jogue3m/?context=3
+                          - generic [ref=f10e369]:
+                            - generic [ref=f10e370]:
+                              - generic [ref=f10e371]:
+                                - link [ref=f10e374]:
+                                  - /url: /r/vinyl/
+                                - generic [ref=f10e377]:
+                                  - link "r/vinyl" [ref=f10e380]:
+                                    - /url: /r/vinyl/
+                                  - text: •
+                                  - heading [level=2] [ref=f10e382]:
+                                    - link "Donda Deluxe (defect)" [ref=f10e383]:
+                                      - /url: /r/vinyl/comments/14bmu1t/donda_deluxe_defect/
+                              - generic [ref=f10e385]:
+                                - generic [ref=f10e386]:
+                                  - link "Competitive-Lime9105" [ref=f10e388]:
+                                    - /url: /user/Competitive-Lime9105/
+                                  - generic "Comment distinguished as the original poster" [ref=f10e391]: OP
+                                  - text: replied to
+                                  - link "aopps42" [ref=f10e393]:
+                                    - /url: /user/aopps42/
+                                - time [ref=f10e396]: 3 yr. ago
+                            - paragraph [ref=f10e400]: Haha I wish 🤌 if is real I fly u to cph to toast
+                            - generic [ref=f10e405]:
+                              - generic [ref=f10e407]:
+                                - button "Upvote" [ref=f10e408]
+                                - generic [ref=f10e413]: "-4"
+                                - button "Downvote" [ref=f10e415]
+                              - button "Share" [ref=f10e422]
+                              - button "Open user actions" [ref=f10e432]
+                      - separator [ref=f10e437]
+                      - article "Donda Deluxe (defect)" [ref=f10e438]:
+                        - generic [ref=f10e440] [cursor=pointer]:
+                          - link "Thread for Competitive-Lime9105's comment on Donda Deluxe (defect)" [ref=f10e441]:
+                            - /url: /r/vinyl/comments/14bmu1t/comment/jogthay/?context=3
+                          - generic [ref=f10e442]:
+                            - generic [ref=f10e443]:
+                              - generic [ref=f10e444]:
+                                - link [ref=f10e447]:
+                                  - /url: /r/vinyl/
+                                - generic [ref=f10e450]:
+                                  - link "r/vinyl" [ref=f10e453]:
+                                    - /url: /r/vinyl/
+                                  - text: •
+                                  - heading [level=2] [ref=f10e455]:
+                                    - link "Donda Deluxe (defect)" [ref=f10e456]:
+                                      - /url: /r/vinyl/comments/14bmu1t/donda_deluxe_defect/
+                              - generic [ref=f10e458]:
+                                - generic [ref=f10e459]:
+                                  - link "Competitive-Lime9105" [ref=f10e461]:
+                                    - /url: /user/Competitive-Lime9105/
+                                  - generic "Comment distinguished as the original poster" [ref=f10e464]: OP
+                                  - text: replied to
+                                  - link "iamjoeywan" [ref=f10e466]:
+                                    - /url: /user/iamjoeywan/
+                                - time [ref=f10e469]: 3 yr. ago
+                            - paragraph [ref=f10e473]: Look.. “freedom of speech” is long gone, and that’s ok especially when is racism or hate talk, but can we save “freedom of listening”. I think between buying a disc and supporting racism there is a huge difference. And if we really want to tell the whole story… Def Jam is the producer of Donda and is not associated to Kanye anymore ever since the albums released in 2021 due to his antisemitic statements. Now I am not sure how much the label is still paying off to him but technically I’m financially supporting the label not Kanye… but y’all free to hate, I am just gonna enjoying this piece of music.
+                            - generic [ref=f10e478]:
+                              - generic [ref=f10e480]:
+                                - button "Upvote" [ref=f10e481]
+                                - generic [ref=f10e486]: "-14"
+                                - button "Downvote" [ref=f10e488]
+                              - button "Share" [ref=f10e495]
+                              - button "Open user actions" [ref=f10e505]
+                      - separator [ref=f10e510]
+                      - article "Donda Deluxe (defect)" [ref=f10e512]:
+                        - generic [ref=f10e514] [cursor=pointer]:
+                          - link "Thread for Competitive-Lime9105's comment on Donda Deluxe (defect)" [ref=f10e515]:
+                            - /url: /r/vinyl/comments/14bmu1t/comment/jogji8q/?context=3
+                          - generic [ref=f10e516]:
+                            - generic [ref=f10e517]:
+                              - generic [ref=f10e518]:
+                                - link [ref=f10e521]:
+                                  - /url: /r/vinyl/
+                                - generic [ref=f10e524]:
+                                  - link "r/vinyl" [ref=f10e527]:
+                                    - /url: /r/vinyl/
+                                  - text: •
+                                  - heading [level=2] [ref=f10e529]:
+                                    - link "Donda Deluxe (defect)" [ref=f10e530]:
+                                      - /url: /r/vinyl/comments/14bmu1t/donda_deluxe_defect/
+                              - generic [ref=f10e532]:
+                                - generic [ref=f10e533]:
+                                  - link "Competitive-Lime9105" [ref=f10e535]:
+                                    - /url: /user/Competitive-Lime9105/
+                                  - generic "Comment distinguished as the original poster" [ref=f10e538]: OP
+                                  - text: replied to
+                                  - link "myusernamechosen" [ref=f10e540]:
+                                    - /url: /user/myusernamechosen/
+                                - time [ref=f10e543]: 3 yr. ago
+                            - paragraph [ref=f10e547]: Im supporting the art not the artist… 😎
+                            - generic [ref=f10e552]:
+                              - generic [ref=f10e554]:
+                                - button "Upvote" [ref=f10e555]
+                                - generic [ref=f10e560]: "-21"
+                                - button "Downvote" [ref=f10e562]
+                              - button "Share" [ref=f10e569]
+                              - button "Open user actions" [ref=f10e579]
+                      - separator [ref=f10e584]
+                      - article "Donda Deluxe (defect)" [ref=f10e586]:
+                        - generic [ref=f10e588] [cursor=pointer]:
+                          - link "Thread for Competitive-Lime9105's comment on Donda Deluxe (defect)" [ref=f10e589]:
+                            - /url: /r/vinyl/comments/14bmu1t/comment/jogipuw/?context=3
+                          - generic [ref=f10e590]:
+                            - generic [ref=f10e591]:
+                              - generic [ref=f10e592]:
+                                - link [ref=f10e595]:
+                                  - /url: /r/vinyl/
+                                - generic [ref=f10e598]:
+                                  - link "r/vinyl" [ref=f10e601]:
+                                    - /url: /r/vinyl/
+                                  - text: •
+                                  - heading [level=2] [ref=f10e603]:
+                                    - link "Donda Deluxe (defect)" [ref=f10e604]:
+                                      - /url: /r/vinyl/comments/14bmu1t/donda_deluxe_defect/
+                              - generic [ref=f10e606]:
+                                - generic [ref=f10e607]:
+                                  - link "Competitive-Lime9105" [ref=f10e609]:
+                                    - /url: /user/Competitive-Lime9105/
+                                  - generic "Comment distinguished as the original poster" [ref=f10e612]: OP
+                                  - text: replied to
+                                  - link "Mrrrrbee" [ref=f10e614]:
+                                    - /url: /user/Mrrrrbee/
+                                - time [ref=f10e617]: 3 yr. ago
+                            - paragraph [ref=f10e621]: Great thanks a lot!
+                            - generic [ref=f10e626]:
+                              - generic [ref=f10e628]:
+                                - button "Upvote" [ref=f10e629]
+                                - generic [ref=f10e634]: "0"
+                                - button "Downvote" [ref=f10e636]
+                              - button "Share" [ref=f10e643]
+                              - button "Open user actions" [ref=f10e653]
+                      - separator [ref=f10e658]
+                      - article "Donda Deluxe (defect)" [ref=f10e660]:
+                        - generic [ref=f10e662] [cursor=pointer]:
+                          - link "Thread for Competitive-Lime9105's comment on Donda Deluxe (defect)" [ref=f10e663]:
+                            - /url: /r/vinyl/comments/14bmu1t/comment/jogeywy/?context=3
+                          - generic [ref=f10e664]:
+                            - generic [ref=f10e665]:
+                              - generic [ref=f10e666]:
+                                - link [ref=f10e669]:
+                                  - /url: /r/vinyl/
+                                - generic [ref=f10e672]:
+                                  - link "r/vinyl" [ref=f10e675]:
+                                    - /url: /r/vinyl/
+                                  - text: •
+                                  - heading [level=2] [ref=f10e677]:
+                                    - link "Donda Deluxe (defect)" [ref=f10e678]:
+                                      - /url: /r/vinyl/comments/14bmu1t/donda_deluxe_defect/
+                              - generic [ref=f10e680]:
+                                - generic [ref=f10e681]:
+                                  - link "Competitive-Lime9105" [ref=f10e683]:
+                                    - /url: /user/Competitive-Lime9105/
+                                  - generic "Comment distinguished as the original poster" [ref=f10e686]: OP
+                                  - text: replied to
+                                  - link "Mrrrrbee" [ref=f10e688]:
+                                    - /url: /user/Mrrrrbee/
+                                - time [ref=f10e691]: 3 yr. ago
+                            - paragraph [ref=f10e695]: Thanks m8, should I turn it back to the shop,or should I reach out to the label? Any chance I can keep this copy and get a new?
+                            - generic [ref=f10e700]:
+                              - generic [ref=f10e702]:
+                                - button "Upvote" [ref=f10e703]
+                                - generic [ref=f10e708]: "0"
+                                - button "Downvote" [ref=f10e710]
+                              - button "Share" [ref=f10e717]
+                              - button "Open user actions" [ref=f10e727]
+                      - separator [ref=f10e732]
+                      - generic [ref=f10e733]:
+                        - generic:
+                          - article "Donda Deluxe (defect)" [ref=f10e734]:
+                            - generic [ref=f10e736] [cursor=pointer]:
+                              - link "Thread for Competitive-Lime9105's comment on Donda Deluxe (defect)" [ref=f10e737]:
+                                - /url: /r/vinyl/comments/14bmu1t/comment/jogdcsm/?context=3
+                              - generic [ref=f10e738]:
+                                - generic [ref=f10e739]:
+                                  - generic [ref=f10e740]:
+                                    - link [ref=f10e743]:
+                                      - /url: /r/vinyl/
+                                    - generic [ref=f10e746]:
+                                      - link "r/vinyl" [ref=f10e749]:
+                                        - /url: /r/vinyl/
+                                      - text: •
+                                      - heading [level=2] [ref=f10e751]:
+                                        - link "Donda Deluxe (defect)" [ref=f10e752]:
+                                          - /url: /r/vinyl/comments/14bmu1t/donda_deluxe_defect/
+                                  - generic [ref=f10e754]:
+                                    - generic [ref=f10e755]:
+                                      - link "Competitive-Lime9105" [ref=f10e757]:
+                                        - /url: /user/Competitive-Lime9105/
+                                      - generic "Comment distinguished as the original poster" [ref=f10e760]: OP
+                                      - text: commented
+                                    - time [ref=f10e762]: 3 yr. ago
+                                - paragraph [ref=f10e766]: "Adding a 300+ comment so the bot will not delete the post.. this is Kanye West album Donda Deluxe, I have just purchased it from a vinyl shop and of course is a legit copy, I am quite new to the whole Vinyl community, I believe this kind of misprint are quite rare to pass trough a quality control so I was was wandering if the copy could be worth keeping or trying to resell, mr @Kanyewest if you listening, hm you got on this? I mean the thing is quite aesthetically pleasant would look good framed… so I’m considering keeping. #kanye"
+                                - generic [ref=f10e771]:
+                                  - generic [ref=f10e773]:
+                                    - button "Upvote" [ref=f10e774]
+                                    - generic [ref=f10e779]: "-10"
+                                    - button "Downvote" [ref=f10e781]
+                                  - button "Share" [ref=f10e788]
+                                  - button "Open user actions" [ref=f10e798]
+                          - separator [ref=f10e803]
+                          - article [ref=f10e804]:
+                            - generic [ref=f10e805] [cursor=pointer]:
+                              - link "Donda Deluxe (defect)" [ref=f10e806]:
+                                - /url: https://www.reddit.com/r/vinyl/comments/14bmu1t/donda_deluxe_defect/
+                              - generic:
+                                - generic [ref=f10e808]:
+                                  - generic [ref=f10e810]:
+                                    - generic [ref=f10e811]:
+                                      - link "r/vinyl" [ref=f10e814]:
+                                        - /url: https://www.reddit.com/r/vinyl/
+                                      - generic [ref=f10e819]: •
+                                      - time [ref=f10e821]: 3 yr. ago
+                                    - generic [ref=f10e822]:
+                                      - img "Archived post" [ref=f10e826]
+                                      - button "Join" [ref=f10e829]
+                                      - button "Open user actions" [ref=f10e834]
+                                  - generic [ref=f10e839]:
+                                    - link "Donda Deluxe (defect)" [ref=f10e841]:
+                                      - /url: https://www.reddit.com/r/vinyl/comments/14bmu1t/donda_deluxe_defect/
+                                    - generic [ref=f10e842]:
+                                      - link "https://www.reddit.com/gallery/14bmu1t" [ref=f10e844]:
+                                        - /url: https://www.reddit.com/gallery/14bmu1t
+                                      - generic [ref=f10e845]:
+                                        - generic:
+                                          - link "[removed]":
+                                            - /url: /r/vinyl/comments/14bmu1t/donda_deluxe_defect/
+                                - generic [ref=f10e846]: Sorry, this post has been removed by the moderators of r/vinyl.
+                              - generic "Actions available for this post" [ref=f10e853]:
+                                - generic [ref=f10e856]:
+                                  - button "Upvote" [disabled]
+                                  - generic [ref=f10e857]: "8"
+                                  - button "Downvote" [disabled]
+                                - link "31 Go to comments" [ref=f10e859]:
+                                  - /url: /r/vinyl/comments/14bmu1t/donda_deluxe_defect/
+                                  - generic [ref=f10e860]: "31"
+                                  - generic [ref=f10e866]: Go to comments
+                                - button "Share" [ref=f10e870]
+                          - separator [ref=f10e877]
+                          - article "[deleted by user]" [ref=f10e878]:
+                            - generic [ref=f10e880] [cursor=pointer]:
+                              - link "Thread for Competitive-Lime9105's comment on [deleted by user]" [ref=f10e881]:
+                                - /url: /r/SNKRS/comments/1437mov/comment/jn8nqtp/?context=3
+                              - generic [ref=f10e882]:
+                                - generic [ref=f10e883]:
+                                  - generic [ref=f10e884]:
+                                    - link [ref=f10e887]:
+                                      - /url: /r/SNKRS/
+                                    - generic [ref=f10e890]:
+                                      - link "r/SNKRS" [ref=f10e893]:
+                                        - /url: /r/SNKRS/
+                                      - text: •
+                                      - heading [level=2] [ref=f10e895]:
+                                        - link "[deleted by user]" [ref=f10e896]:
+                                          - /url: /r/SNKRS/comments/1437mov/deleted_by_user/
+                                  - generic [ref=f10e898]:
+                                    - generic [ref=f10e899]:
+                                      - link "Competitive-Lime9105" [ref=f10e901]:
+                                        - /url: /user/Competitive-Lime9105/
+                                      - text: commented
+                                    - time [ref=f10e904]: 3 yr. ago
+                                - paragraph [ref=f10e908]: Man… sorry to say it, check her dms.
+                                - generic [ref=f10e913]:
+                                  - generic [ref=f10e915]:
+                                    - button "Upvote" [ref=f10e916]
+                                    - generic [ref=f10e921]: "152"
+                                    - button "Downvote" [ref=f10e923]
+                                  - button "Reply reply" [ref=f10e929]:
+                                    - generic [ref=f10e930]: Reply
+                                    - generic [ref=f10e935]: reply
+                                  - button "Share" [ref=f10e938]
+                                  - button "Open user actions" [ref=f10e948]
+                          - separator [ref=f10e953]
+                          - article "[deleted by user]" [ref=f10e954]:
+                            - generic [ref=f10e956] [cursor=pointer]:
+                              - link "Thread for Competitive-Lime9105's comment on [deleted by user]" [ref=f10e957]:
+                                - /url: /r/SNKRS/comments/zimri9/comment/izshhp7/?context=3
+                              - generic [ref=f10e958]:
+                                - generic [ref=f10e959]:
+                                  - generic [ref=f10e960]:
+                                    - link [ref=f10e963]:
+                                      - /url: /r/SNKRS/
+                                    - generic [ref=f10e966]:
+                                      - link "r/SNKRS" [ref=f10e969]:
+                                        - /url: /r/SNKRS/
+                                      - text: •
+                                      - heading [level=2] [ref=f10e971]:
+                                        - link "[deleted by user]" [ref=f10e972]:
+                                          - /url: /r/SNKRS/comments/zimri9/deleted_by_user/
+                                  - generic [ref=f10e974]:
+                                    - generic [ref=f10e975]:
+                                      - link "Competitive-Lime9105" [ref=f10e977]:
+                                        - /url: /user/Competitive-Lime9105/
+                                      - text: commented
+                                    - time [ref=f10e980]: 4 yr. ago
+                                - paragraph [ref=f10e984]: Nice dragon bro
+                                - generic [ref=f10e989]:
+                                  - generic [ref=f10e991]:
+                                    - button "Upvote" [ref=f10e992]
+                                    - generic [ref=f10e997]: "1"
+                                    - button "Downvote" [ref=f10e999]
+                                  - button "Reply reply" [ref=f10e1005]:
+                                    - generic [ref=f10e1006]: Reply
+                                    - generic [ref=f10e1011]: reply
+                                  - button "Share" [ref=f10e1014]
+                                  - button "Open user actions" [ref=f10e1024]
+                          - separator [ref=f10e1029]
+                          - article "Fk this am." [ref=f10e1030]:
+                            - generic [ref=f10e1032] [cursor=pointer]:
+                              - link "Thread for Competitive-Lime9105's comment on Fk this am." [ref=f10e1033]:
+                                - /url: /r/SNKRS/comments/z8lnfq/comment/iydkz67/?context=3
+                              - generic [ref=f10e1034]:
+                                - generic [ref=f10e1035]:
+                                  - generic [ref=f10e1036]:
+                                    - link [ref=f10e1039]:
+                                      - /url: /r/SNKRS/
+                                    - generic [ref=f10e1042]:
+                                      - link "r/SNKRS" [ref=f10e1045]:
+                                        - /url: /r/SNKRS/
+                                      - text: •
+                                      - heading [level=2] [ref=f10e1047]:
+                                        - link "Fk this am." [ref=f10e1048]:
+                                          - /url: /r/SNKRS/comments/z8lnfq/fk_this_am/
+                                  - generic [ref=f10e1050]:
+                                    - generic [ref=f10e1051]:
+                                      - link "Competitive-Lime9105" [ref=f10e1053]:
+                                        - /url: /user/Competitive-Lime9105/
+                                      - text: replied to
+                                      - link "Dr_EFC" [ref=f10e1056]:
+                                        - /url: /user/Dr_EFC/
+                                    - time [ref=f10e1059]: 4 yr. ago
+                                - paragraph [ref=f10e1063]: Ye that’s what I mean, availability was like 1 size run for the whole EU..
+                                - generic [ref=f10e1068]:
+                                  - generic [ref=f10e1070]:
+                                    - button "Upvote" [ref=f10e1071]
+                                    - generic [ref=f10e1076]: "1"
+                                    - button "Downvote" [ref=f10e1078]
+                                  - button "Reply reply" [ref=f10e1084]:
+                                    - generic [ref=f10e1085]: Reply
+                                    - generic [ref=f10e1090]: reply
+                                  - button "Share" [ref=f10e1093]
+                                  - button "Open user actions" [ref=f10e1103]
+                          - separator [ref=f10e1108]
+                          - article "Fk this am." [ref=f10e1109]:
+                            - generic [ref=f10e1111] [cursor=pointer]:
+                              - link "Thread for Competitive-Lime9105's comment on Fk this am." [ref=f10e1112]:
+                                - /url: /r/SNKRS/comments/z8lnfq/comment/iyct37d/?context=3
+                              - generic [ref=f10e1113]:
+                                - generic [ref=f10e1114]:
+                                  - generic [ref=f10e1115]:
+                                    - link [ref=f10e1118]:
+                                      - /url: /r/SNKRS/
+                                    - generic [ref=f10e1121]:
+                                      - link "r/SNKRS" [ref=f10e1124]:
+                                        - /url: /r/SNKRS/
+                                      - text: •
+                                      - heading [level=2] [ref=f10e1126]:
+                                        - link "Fk this am." [ref=f10e1127]:
+                                          - /url: /r/SNKRS/comments/z8lnfq/fk_this_am/
+                                  - generic [ref=f10e1129]:
+                                    - generic [ref=f10e1130]:
+                                      - link "Competitive-Lime9105" [ref=f10e1132]:
+                                        - /url: /user/Competitive-Lime9105/
+                                      - text: replied to
+                                      - link "mrnonamex" [ref=f10e1135]:
+                                        - /url: /user/mrnonamex/
+                                    - time [ref=f10e1138]: 4 yr. ago
+                                - paragraph [ref=f10e1142]: I would too for those, but my inner conscious buyer instinct won’t allow me to. So I rather just hate.
+                                - generic [ref=f10e1147]:
+                                  - generic [ref=f10e1149]:
+                                    - button "Upvote" [ref=f10e1150]
+                                    - generic [ref=f10e1155]: "1"
+                                    - button "Downvote" [ref=f10e1157]
+                                  - button "Reply reply" [ref=f10e1163]:
+                                    - generic [ref=f10e1164]: Reply
+                                    - generic [ref=f10e1169]: reply
+                                  - button "Share" [ref=f10e1172]
+                                  - button "Open user actions" [ref=f10e1182]
+                          - separator [ref=f10e1187]
+                          - article "Fk this am." [ref=f10e1188]:
+                            - generic [ref=f10e1190] [cursor=pointer]:
+                              - link "Thread for Competitive-Lime9105's comment on Fk this am." [ref=f10e1191]:
+                                - /url: /r/SNKRS/comments/z8lnfq/comment/iycau6w/?context=3
+                              - generic [ref=f10e1192]:
+                                - generic [ref=f10e1193]:
+                                  - generic [ref=f10e1194]:
+                                    - link [ref=f10e1197]:
+                                      - /url: /r/SNKRS/
+                                    - generic [ref=f10e1200]:
+                                      - link "r/SNKRS" [ref=f10e1203]:
+                                        - /url: /r/SNKRS/
+                                      - text: •
+                                      - heading [level=2] [ref=f10e1205]:
+                                        - link "Fk this am." [ref=f10e1206]:
+                                          - /url: /r/SNKRS/comments/z8lnfq/fk_this_am/
+                                  - generic [ref=f10e1208]:
+                                    - generic [ref=f10e1209]:
+                                      - link "Competitive-Lime9105" [ref=f10e1211]:
+                                        - /url: /user/Competitive-Lime9105/
+                                      - text: commented
+                                    - time [ref=f10e1214]: 4 yr. ago
+                                - paragraph [ref=f10e1218]: EU get about one full size run of stock… I mean, someone needs to pay resell, right?
+                                - generic [ref=f10e1223]:
+                                  - generic [ref=f10e1225]:
+                                    - button "Upvote" [ref=f10e1226]
+                                    - generic [ref=f10e1231]: "1"
+                                    - button "Downvote" [ref=f10e1233]
+                                  - button "Reply reply" [ref=f10e1239]:
+                                    - generic [ref=f10e1240]: Reply
+                                    - generic [ref=f10e1245]: reply
+                                  - button "Share" [ref=f10e1248]
+                                  - button "Open user actions" [ref=f10e1258]
+                          - separator [ref=f10e1263]
+                          - article "An expensive pair." [ref=f10e1264]:
+                            - generic [ref=f10e1266] [cursor=pointer]:
+                              - link "Thread for Competitive-Lime9105's comment on An expensive pair." [ref=f10e1267]:
+                                - /url: /r/SNKRS/comments/z0udgg/comment/ixcbvgd/?context=3
+                              - generic [ref=f10e1268]:
+                                - generic [ref=f10e1269]:
+                                  - generic [ref=f10e1270]:
+                                    - link [ref=f10e1273]:
+                                      - /url: /r/SNKRS/
+                                    - generic [ref=f10e1276]:
+                                      - link "r/SNKRS" [ref=f10e1279]:
+                                        - /url: /r/SNKRS/
+                                      - text: •
+                                      - heading [level=2] [ref=f10e1281]:
+                                        - link "An expensive pair." [ref=f10e1282]:
+                                          - /url: /r/SNKRS/comments/z0udgg/an_expensive_pair/
+                                  - generic [ref=f10e1284]:
+                                    - generic [ref=f10e1285]:
+                                      - link "Competitive-Lime9105" [ref=f10e1287]:
+                                        - /url: /user/Competitive-Lime9105/
+                                      - generic "Comment distinguished as the original poster" [ref=f10e1290]: OP
+                                      - text: replied to
+                                      - link "Luli081w" [ref=f10e1292]:
+                                        - /url: /user/Luli081w/
+                                    - time [ref=f10e1295]: 4 yr. ago
+                                - paragraph [ref=f10e1299]: It’s a glitch is DKK but it showed $ for no reasons
+                                - generic [ref=f10e1304]:
+                                  - generic [ref=f10e1306]:
+                                    - button "Upvote" [ref=f10e1307]
+                                    - generic [ref=f10e1312]: "1"
+                                    - button "Downvote" [ref=f10e1314]
+                                  - button "Reply reply" [ref=f10e1320]:
+                                    - generic [ref=f10e1321]: Reply
+                                    - generic [ref=f10e1326]: reply
+                                  - button "Share" [ref=f10e1329]
+                                  - button "Open user actions" [ref=f10e1339]
+                          - separator [ref=f10e1344]
+                          - article [ref=f10e1345]:
+                            - generic [ref=f10e1346] [cursor=pointer]:
+                              - link "An expensive pair." [ref=f10e1347]:
+                                - /url: https://www.reddit.com/r/SNKRS/comments/z0udgg/an_expensive_pair/
+                              - generic [ref=f10e1349]:
+                                - generic [ref=f10e1350]:
+                                  - link "r/SNKRS" [ref=f10e1353]:
+                                    - /url: https://www.reddit.com/r/SNKRS/
+                                  - generic [ref=f10e1358]: •
+                                  - time [ref=f10e1360]: 4 yr. ago
+                                - generic [ref=f10e1361]:
+                                  - button "Join" [ref=f10e1363]
+                                  - button "Open user actions" [ref=f10e1368]
+                              - heading [level=2] [ref=f10e1375]:
+                                - link "An expensive pair." [ref=f10e1376]:
+                                  - /url: https://www.reddit.com/r/SNKRS/comments/z0udgg/an_expensive_pair/
+                              - img "r/SNKRS - An expensive pair." [ref=f10e1382]
+                              - generic "Actions available for this post" [ref=f10e1384]:
+                                - generic [ref=f10e1387]:
+                                  - button "Upvote" [ref=f10e1388]
+                                  - generic [ref=f10e1393]: "9"
+                                  - button "Downvote" [ref=f10e1395]
+                                - link "4 Go to comments" [ref=f10e1400]:
+                                  - /url: /r/SNKRS/comments/z0udgg/an_expensive_pair/
+                                  - generic [ref=f10e1401]: "4"
+                                  - generic [ref=f10e1407]: Go to comments
+                                - button "Share" [ref=f10e1411]
+                          - separator [ref=f10e1418]
+                          - article "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e1419]:
+                            - generic [ref=f10e1421] [cursor=pointer]:
+                              - link "Thread for Competitive-Lime9105's comment on Why no one talks about these? Air Ship “Team Orange”" [ref=f10e1422]:
+                                - /url: /r/SNKRS/comments/y6gjfl/comment/it6jn2u/?context=3
+                              - generic [ref=f10e1423]:
+                                - generic [ref=f10e1424]:
+                                  - generic [ref=f10e1425]:
+                                    - link [ref=f10e1428]:
+                                      - /url: /r/SNKRS/
+                                    - generic [ref=f10e1431]:
+                                      - link "r/SNKRS" [ref=f10e1434]:
+                                        - /url: /r/SNKRS/
+                                      - text: •
+                                      - heading [level=2] [ref=f10e1436]:
+                                        - link "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e1437]:
+                                          - /url: /r/SNKRS/comments/y6gjfl/why_no_one_talks_about_these_air_ship_team_orange/
+                                  - generic [ref=f10e1439]:
+                                    - generic [ref=f10e1440]:
+                                      - link "Competitive-Lime9105" [ref=f10e1442]:
+                                        - /url: /user/Competitive-Lime9105/
+                                      - generic "Comment distinguished as the original poster" [ref=f10e1445]: OP
+                                      - text: replied to
+                                      - link "sethbergs" [ref=f10e1447]:
+                                        - /url: /user/sethbergs/
+                                    - time [ref=f10e1450]: 4 yr. ago
+                                - paragraph [ref=f10e1454]: Just got em! They are 🔥🍊 going to be great for summer 23🏀
+                                - generic [ref=f10e1459]:
+                                  - generic [ref=f10e1461]:
+                                    - button "Upvote" [ref=f10e1462]
+                                    - generic [ref=f10e1467]: "4"
+                                    - button "Downvote" [ref=f10e1469]
+                                  - button "Reply reply" [ref=f10e1475]:
+                                    - generic [ref=f10e1476]: Reply
+                                    - generic [ref=f10e1481]: reply
+                                  - button "Share" [ref=f10e1484]
+                                  - button "Open user actions" [ref=f10e1494]
+                          - separator [ref=f10e1499]
+                          - article [ref=f10e1500]:
+                            - generic [ref=f10e1501] [cursor=pointer]:
+                              - link "How this sold out today but it has been posted tomorrow? 🤯" [ref=f10e1502]:
+                                - /url: https://www.reddit.com/r/SNKRS/comments/y8bym6/how_this_sold_out_today_but_it_has_been_posted/
+                              - generic [ref=f10e1504]:
+                                - generic [ref=f10e1505]:
+                                  - link "r/SNKRS" [ref=f10e1508]:
+                                    - /url: https://www.reddit.com/r/SNKRS/
+                                  - generic [ref=f10e1513]: •
+                                  - time [ref=f10e1515]: 4 yr. ago
+                                - generic [ref=f10e1516]:
+                                  - button "Join" [ref=f10e1518]
+                                  - button "Open user actions" [ref=f10e1523]
+                              - heading [level=2] [ref=f10e1530]:
+                                - link "How this sold out today but it has been posted tomorrow? 🤯" [ref=f10e1531]:
+                                  - /url: https://www.reddit.com/r/SNKRS/comments/y8bym6/how_this_sold_out_today_but_it_has_been_posted/
+                              - generic [ref=f10e1536]:
+                                - generic [ref=f10e1537]:
+                                  - generic [ref=f10e1538]:
+                                    - list [ref=f10e1540]:
+                                      - listitem [ref=f10e1541]:
+                                        - figure [ref=f10e1542]:
+                                          - img "r/SNKRS - How this sold out today but it has been posted tomorrow? 🤯" [ref=f10e1543]
+                                    - group [ref=f10e1548]:
+                                      - button "Page 1 (Current page)" [ref=f10e1550]
+                                      - button "Page 2" [ref=f10e1552]
+                                  - generic [ref=f10e1555]:
+                                    - button "Previous page" [disabled]
+                                  - button "Next page" [ref=f10e1558]
+                                - generic [ref=f10e1563]: Item 1 of 2
+                              - generic "Actions available for this post" [ref=f10e1565]:
+                                - generic [ref=f10e1568]:
+                                  - button "Upvote" [ref=f10e1569]
+                                  - generic [ref=f10e1574]: "1"
+                                  - button "Downvote" [ref=f10e1576]
+                                - link "0 Go to comments" [ref=f10e1581]:
+                                  - /url: /r/SNKRS/comments/y8bym6/how_this_sold_out_today_but_it_has_been_posted/
+                                  - generic [ref=f10e1582]: "0"
+                                  - generic [ref=f10e1588]: Go to comments
+                                - button "Share" [ref=f10e1592]
+                          - separator [ref=f10e1599]
+                          - article "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e1600]:
+                            - generic [ref=f10e1602] [cursor=pointer]:
+                              - link "Thread for Competitive-Lime9105's comment on Why no one talks about these? Air Ship “Team Orange”" [ref=f10e1603]:
+                                - /url: /r/SNKRS/comments/y6gjfl/comment/isxecgl/?context=3
+                              - generic [ref=f10e1604]:
+                                - generic [ref=f10e1605]:
+                                  - generic [ref=f10e1606]:
+                                    - link [ref=f10e1609]:
+                                      - /url: /r/SNKRS/
+                                    - generic [ref=f10e1612]:
+                                      - link "r/SNKRS" [ref=f10e1615]:
+                                        - /url: /r/SNKRS/
+                                      - text: •
+                                      - heading [level=2] [ref=f10e1617]:
+                                        - link "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e1618]:
+                                          - /url: /r/SNKRS/comments/y6gjfl/why_no_one_talks_about_these_air_ship_team_orange/
+                                  - generic [ref=f10e1620]:
+                                    - generic [ref=f10e1621]:
+                                      - link "Competitive-Lime9105" [ref=f10e1623]:
+                                        - /url: /user/Competitive-Lime9105/
+                                      - generic "Comment distinguished as the original poster" [ref=f10e1626]: OP
+                                      - text: replied to
+                                      - link "XxMineCwaftxX" [ref=f10e1628]:
+                                        - /url: /user/XxMineCwaftxX/
+                                    - time [ref=f10e1631]: 4 yr. ago
+                                - paragraph [ref=f10e1635]: I guess we are even I worded my question badly u seemed aggressive, but at the end of the day, we both just like sneakers.. ✌️peace out!
+                                - generic [ref=f10e1640]:
+                                  - generic [ref=f10e1642]:
+                                    - button "Upvote" [ref=f10e1643]
+                                    - generic [ref=f10e1648]: "1"
+                                    - button "Downvote" [ref=f10e1650]
+                                  - button "Reply reply" [ref=f10e1656]:
+                                    - generic [ref=f10e1657]: Reply
+                                    - generic [ref=f10e1662]: reply
+                                  - button "Share" [ref=f10e1665]
+                                  - button "Open user actions" [ref=f10e1675]
+                          - separator [ref=f10e1680]
+                          - article "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e1681]:
+                            - generic [ref=f10e1683] [cursor=pointer]:
+                              - link "Thread for Competitive-Lime9105's comment on Why no one talks about these? Air Ship “Team Orange”" [ref=f10e1684]:
+                                - /url: /r/SNKRS/comments/y6gjfl/comment/ist6aib/?context=3
+                              - generic [ref=f10e1685]:
+                                - generic [ref=f10e1686]:
+                                  - generic [ref=f10e1687]:
+                                    - link [ref=f10e1690]:
+                                      - /url: /r/SNKRS/
+                                    - generic [ref=f10e1693]:
+                                      - link "r/SNKRS" [ref=f10e1696]:
+                                        - /url: /r/SNKRS/
+                                      - text: •
+                                      - heading [level=2] [ref=f10e1698]:
+                                        - link "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e1699]:
+                                          - /url: /r/SNKRS/comments/y6gjfl/why_no_one_talks_about_these_air_ship_team_orange/
+                                  - generic [ref=f10e1701]:
+                                    - generic [ref=f10e1702]:
+                                      - link "Competitive-Lime9105" [ref=f10e1704]:
+                                        - /url: /user/Competitive-Lime9105/
+                                      - generic "Comment distinguished as the original poster" [ref=f10e1707]: OP
+                                      - text: replied to
+                                      - link "XxMineCwaftxX" [ref=f10e1709]:
+                                        - /url: /user/XxMineCwaftxX/
+                                    - time [ref=f10e1712]: 4 yr. ago
+                                - paragraph [ref=f10e1716]: Ok, you must have a master degree in consumer behaviour… I was just wondering, since their price is so low related to other air ships on StockX, if there was a reason, also there is very little contents about them on the tube… and anyhow I did bought a pair before posting, I wasn’t waiting for nobody’s opinion.. I wanted a affordable air ship for my collection for a while now… I am not trying to have no internet beef but you just sound salty for no reason here… I mean, I might as well be a hype beast or a reseller, so what? What’s your point? But no, that’s not even really the case…
+                                - generic [ref=f10e1721]:
+                                  - generic [ref=f10e1723]:
+                                    - button "Upvote" [ref=f10e1724]
+                                    - generic [ref=f10e1729]: "1"
+                                    - button "Downvote" [ref=f10e1731]
+                                  - button "Reply reply" [ref=f10e1737]:
+                                    - generic [ref=f10e1738]: Reply
+                                    - generic [ref=f10e1743]: reply
+                                  - button "Share" [ref=f10e1746]
+                                  - button "Open user actions" [ref=f10e1756]
+                          - separator [ref=f10e1761]
+                          - article "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e1762]:
+                            - generic [ref=f10e1764] [cursor=pointer]:
+                              - link "Thread for Competitive-Lime9105's comment on Why no one talks about these? Air Ship “Team Orange”" [ref=f10e1765]:
+                                - /url: /r/SNKRS/comments/y6gjfl/comment/isq0sz5/?context=3
+                              - generic [ref=f10e1766]:
+                                - generic [ref=f10e1767]:
+                                  - generic [ref=f10e1768]:
+                                    - link [ref=f10e1771]:
+                                      - /url: /r/SNKRS/
+                                    - generic [ref=f10e1774]:
+                                      - link "r/SNKRS" [ref=f10e1777]:
+                                        - /url: /r/SNKRS/
+                                      - text: •
+                                      - heading [level=2] [ref=f10e1779]:
+                                        - link "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e1780]:
+                                          - /url: /r/SNKRS/comments/y6gjfl/why_no_one_talks_about_these_air_ship_team_orange/
+                                  - generic [ref=f10e1782]:
+                                    - generic [ref=f10e1783]:
+                                      - link "Competitive-Lime9105" [ref=f10e1785]:
+                                        - /url: /user/Competitive-Lime9105/
+                                      - generic "Comment distinguished as the original poster" [ref=f10e1788]: OP
+                                      - text: replied to
+                                      - link "Mauinic" [ref=f10e1790]:
+                                        - /url: /user/Mauinic/
+                                    - time [ref=f10e1793]: 4 yr. ago
+                                - paragraph [ref=f10e1797]: Agree, and tbh I am just happy to score this PE easily…
+                                - generic [ref=f10e1802]:
+                                  - generic [ref=f10e1804]:
+                                    - button "Upvote" [ref=f10e1805]
+                                    - generic [ref=f10e1810]: "1"
+                                    - button "Downvote" [ref=f10e1812]
+                                  - button "Reply reply" [ref=f10e1818]:
+                                    - generic [ref=f10e1819]: Reply
+                                    - generic [ref=f10e1824]: reply
+                                  - button "Share" [ref=f10e1827]
+                                  - button "Open user actions" [ref=f10e1837]
+                          - separator [ref=f10e1842]
+                          - article "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e1843]:
+                            - generic [ref=f10e1845] [cursor=pointer]:
+                              - link "Thread for Competitive-Lime9105's comment on Why no one talks about these? Air Ship “Team Orange”" [ref=f10e1846]:
+                                - /url: /r/SNKRS/comments/y6gjfl/comment/ispzrpm/?context=3
+                              - generic [ref=f10e1847]:
+                                - generic [ref=f10e1848]:
+                                  - generic [ref=f10e1849]:
+                                    - link [ref=f10e1852]:
+                                      - /url: /r/SNKRS/
+                                    - generic [ref=f10e1855]:
+                                      - link "r/SNKRS" [ref=f10e1858]:
+                                        - /url: /r/SNKRS/
+                                      - text: •
+                                      - heading [level=2] [ref=f10e1860]:
+                                        - link "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e1861]:
+                                          - /url: /r/SNKRS/comments/y6gjfl/why_no_one_talks_about_these_air_ship_team_orange/
+                                  - generic [ref=f10e1863]:
+                                    - generic [ref=f10e1864]:
+                                      - link "Competitive-Lime9105" [ref=f10e1866]:
+                                        - /url: /user/Competitive-Lime9105/
+                                      - generic "Comment distinguished as the original poster" [ref=f10e1869]: OP
+                                      - text: replied to
+                                      - link "twisteddark2" [ref=f10e1871]:
+                                        - /url: /user/twisteddark2/
+                                    - time [ref=f10e1874]: 4 yr. ago
+                                - paragraph [ref=f10e1878]: I’d call em clean instead of basic, and if this siluette is boring, what about a dunk high? Plus they are PE… Travis Scott x air ships and this is going to the moon.. considered there are only like 4 color ways of this on the market.
+                                - generic [ref=f10e1883]:
+                                  - generic [ref=f10e1885]:
+                                    - button "Upvote" [ref=f10e1886]
+                                    - generic [ref=f10e1891]: "-1"
+                                    - button "Downvote" [ref=f10e1893]
+                                  - button "Reply reply" [ref=f10e1899]:
+                                    - generic [ref=f10e1900]: Reply
+                                    - generic [ref=f10e1905]: reply
+                                  - button "Share" [ref=f10e1908]
+                                  - button "Open user actions" [ref=f10e1918]
+                          - separator [ref=f10e1923]
+                          - article "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e1924]:
+                            - generic [ref=f10e1926] [cursor=pointer]:
+                              - link "Thread for Competitive-Lime9105's comment on Why no one talks about these? Air Ship “Team Orange”" [ref=f10e1927]:
+                                - /url: /r/SNKRS/comments/y6gjfl/comment/ispy96w/?context=3
+                              - generic [ref=f10e1928]:
+                                - generic [ref=f10e1929]:
+                                  - generic [ref=f10e1930]:
+                                    - link [ref=f10e1933]:
+                                      - /url: /r/SNKRS/
+                                    - generic [ref=f10e1936]:
+                                      - link "r/SNKRS" [ref=f10e1939]:
+                                        - /url: /r/SNKRS/
+                                      - text: •
+                                      - heading [level=2] [ref=f10e1941]:
+                                        - link "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e1942]:
+                                          - /url: /r/SNKRS/comments/y6gjfl/why_no_one_talks_about_these_air_ship_team_orange/
+                                  - generic [ref=f10e1944]:
+                                    - generic [ref=f10e1945]:
+                                      - link "Competitive-Lime9105" [ref=f10e1947]:
+                                        - /url: /user/Competitive-Lime9105/
+                                      - generic "Comment distinguished as the original poster" [ref=f10e1950]: OP
+                                      - text: replied to
+                                      - link "Mauinic" [ref=f10e1952]:
+                                        - /url: /user/Mauinic/
+                                    - time [ref=f10e1955]: 4 yr. ago
+                                - paragraph [ref=f10e1959]: 💯 yea I don’t get it either, but I mean, is not a hype shoe (yet)…
+                                - generic [ref=f10e1964]:
+                                  - generic [ref=f10e1966]:
+                                    - button "Upvote" [ref=f10e1967]
+                                    - generic [ref=f10e1972]: "2"
+                                    - button "Downvote" [ref=f10e1974]
+                                  - button "Reply reply" [ref=f10e1980]:
+                                    - generic [ref=f10e1981]: Reply
+                                    - generic [ref=f10e1986]: reply
+                                  - button "Share" [ref=f10e1989]
+                                  - button "Open user actions" [ref=f10e1999]
+                          - separator [ref=f10e2004]
+                          - article "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e2005]:
+                            - generic [ref=f10e2007] [cursor=pointer]:
+                              - link "Thread for Competitive-Lime9105's comment on Why no one talks about these? Air Ship “Team Orange”" [ref=f10e2008]:
+                                - /url: /r/SNKRS/comments/y6gjfl/comment/ispxtg2/?context=3
+                              - generic [ref=f10e2009]:
+                                - generic [ref=f10e2010]:
+                                  - generic [ref=f10e2011]:
+                                    - link [ref=f10e2014]:
+                                      - /url: /r/SNKRS/
+                                    - generic [ref=f10e2017]:
+                                      - link "r/SNKRS" [ref=f10e2020]:
+                                        - /url: /r/SNKRS/
+                                      - text: •
+                                      - heading [level=2] [ref=f10e2022]:
+                                        - link "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e2023]:
+                                          - /url: /r/SNKRS/comments/y6gjfl/why_no_one_talks_about_these_air_ship_team_orange/
+                                  - generic [ref=f10e2025]:
+                                    - generic [ref=f10e2026]:
+                                      - link "Competitive-Lime9105" [ref=f10e2028]:
+                                        - /url: /user/Competitive-Lime9105/
+                                      - generic "Comment distinguished as the original poster" [ref=f10e2031]: OP
+                                      - text: replied to
+                                      - link "txhypebeast4" [ref=f10e2033]:
+                                        - /url: /user/txhypebeast4/
+                                    - time [ref=f10e2036]: 4 yr. ago
+                                - paragraph [ref=f10e2040]: Well they were not really the raffle is on now in EU
+                                - generic [ref=f10e2045]:
+                                  - generic [ref=f10e2047]:
+                                    - button "Upvote" [ref=f10e2048]
+                                    - generic [ref=f10e2053]: "1"
+                                    - button "Downvote" [ref=f10e2055]
+                                  - button "Reply reply" [ref=f10e2061]:
+                                    - generic [ref=f10e2062]: Reply
+                                    - generic [ref=f10e2067]: reply
+                                  - button "Share" [ref=f10e2070]
+                                  - button "Open user actions" [ref=f10e2080]
+                          - separator [ref=f10e2085]
+                          - article "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e2086]:
+                            - generic [ref=f10e2088] [cursor=pointer]:
+                              - link "Thread for Competitive-Lime9105's comment on Why no one talks about these? Air Ship “Team Orange”" [ref=f10e2089]:
+                                - /url: /r/SNKRS/comments/y6gjfl/comment/ispxpyh/?context=3
+                              - generic [ref=f10e2090]:
+                                - generic [ref=f10e2091]:
+                                  - generic [ref=f10e2092]:
+                                    - link [ref=f10e2095]:
+                                      - /url: /r/SNKRS/
+                                    - generic [ref=f10e2098]:
+                                      - link "r/SNKRS" [ref=f10e2101]:
+                                        - /url: /r/SNKRS/
+                                      - text: •
+                                      - heading [level=2] [ref=f10e2103]:
+                                        - link "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e2104]:
+                                          - /url: /r/SNKRS/comments/y6gjfl/why_no_one_talks_about_these_air_ship_team_orange/
+                                  - generic [ref=f10e2106]:
+                                    - generic [ref=f10e2107]:
+                                      - link "Competitive-Lime9105" [ref=f10e2109]:
+                                        - /url: /user/Competitive-Lime9105/
+                                      - generic "Comment distinguished as the original poster" [ref=f10e2112]: OP
+                                      - text: replied to
+                                      - link "sethbergs" [ref=f10e2114]:
+                                        - /url: /user/sethbergs/
+                                    - time [ref=f10e2117]: 4 yr. ago
+                                - paragraph [ref=f10e2121]: I did indeed, I’ll keep you posted 👌
+                                - generic [ref=f10e2126]:
+                                  - generic [ref=f10e2128]:
+                                    - button "Upvote" [ref=f10e2129]
+                                    - generic [ref=f10e2134]: "5"
+                                    - button "Downvote" [ref=f10e2136]
+                                  - button "Reply reply" [ref=f10e2142]:
+                                    - generic [ref=f10e2143]: Reply
+                                    - generic [ref=f10e2148]: reply
+                                  - button "Share" [ref=f10e2151]
+                                  - button "Open user actions" [ref=f10e2161]
+                          - separator [ref=f10e2166]
+                          - article "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e2167]:
+                            - generic [ref=f10e2169] [cursor=pointer]:
+                              - link "Thread for Competitive-Lime9105's comment on Why no one talks about these? Air Ship “Team Orange”" [ref=f10e2170]:
+                                - /url: /r/SNKRS/comments/y6gjfl/comment/ispp2tc/?context=3
+                              - generic [ref=f10e2171]:
+                                - generic [ref=f10e2172]:
+                                  - generic [ref=f10e2173]:
+                                    - link [ref=f10e2176]:
+                                      - /url: /r/SNKRS/
+                                    - generic [ref=f10e2179]:
+                                      - link "r/SNKRS" [ref=f10e2182]:
+                                        - /url: /r/SNKRS/
+                                      - text: •
+                                      - heading [level=2] [ref=f10e2184]:
+                                        - link "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e2185]:
+                                          - /url: /r/SNKRS/comments/y6gjfl/why_no_one_talks_about_these_air_ship_team_orange/
+                                  - generic [ref=f10e2187]:
+                                    - generic [ref=f10e2188]:
+                                      - link "Competitive-Lime9105" [ref=f10e2190]:
+                                        - /url: /user/Competitive-Lime9105/
+                                      - generic "Comment distinguished as the original poster" [ref=f10e2193]: OP
+                                      - text: replied to
+                                      - link "chilibaby1" [ref=f10e2195]:
+                                        - /url: /user/chilibaby1/
+                                    - time [ref=f10e2198]: 4 yr. ago
+                                - paragraph [ref=f10e2202]: I haven’t seen the other post.. no need to get mad tho😂 sometimes simple is good🤷🏼‍♂️ and there is a nice story behind which is what I personally value the most
+                                - generic [ref=f10e2207]:
+                                  - generic [ref=f10e2209]:
+                                    - button "Upvote" [ref=f10e2210]
+                                    - generic [ref=f10e2215]: "2"
+                                    - button "Downvote" [ref=f10e2217]
+                                  - button "Reply reply" [ref=f10e2223]:
+                                    - generic [ref=f10e2224]: Reply
+                                    - generic [ref=f10e2229]: reply
+                                  - button "Share" [ref=f10e2232]
+                                  - button "Open user actions" [ref=f10e2242]
+                          - separator [ref=f10e2247]
+                          - article "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e2248]:
+                            - generic [ref=f10e2250] [cursor=pointer]:
+                              - link "Thread for Competitive-Lime9105's comment on Why no one talks about these? Air Ship “Team Orange”" [ref=f10e2251]:
+                                - /url: /r/SNKRS/comments/y6gjfl/comment/ispj4ys/?context=3
+                              - generic [ref=f10e2252]:
+                                - generic [ref=f10e2253]:
+                                  - generic [ref=f10e2254]:
+                                    - link [ref=f10e2257]:
+                                      - /url: /r/SNKRS/
+                                    - generic [ref=f10e2260]:
+                                      - link "r/SNKRS" [ref=f10e2263]:
+                                        - /url: /r/SNKRS/
+                                      - text: •
+                                      - heading [level=2] [ref=f10e2265]:
+                                        - link "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e2266]:
+                                          - /url: /r/SNKRS/comments/y6gjfl/why_no_one_talks_about_these_air_ship_team_orange/
+                                  - generic [ref=f10e2268]:
+                                    - generic [ref=f10e2269]:
+                                      - link "Competitive-Lime9105" [ref=f10e2271]:
+                                        - /url: /user/Competitive-Lime9105/
+                                      - generic "Comment distinguished as the original poster" [ref=f10e2274]: OP
+                                      - text: commented
+                                    - time [ref=f10e2276]: 4 yr. ago
+                                - paragraph [ref=f10e2280]: Wow.. well the orange is kinda the same they dropped in a small shop in Bologna ITA named “back door bottega” the raffle is now open for EU but there is zero hype..
+                                - generic [ref=f10e2285]:
+                                  - generic [ref=f10e2287]:
+                                    - button "Upvote" [ref=f10e2288]
+                                    - generic [ref=f10e2293]: "2"
+                                    - button "Downvote" [ref=f10e2295]
+                                  - button "Reply reply" [ref=f10e2301]:
+                                    - generic [ref=f10e2302]: Reply
+                                    - generic [ref=f10e2307]: reply
+                                  - button "Share" [ref=f10e2310]
+                                  - button "Open user actions" [ref=f10e2320]
+                          - separator [ref=f10e2325]
+                          - article "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e2326]:
+                            - generic [ref=f10e2328] [cursor=pointer]:
+                              - link "Thread for Competitive-Lime9105's comment on Why no one talks about these? Air Ship “Team Orange”" [ref=f10e2329]:
+                                - /url: /r/SNKRS/comments/y6gjfl/comment/isphpl0/?context=3
+                              - generic [ref=f10e2330]:
+                                - generic [ref=f10e2331]:
+                                  - generic [ref=f10e2332]:
+                                    - link [ref=f10e2335]:
+                                      - /url: /r/SNKRS/
+                                    - generic [ref=f10e2338]:
+                                      - link "r/SNKRS" [ref=f10e2341]:
+                                        - /url: /r/SNKRS/
+                                      - text: •
+                                      - heading [level=2] [ref=f10e2343]:
+                                        - link "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e2344]:
+                                          - /url: /r/SNKRS/comments/y6gjfl/why_no_one_talks_about_these_air_ship_team_orange/
+                                  - generic [ref=f10e2346]:
+                                    - generic [ref=f10e2347]:
+                                      - link "Competitive-Lime9105" [ref=f10e2349]:
+                                        - /url: /user/Competitive-Lime9105/
+                                      - generic "Comment distinguished as the original poster" [ref=f10e2352]: OP
+                                      - text: commented
+                                    - time [ref=f10e2354]: 4 yr. ago
+                                - paragraph [ref=f10e2358]: Also don’t you think orange is going to be limited? I kno is just a label but is still a PE SP drop
+                                - generic [ref=f10e2363]:
+                                  - generic [ref=f10e2365]:
+                                    - button "Upvote" [ref=f10e2366]
+                                    - generic [ref=f10e2371]: "1"
+                                    - button "Downvote" [ref=f10e2373]
+                                  - button "Reply reply" [ref=f10e2379]:
+                                    - generic [ref=f10e2380]: Reply
+                                    - generic [ref=f10e2385]: reply
+                                  - button "Share" [ref=f10e2388]
+                                  - button "Open user actions" [ref=f10e2398]
+                          - separator [ref=f10e2403]
+                          - article "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e2404]:
+                            - generic [ref=f10e2406] [cursor=pointer]:
+                              - link "Thread for Competitive-Lime9105's comment on Why no one talks about these? Air Ship “Team Orange”" [ref=f10e2407]:
+                                - /url: /r/SNKRS/comments/y6gjfl/comment/isphdji/?context=3
+                              - generic [ref=f10e2408]:
+                                - generic [ref=f10e2409]:
+                                  - generic [ref=f10e2410]:
+                                    - link [ref=f10e2413]:
+                                      - /url: /r/SNKRS/
+                                    - generic [ref=f10e2416]:
+                                      - link "r/SNKRS" [ref=f10e2419]:
+                                        - /url: /r/SNKRS/
+                                      - text: •
+                                      - heading [level=2] [ref=f10e2421]:
+                                        - link "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e2422]:
+                                          - /url: /r/SNKRS/comments/y6gjfl/why_no_one_talks_about_these_air_ship_team_orange/
+                                  - generic [ref=f10e2424]:
+                                    - generic [ref=f10e2425]:
+                                      - link "Competitive-Lime9105" [ref=f10e2427]:
+                                        - /url: /user/Competitive-Lime9105/
+                                      - generic "Comment distinguished as the original poster" [ref=f10e2430]: OP
+                                      - text: commented
+                                    - time [ref=f10e2432]: 4 yr. ago
+                                - paragraph [ref=f10e2436]: Ye but did they dropped the green one yet? I thought it was rumoured to drop before the end of the year all together with the yellow
+                                - generic [ref=f10e2441]:
+                                  - generic [ref=f10e2443]:
+                                    - button "Upvote" [ref=f10e2444]
+                                    - generic [ref=f10e2449]: "0"
+                                    - button "Downvote" [ref=f10e2451]
+                                  - button "Reply reply" [ref=f10e2457]:
+                                    - generic [ref=f10e2458]: Reply
+                                    - generic [ref=f10e2463]: reply
+                                  - button "Share" [ref=f10e2466]
+                                  - button "Open user actions" [ref=f10e2476]
+                          - separator [ref=f10e2481]
+                          - article "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e2482]:
+                            - generic [ref=f10e2484] [cursor=pointer]:
+                              - link "Thread for Competitive-Lime9105's comment on Why no one talks about these? Air Ship “Team Orange”" [ref=f10e2485]:
+                                - /url: /r/SNKRS/comments/y6gjfl/comment/ispezyr/?context=3
+                              - generic [ref=f10e2486]:
+                                - generic [ref=f10e2487]:
+                                  - generic [ref=f10e2488]:
+                                    - link [ref=f10e2491]:
+                                      - /url: /r/SNKRS/
+                                    - generic [ref=f10e2494]:
+                                      - link "r/SNKRS" [ref=f10e2497]:
+                                        - /url: /r/SNKRS/
+                                      - text: •
+                                      - heading [level=2] [ref=f10e2499]:
+                                        - link "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e2500]:
+                                          - /url: /r/SNKRS/comments/y6gjfl/why_no_one_talks_about_these_air_ship_team_orange/
+                                  - generic [ref=f10e2502]:
+                                    - generic [ref=f10e2503]:
+                                      - link "Competitive-Lime9105" [ref=f10e2505]:
+                                        - /url: /user/Competitive-Lime9105/
+                                      - generic "Comment distinguished as the original poster" [ref=f10e2508]: OP
+                                      - text: commented
+                                    - time [ref=f10e2510]: 4 yr. ago
+                                - paragraph [ref=f10e2514]: Agree super polarising.. I mean I think is not a shoes for dunks heads but a very collectible og shoes… I’m still surprised this is sitting at 200€ on StockX I hate paying resell but I had to get this one, at this price, been wanting a pair of air ship for a long while now… and considered the price for the red and blue Ones this was a must..
+                                - generic [ref=f10e2519]:
+                                  - generic [ref=f10e2521]:
+                                    - button "Upvote" [ref=f10e2522]
+                                    - generic [ref=f10e2527]: "-1"
+                                    - button "Downvote" [ref=f10e2529]
+                                  - button "Reply reply" [ref=f10e2535]:
+                                    - generic [ref=f10e2536]: Reply
+                                    - generic [ref=f10e2541]: reply
+                                  - button "Share" [ref=f10e2544]
+                                  - button "Open user actions" [ref=f10e2554]
+                          - separator [ref=f10e2559]
+                          - article "Need outfits for Jordan 1 visionare" [ref=f10e2560]:
+                            - generic [ref=f10e2562] [cursor=pointer]:
+                              - link "Thread for Competitive-Lime9105's comment on Need outfits for Jordan 1 visionare" [ref=f10e2563]:
+                                - /url: /r/SNKRS/comments/y4wa3b/comment/ispce4u/?context=3
+                              - generic [ref=f10e2564]:
+                                - generic [ref=f10e2565]:
+                                  - generic [ref=f10e2566]:
+                                    - link [ref=f10e2569]:
+                                      - /url: /r/SNKRS/
+                                    - generic [ref=f10e2572]:
+                                      - link "r/SNKRS" [ref=f10e2575]:
+                                        - /url: /r/SNKRS/
+                                      - text: •
+                                      - heading [level=2] [ref=f10e2577]:
+                                        - link "Need outfits for Jordan 1 visionare" [ref=f10e2578]:
+                                          - /url: /r/SNKRS/comments/y4wa3b/need_outfits_for_jordan_1_visionare/
+                                  - generic [ref=f10e2580]:
+                                    - generic [ref=f10e2581]:
+                                      - link "Competitive-Lime9105" [ref=f10e2583]:
+                                        - /url: /user/Competitive-Lime9105/
+                                      - text: commented
+                                    - time [ref=f10e2586]: 4 yr. ago
+                                - paragraph [ref=f10e2590]:
+                                  - text: Thank me later
+                                  - link "north face safety green jacket" [ref=f10e2591]:
+                                    - /url: https://www.sneakersnstuff.com/en/product/53476/the-north-face-1996-retro-nuptse-jacket
+                                - generic [ref=f10e2596]:
+                                  - generic [ref=f10e2598]:
+                                    - button "Upvote" [ref=f10e2599]
+                                    - generic [ref=f10e2604]: "1"
+                                    - button "Downvote" [ref=f10e2606]
+                                  - button "Reply reply" [ref=f10e2612]:
+                                    - generic [ref=f10e2613]: Reply
+                                    - generic [ref=f10e2618]: reply
+                                  - button "Share" [ref=f10e2621]
+                                  - button "Open user actions" [ref=f10e2631]
+                          - separator [ref=f10e2636]
+                          - article [ref=f10e2637]:
+                            - generic [ref=f10e2638] [cursor=pointer]:
+                              - link "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e2639]:
+                                - /url: https://www.reddit.com/r/SNKRS/comments/y6gjfl/why_no_one_talks_about_these_air_ship_team_orange/
+                              - generic [ref=f10e2641]:
+                                - generic [ref=f10e2642]:
+                                  - link "r/SNKRS" [ref=f10e2645]:
+                                    - /url: https://www.reddit.com/r/SNKRS/
+                                  - generic [ref=f10e2650]: •
+                                  - time [ref=f10e2652]: 4 yr. ago
+                                - generic [ref=f10e2653]:
+                                  - button "Join" [ref=f10e2655]
+                                  - button "Open user actions" [ref=f10e2660]
+                              - heading [level=2] [ref=f10e2667]:
+                                - link "Why no one talks about these? Air Ship “Team Orange”" [ref=f10e2668]:
+                                  - /url: https://www.reddit.com/r/SNKRS/comments/y6gjfl/why_no_one_talks_about_these_air_ship_team_orange/
+                              - generic [ref=f10e2673]:
+                                - generic [ref=f10e2674]:
+                                  - generic [ref=f10e2675]:
+                                    - list [ref=f10e2677]:
+                                      - listitem [ref=f10e2678]:
+                                        - figure [ref=f10e2679]:
+                                          - img "r/SNKRS - Why no one talks about these? Air Ship “Team Orange”" [ref=f10e2680]
+                                    - group [ref=f10e2685]:
+                                      - button "Page 1 (Current page)" [ref=f10e2687]
+                                      - button "Page 2" [ref=f10e2689]
+                                  - generic [ref=f10e2692]:
+                                    - button "Previous page" [disabled]
+                                  - button "Next page" [ref=f10e2695]
+                                - generic [ref=f10e2700]: Item 1 of 2
+                              - generic "Actions available for this post" [ref=f10e2702]:
+                                - generic [ref=f10e2705]:
+                                  - button "Upvote" [ref=f10e2706]
+                                  - generic [ref=f10e2711]: "2"
+                                  - button "Downvote" [ref=f10e2713]
+                                - link "38 Go to comments" [ref=f10e2718]:
+                                  - /url: /r/SNKRS/comments/y6gjfl/why_no_one_talks_about_these_air_ship_team_orange/
+                                  - generic [ref=f10e2719]: "38"
+                                  - generic [ref=f10e2725]: Go to comments
+                                - button "Share" [ref=f10e2729]
+                          - separator [ref=f10e2736]
+            - generic [ref=f10e2737]:
+              - complementary "Profile information" [ref=f10e2739]:
+                - generic [ref=f10e2741]:
+                  - generic [ref=f10e2742]:
+                    - heading "Bb_all_in" [level=2] [ref=f10e2743]
+                    - button "Open overflow menu" [ref=f10e2747] [cursor=pointer]
+                  - button "Follow" [ref=f10e2756] [cursor=pointer]
+                  - generic [ref=f10e2763]:
+                    - generic [ref=f10e2764]:
+                      - paragraph [ref=f10e2765]:
+                        - generic [ref=f10e2766]: "127"
+                      - paragraph [ref=f10e2767]: Karma
+                    - generic [ref=f10e2769] [cursor=pointer]:
+                      - paragraph [ref=f10e2770]: "32"
+                      - paragraph [ref=f10e2771]: Contributions
+                    - generic [ref=f10e2772]:
+                      - paragraph [ref=f10e2773]:
+                        - time [ref=f10e2776]: 4 y
+                      - paragraph [ref=f10e2777]: Reddit Age
+                    - generic [ref=f10e2779] [cursor=pointer]:
+                      - paragraph [ref=f10e2780]:
+                        - generic [ref=f10e2781]: "3"
+                      - paragraph [ref=f10e2790]: Active in >
+                  - separator [ref=f10e2791]
+                  - heading "Trophy Case" [level=2] [ref=f10e2792]
+                  - menu [ref=f10e2794]:
+                    - menuitem "Four-Year Club"
+              - list [ref=f10e2796]:
+                - listitem [ref=f10e2797]:
+                  - link "Home" [ref=f10e2799] [cursor=pointer]:
+                    - /url: /?feed=home
+                - listitem [ref=f10e2800]:
+                  - link "Popular" [ref=f10e2802] [cursor=pointer]:
+                    - /url: /r/popular/
+                - listitem [ref=f10e2803]:
+                  - link "News" [ref=f10e2805] [cursor=pointer]:
+                    - /url: /news/
+                - listitem [ref=f10e2806]:
+                  - link "Explore" [ref=f10e2808] [cursor=pointer]:
+                    - /url: /explore/
+                - listitem [ref=f10e2809]:
+                  - link "Best of Reddit" [ref=f10e2811] [cursor=pointer]:
+                    - /url: https://www.reddit.com/posts/2026/global/
+                - listitem [ref=f10e2812]:
+                  - link "Best of Reddit in Portuguese" [ref=f10e2814] [cursor=pointer]:
+                    - /url: https://www.reddit.com/posts/2026/tl-pt-BR/
+                - listitem [ref=f10e2815]:
+                  - link "Best of Reddit in German" [ref=f10e2817] [cursor=pointer]:
+                    - /url: https://www.reddit.com/posts/2026/tl-de/
+                - listitem [ref=f10e2818]:
+                  - link "Reddit Rules" [ref=f10e2820] [cursor=pointer]:
+                    - /url: https://www.redditinc.com/policies/content-policy
+                - listitem [ref=f10e2821]:
+                  - link "Privacy Policy" [ref=f10e2823] [cursor=pointer]:
+                    - /url: https://www.reddit.com/policies/privacy-policy
+                - listitem [ref=f10e2824]:
+                  - link "User Agreement" [ref=f10e2826] [cursor=pointer]:
+                    - /url: https://www.redditinc.com/policies/user-agreement
+                - listitem [ref=f10e2827]:
+                  - link "Accessibility" [ref=f10e2829] [cursor=pointer]:
+                    - /url: https://support.reddithelp.com/hc/sections/38303584022676-Accessibility
+                - listitem [ref=f10e2830]:
+                  - link "Reddit, Inc. © 2026. All rights reserved." [ref=f10e2831] [cursor=pointer]:
+                    - /url: https://redditinc.com
+        - generic [ref=f10e2834]:
+          - paragraph [ref=f10e2835]: Join the most real place on the internet
+          - generic [ref=f10e2837]:
+            - generic [ref=f10e2840]:
+              - generic [ref=f10e2844]:
+                - button "Continua con Google. Si apre in una nuova scheda" [ref=f10e2846] [cursor=pointer]:
+                  - generic [ref=f10e2848]: Continua con Google
+                - iframe
+              - generic [ref=f10e2859] [cursor=pointer]:
+                - generic [ref=f10e2860]: Continue with Apple
+                - button "Sign in with Apple" [ref=f10e2866]:
+                  - generic [ref=f10e2867]:
+                    - img:
+                      - generic:
+                        - img:
+                          - generic:  Sign in with Apple
+            - link "Continue with Phone Number" [ref=f10e2872] [cursor=pointer]:
+              - /url: https://www.reddit.com/login/
+            - link "Continue with Email" [ref=f10e2881] [cursor=pointer]:
+              - /url: https://www.reddit.com/register/
+          - paragraph [ref=f10e2888]:
+            - text: By continuing, you agree to our
+            - link "User Agreement" [ref=f10e2889] [cursor=pointer]:
+              - /url: https://www.redditinc.com/policies/user-agreement
+            - text: and acknowledge that you understand the
+            - link "Privacy Policy" [ref=f10e2890] [cursor=pointer]:
+              - /url: https://www.redditinc.com/policies/privacy-policy
+            - text: .
+      - dialog "Data Protection Consent" [ref=f10e2892]:
+        - generic [ref=f10e2893]:
+          - generic [ref=f10e2895]:
+            - generic:
+              - button "Close" [ref=f10e2899] [cursor=pointer]
+              - generic [ref=f10e2904]:
+                - generic [ref=f10e2905]: Let us know your cookie preferences
+                - generic [ref=f10e2908]:
+                  - paragraph [ref=f10e2909]: "Reddit uses cookies and similar technologies to:"
+                  - list [ref=f10e2910]:
+                    - listitem [ref=f10e2911]: Keep the website operational and running properly
+                    - listitem [ref=f10e2912]: Prevent fraud and abuse
+                    - listitem [ref=f10e2913]: Monitor site usage and performance metrics
+                  - paragraph [ref=f10e2914]: "If you choose “Accept All” we’ll also use cookies to:"
+                  - list [ref=f10e2915]:
+                    - listitem [ref=f10e2916]: Personalize your recommendations and ads
+                    - listitem [ref=f10e2917]: Measure the performance of ads
+                    - listitem [ref=f10e2918]: Develop and improve new features and services
+                  - paragraph [ref=f10e2919]: If you choose “Reject Optional Cookies” we won’t use cookies for these additional uses. You can update your cookie preference from your settings.
+                  - paragraph [ref=f10e2920]:
+                    - text: Learn more about
+                    - link "how Reddit uses cookies" [ref=f10e2921] [cursor=pointer]:
+                      - /url: /en-us/policies/cookies
+                    - text: .
+          - generic [ref=f10e2923]:
+            - button "Reject Optional Cookies" [ref=f10e2924] [cursor=pointer]
+            - button "Accept All" [ref=f10e2927] [cursor=pointer]

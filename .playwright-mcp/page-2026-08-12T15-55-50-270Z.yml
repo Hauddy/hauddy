@@ -1,0 +1,42 @@
+- generic [ref=f19e1]:
+  - generic [ref=f19e3]:
+    - generic [ref=f19e4]:
+      - generic [ref=f19e6]:
+        - generic [ref=f19e7]: Loading
+        - progressbar [ref=f19e8]
+      - main [ref=f19e15]:
+        - generic [ref=f19e20]:
+          - heading "Sign in" [level=1] [ref=f19e21]
+          - generic [ref=f19e22]: with your Google Account to continue to YouTube. This account will be available to other Google apps in the browser.
+        - generic [ref=f19e25]:
+          - generic [ref=f19e30]:
+            - generic [ref=f19e35]:
+              - textbox "Email or phone" [active] [ref=f19e36]
+              - generic: Email or phone
+            - button "Forgot email?" [ref=f19e40] [cursor=pointer]
+          - generic [ref=f19e43]:
+            - text: Not your computer? Use Guest mode to sign in privately.
+            - link "Learn more about using Guest mode (external, opens in a new window)" [ref=f19e44] [cursor=pointer]:
+              - /url: https://support.google.com/chrome/answer/6130773?hl=en
+              - text: Learn more about using Guest mode
+        - generic [ref=f19e46]:
+          - button "Next" [ref=f19e50]
+          - button "Create account" [ref=f19e59]
+    - contentinfo [ref=f19e66]:
+      - combobox "Change language English (United States)" [ref=f19e70] [cursor=pointer]:
+        - generic: English (United States)
+      - list [ref=f19e72]:
+        - listitem [ref=f19e73]:
+          - link "Open Google Account Help Center (external, opens in a new window)" [ref=f19e74] [cursor=pointer]:
+            - /url: https://support.google.com/accounts?hl=en&p=account_iph
+            - text: Help
+        - listitem [ref=f19e75]:
+          - link "Privacy Policy (external, opens in a new window)" [ref=f19e76] [cursor=pointer]:
+            - /url: https://accounts.google.com/TOS?loc=ES&hl=en&privacy=true
+            - text: Privacy
+        - listitem [ref=f19e77]:
+          - link "Google Terms of Service (external, opens in a new window)" [ref=f19e78] [cursor=pointer]:
+            - /url: https://accounts.google.com/TOS?loc=ES&hl=en
+            - text: Terms
+  - iframe [ref=f19e79]:
+    

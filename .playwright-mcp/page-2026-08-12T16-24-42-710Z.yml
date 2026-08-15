@@ -1,0 +1,153 @@
+- generic [active] [ref=f26e1]:
+  - generic [ref=f26e2]:
+    - log [ref=f26e430]:
+      - generic [ref=f26e431]: Loading
+      - generic [ref=f26e432]: Loading finished
+    - log
+  - generic [ref=f26e67]:
+    - generic [ref=f26e72]:
+      - generic [ref=f26e73]:
+        - generic [ref=f26e75]:
+          - generic [ref=f26e433]: HC
+          - generic [ref=f26e79]: Hauddy Community
+        - generic [ref=f26e80]:
+          - button "Messaggi ricevuti" [ref=f26e83] [cursor=pointer]
+          - link [ref=f26e86] [cursor=pointer]:
+            - /url: https://support.discord.com
+            - button "Aiuto" [ref=f26e87]
+      - generic [ref=f26e91]:
+        - generic [ref=f26e92]:
+          - navigation "Barra laterale del server" [ref=f26e93]:
+            - tree [ref=f26e94]:
+              - generic [ref=f26e95]:
+                - treeitem "Messaggi diretti" [level=1] [ref=f26e104] [cursor=pointer]
+                - group "Server" [ref=f26e435]:
+                  - generic [ref=f26e436]:
+                    - treeitem "Hauddy Community" [level=1] [selected] [ref=f26e446] [cursor=pointer]:
+                      - generic [ref=f26e448]: HC
+                    - generic [ref=f26e449]: Hauddy Community
+                - treeitem "Aggiungi un server" [level=1] [ref=f26e117] [cursor=pointer]
+                - treeitem "Scopri" [level=1] [ref=f26e134] [cursor=pointer]
+                - treeitem "Scarica le app" [level=1] [ref=f26e145] [cursor=pointer]
+          - navigation "Hauddy Community (server)" [ref=f26e450]:
+            - generic [ref=f26e453]:
+              - button "Hauddy Community, azioni server" [ref=f26e454] [cursor=pointer]:
+                - heading "Hauddy Community" [level=2] [ref=f26e456]
+              - button "Invita al server" [ref=f26e461] [cursor=pointer]
+            - heading "Canali" [level=2] [ref=f26e466]
+            - list "Canali" [ref=f26e468]:
+              - listitem [ref=f26e470]:
+                - generic [ref=f26e471]:
+                  - button "Eventi"
+                  - generic [ref=f26e472] [cursor=pointer]: Eventi
+              - listitem [ref=f26e477]:
+                - generic [ref=f26e478]:
+                  - button "Potenziamenti server"
+                  - generic [ref=f26e479] [cursor=pointer]: Potenziamenti server
+              - listitem [ref=f26e485]:
+                - generic [ref=f26e486] [cursor=pointer]:
+                  - button "Canali testuali (categoria)" [expanded] [ref=f26e487]:
+                    - heading "Canali testuali" [level=3] [ref=f26e488]
+                  - generic [ref=f26e492]:
+                    - button "Creare canale" [ref=f26e493]
+                    - generic [ref=f26e496]: Creare canale
+                - button "Consiglio tutorial" [ref=f26e497]
+              - listitem [ref=f26e501]:
+                - link "generale (canale testuale)" [ref=f26e504] [cursor=pointer]:
+                  - /url: /channels/1537134745526472844/1537134746214342718
+                  - generic [ref=f26e505]:
+                    - img "Testo icon" [ref=f26e506]
+                    - generic [ref=f26e509]: Testo
+                    - generic [ref=f26e510]: generale
+                    - generic [ref=f26e511]:
+                      - button "Invita nel canale" [ref=f26e513]
+                      - generic [ref=f26e517]: Invita nel canale
+                      - button "Modifica il canale" [ref=f26e519]
+                      - generic [ref=f26e522]: Modifica il canale
+              - listitem [ref=f26e523]:
+                - generic [ref=f26e524] [cursor=pointer]:
+                  - button "Canali vocali (categoria)" [expanded] [ref=f26e525]:
+                    - heading "Canali vocali" [level=3] [ref=f26e526]
+                  - generic [ref=f26e530]:
+                    - button "Creare canale" [ref=f26e531]
+                    - generic [ref=f26e534]: Creare canale
+              - listitem [ref=f26e535]:
+                - button "Generale (canale vocale)" [ref=f26e539] [cursor=pointer]:
+                  - generic [ref=f26e540]:
+                    - img "Voce icon" [ref=f26e541]
+                    - generic [ref=f26e545]: Voce
+                    - generic [ref=f26e546]: Generale
+                    - generic:
+                      - generic [ref=f26e547]: Apri chat
+                      - generic [ref=f26e548]: Invita nella chat vocale
+                      - generic [ref=f26e549]: Modifica il canale
+          - separator "Resize Sidebar" [ref=f26e224]
+          - region "Impostazioni e stato utente" [ref=f26e225]:
+            - generic [ref=f26e226]:
+              - generic [ref=f26e227] [cursor=pointer]:
+                - button "Gestisci profilo e stato"
+                - generic [ref=f26e230]:
+                  - generic [ref=f26e231]: barnaba.barcellona
+                  - generic [ref=f26e235]:
+                    - generic: barnaba.barcellona_81199
+                    - generic: Online
+              - generic [ref=f26e236]:
+                - generic [ref=f26e237]:
+                  - switch "Silenzia" [checked] [ref=f26e238] [cursor=pointer]
+                  - generic [ref=f26e259]: Togli il silenziamento al microfono
+                  - button "Opzioni di ingresso" [ref=f26e260] [cursor=pointer]
+                - generic [ref=f26e264]:
+                  - switch "Silenzia l'audio" [ref=f26e265] [cursor=pointer]
+                  - button "Opzioni di uscita" [ref=f26e277] [cursor=pointer]
+                - button "Impostazioni utente" [ref=f26e281] [cursor=pointer]
+        - generic [ref=f26e551]:
+          - region "Intestazione canale" [ref=f26e553]:
+            - generic [ref=f26e554]:
+              - generic [ref=f26e555]:
+                - generic [ref=f26e559]: Canale testuale
+                - 'heading "Hauddy Community: generale" [level=1] [ref=f26e561]':
+                  - generic [ref=f26e562]: "Hauddy Community:"
+                  - text: generale
+              - generic [ref=f26e563]:
+                - button "Thread" [ref=f26e564] [cursor=pointer]
+                - button "Impostazioni delle notifiche" [ref=f26e567] [cursor=pointer]
+                - button "Messaggi attaccati" [ref=f26e570] [cursor=pointer]
+                - button "Mostra lista dei membri" [ref=f26e573] [cursor=pointer]
+                - generic [ref=f26e578]:
+                  - combobox "Cerca Hauddy Community" [ref=f26e579]
+                  - button [ref=f26e581]
+          - main "generale (canale)" [ref=f26e588]:
+            - heading "Chat di generale" [level=2] [ref=f26e590]
+            - group [ref=f26e592]:
+              - list "Messaggi in generale" [ref=f26e594]:
+                - generic [ref=f26e597]:
+                  - generic [ref=f26e598]:
+                    - heading [level=3] [ref=f26e599]:
+                      - paragraph [ref=f26e600]: Benvenuto su
+                      - paragraph [ref=f26e601]: Hauddy Community
+                    - generic [ref=f26e602]:
+                      - text: Questo qui è il tuo server nuovo di zecca. Ecco alcuni passi per cominciare. Per saperne di più, dai un'occhiata alla nostra
+                      - link "Guida introduttiva" [ref=f26e603] [cursor=pointer]:
+                        - /url: https://support.discord.com/hc/it/articles/360045138571?utm_source=discord&utm_medium=blog&utm_campaign=2020-06_help-new-user&utm_content=--t%3Apm
+                      - text: .
+                  - button "Invita i tuoi amici" [ref=f26e605] [cursor=pointer]
+                  - button "Personalizza il server con un'icona" [ref=f26e610] [cursor=pointer]
+                  - button "Invia il tuo primo messaggio" [ref=f26e615] [cursor=pointer]
+                  - button "Scarica l'app Discord" [ref=f26e620] [cursor=pointer]
+                  - button "Aggiungi la tua prima app" [ref=f26e625] [cursor=pointer]
+                  - button "Sblocca benefici per tutti con i potenziamenti" [ref=f26e630] [cursor=pointer]
+            - generic [ref=f26e640]:
+              - button "Più opzioni di messaggio" [ref=f26e642] [cursor=pointer]
+              - generic [ref=f26e647]:
+                - generic: "Invia un messaggio in #generale"
+                - 'textbox "Invia un messaggio in #generale" [ref=f26e648]'
+              - generic [ref=f26e650]:
+                - generic [ref=f26e651]:
+                  - button "Invia un regalo" [ref=f26e652] [cursor=pointer]
+                  - generic [ref=f26e668]: Fai fare il salto di qualità ai tuoi amici! Regalagli benefici della chat incredibili grazie a Nitro.
+                - button "Apri selettore di GIF" [ref=f26e670] [cursor=pointer]
+                - generic [ref=f26e680]: Invia GIF
+                - button "Apri selettore di adesivi" [ref=f26e682] [cursor=pointer]
+                - button "Aggiungi emoji" [ref=f26e692] [cursor=pointer]
+                - button "App" [ref=f26e697] [cursor=pointer]
+    - button "Consiglio tutorial" [ref=f26e714]

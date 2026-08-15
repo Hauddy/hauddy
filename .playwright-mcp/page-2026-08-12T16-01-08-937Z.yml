@@ -1,0 +1,13 @@
+- generic [active] [ref=f79e1]:
+  - link [ref=f79e3] [cursor=pointer]:
+    - /url: /
+    - img "YouTube Studio" [ref=f79e4]
+  - generic [ref=f79e5]:
+    - img "Errore" [ref=f79e6]
+    - paragraph [ref=f79e7]: Spiacenti, non hai l'autorizzazione per vedere la pagina
+    - paragraph [ref=f79e8]: Devi accedere a un account che dispone dell'accesso. Prova a cambiare account o accedere a un account che dispone dell'autorizzazione.
+    - generic [ref=f79e9]:
+      - link "Cambia account" [ref=f79e10] [cursor=pointer]:
+        - /url: https://www.youtube.com/channel_switcher?next=https://studio.youtube.com/channel/UC5K2Gutzv4IHroCzOCBaOeA
+      - link "Torna a Studio" [ref=f79e11] [cursor=pointer]:
+        - /url: /
