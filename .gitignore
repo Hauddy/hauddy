@@ -29,6 +29,16 @@ data/
 *.dc.html
 support.js
 
+# Playwright MCP session snapshots
+.playwright-mcp/
+
+# Marketing / brand assets (worked on separately, root-level only)
+/*.png
+/*.html
+
+# Internal scripts not for public repo
+scripts/send-alpha-invites.mjs
+
 # Marketing animation assets — worked on separately, not part of the build
 animation/
 
