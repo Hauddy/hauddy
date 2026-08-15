@@ -23,6 +23,7 @@ const workspaces = [
   'packages/app-shared',
   'packages/web-tokens',
   'packages/sidecar',
+  'packages/hub',
   'packages/app',
   'packages/web',
   'packages/landing',
