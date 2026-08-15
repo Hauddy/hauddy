@@ -8,10 +8,14 @@ export interface HauddyDesktopBridge {
   isDesktop: true;
   expand(route?: string): Promise<void>;
   quit(): Promise<void>;
-  /** Set the Dock icon badge to a count (0 clears it). macOS only. */
   setBadge(count: number): Promise<void>;
-  /** Fire a native OS notification. */
   notify(input: { title: string; body: string }): Promise<void>;
+  relaunch(): Promise<void>;
+  downloadUpdate(): Promise<void>;
+  installUpdate(): Promise<void>;
+  onUpdateProgress(cb: (data: { percent: number }) => void): void;
+  onUpdateReady(cb: () => void): void;
+  onUpdateError(cb: (data: { message: string }) => void): void;
 }
 
 declare global {
@@ -58,4 +62,31 @@ export function quitApp(): void {
     return;
   }
   window.close();
+}
+
+/** Relaunch the app (desktop only). No-op in a plain browser. */
+export function relunchApp(): void {
+  void window.hauddyDesktop?.relaunch();
+}
+
+/** Start downloading and installing an update (desktop only). */
+export function downloadUpdate(): void {
+  void window.hauddyDesktop?.downloadUpdate();
+}
+
+/** Apply the downloaded update by relaunching (desktop only). */
+export function installUpdate(): void {
+  void window.hauddyDesktop?.installUpdate();
+}
+
+export function onUpdateProgress(cb: (data: { percent: number }) => void): void {
+  window.hauddyDesktop?.onUpdateProgress(cb);
+}
+
+export function onUpdateReady(cb: () => void): void {
+  window.hauddyDesktop?.onUpdateReady(cb);
+}
+
+export function onUpdateError(cb: (data: { message: string }) => void): void {
+  window.hauddyDesktop?.onUpdateError(cb);
 }

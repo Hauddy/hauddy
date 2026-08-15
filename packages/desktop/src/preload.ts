@@ -7,12 +7,20 @@ import { contextBridge, ipcRenderer } from 'electron';
  */
 contextBridge.exposeInMainWorld('hauddyDesktop', {
   isDesktop: true,
-  /** Show the full window, navigated to a HashRouter route like
-   *  '/network/agents/@gio?add=1'. */
   expand: (route?: string) => ipcRenderer.invoke('hauddy:expand', route),
   quit: () => ipcRenderer.invoke('hauddy:quit'),
-  /** Set the Dock badge to a notification count (0 clears it). */
   setBadge: (count: number) => ipcRenderer.invoke('hauddy:badge', count),
-  /** Fire a native OS notification. */
   notify: (input: { title: string; body: string }) => ipcRenderer.invoke('hauddy:notify', input),
+  relaunch: () => ipcRenderer.invoke('app:relaunch'),
+  downloadUpdate: () => ipcRenderer.invoke('update:download'),
+  installUpdate: () => ipcRenderer.invoke('update:install'),
+  onUpdateProgress: (cb: (data: { percent: number }) => void) => {
+    ipcRenderer.on('update:progress', (_e, data: { percent: number }) => cb(data));
+  },
+  onUpdateReady: (cb: () => void) => {
+    ipcRenderer.on('update:ready', () => cb());
+  },
+  onUpdateError: (cb: (data: { message: string }) => void) => {
+    ipcRenderer.on('update:error', (_e, data: { message: string }) => cb(data));
+  },
 });

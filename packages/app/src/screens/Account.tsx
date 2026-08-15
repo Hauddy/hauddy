@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api, useApiData } from '../api';
 import type { ExposureRow, PlatformInfo } from '../api/types';
 import { PresenceDot } from '../components/Presence';
+import { isDesktop, downloadUpdate, installUpdate, onUpdateProgress, onUpdateReady, onUpdateError } from '../bridge';
 
 const APP_VERSION: string = import.meta.env.VITE_APP_VERSION ?? '0.0.0';
 
@@ -57,7 +58,7 @@ export default function Account() {
         <p className="loading-note">Loading…</p>
       ) : platform.connected ? (
         <>
-          {softUpdate && !softDismissed && (
+          {softUpdate && !softDismissed && !isDesktop() && (
             <div className="notice update-soft">
               Hauddy {softUpdate.latest} is available —{' '}
               <a href="https://hauddy.com/download" target="_blank" rel="noopener noreferrer">Download</a>
@@ -71,6 +72,10 @@ export default function Account() {
         <ConnectForm />
       )}
 
+      {isDesktop() && (
+        <UpdateSection currentVersion={APP_VERSION} latestVersion={softUpdate?.latest ?? null} />
+      )}
+
       <section className="detail-section">
         <h2 className="section-title">Help</h2>
         <button type="button" className="btn btn-ghost" onClick={() => navigate('/onboarding')}>
@@ -82,6 +87,71 @@ export default function Account() {
         <a href="https://hauddy.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
       </p>
     </>
+  );
+}
+
+type UpdateState = 'idle' | 'downloading' | 'ready' | 'error';
+
+function UpdateSection({ currentVersion, latestVersion }: { currentVersion: string; latestVersion: string | null }) {
+  const [state, setState] = useState<UpdateState>('idle');
+  const [percent, setPercent] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const listenersAttached = useRef(false);
+
+  useEffect(() => {
+    if (listenersAttached.current) return;
+    listenersAttached.current = true;
+    onUpdateProgress(({ percent: p }) => { setPercent(p); setState('downloading'); });
+    onUpdateReady(() => setState('ready'));
+    onUpdateError(({ message }) => { setError(message); setState('error'); });
+  }, []);
+
+  const start = () => {
+    setState('downloading');
+    setPercent(0);
+    setError(null);
+    downloadUpdate();
+  };
+
+  return (
+    <section className="detail-section">
+      <h2 className="section-title">Software update</h2>
+      <div className="update-version-row">
+        <span className="update-version-label">Current version</span>
+        <span className="update-version-value">v{currentVersion}</span>
+      </div>
+      {state === 'idle' && (
+        latestVersion ? (
+          <div className="update-available-row">
+            <span className="update-available-label">v{latestVersion} is available</span>
+            <button type="button" className="btn btn-primary btn-sm" onClick={start}>
+              Download &amp; install
+            </button>
+          </div>
+        ) : (
+          <p className="update-up-to-date">Up to date</p>
+        )
+      )}
+      {state === 'downloading' && (
+        <div className="update-progress-wrap">
+          <div className="update-progress-bar" style={{ width: `${percent}%` }} />
+          <span className="update-progress-label">{percent}%</span>
+        </div>
+      )}
+      {state === 'ready' && (
+        <button type="button" className="btn btn-primary btn-sm" onClick={installUpdate}>
+          Restart to apply
+        </button>
+      )}
+      {state === 'error' && (
+        <div className="notice link-conflict">
+          Update failed: {error}
+          <button type="button" className="btn btn-ghost btn-sm" style={{ marginLeft: 8 }} onClick={start}>
+            Retry
+          </button>
+        </div>
+      )}
+    </section>
   );
 }
 

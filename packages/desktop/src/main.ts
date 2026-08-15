@@ -1,4 +1,7 @@
+import { execFile } from 'node:child_process';
 import fs from 'node:fs';
+import https from 'node:https';
+import os from 'node:os';
 import path from 'node:path';
 import { app, BrowserWindow, ipcMain, Menu, nativeImage, Notification, screen, Tray, utilityProcess } from 'electron';
 
@@ -212,6 +215,72 @@ app.whenReady().then(() => {
     expandTo(typeof route === 'string' && route.startsWith('/') ? route : '/');
   });
   ipcMain.handle('hauddy:quit', () => app.quit());
+  ipcMain.handle('app:relaunch', () => {
+    app.relaunch();
+    app.exit(0);
+  });
+
+  let updateInProgress = false;
+
+  ipcMain.handle('update:download', async (event) => {
+    if (updateInProgress) return;
+    updateInProgress = true;
+    const tmpDmg = path.join(os.tmpdir(), 'hauddy-update.dmg');
+    const tmpMnt = path.join(os.tmpdir(), 'hauddy-mnt');
+    const send = (ch: string, data?: unknown) => event.sender.send(ch, data);
+    const cleanup = () => {
+      try { fs.rmSync(tmpDmg, { force: true }); } catch { /* ignore */ }
+      try { execFile('hdiutil', ['detach', tmpMnt, '-quiet', '-force']); } catch { /* ignore */ }
+    };
+
+    const download = (url: string): Promise<void> =>
+      new Promise((resolve, reject) => {
+        https.get(url, (res) => {
+          if ((res.statusCode === 301 || res.statusCode === 302) && res.headers.location) {
+            res.resume();
+            download(res.headers.location).then(resolve, reject);
+            return;
+          }
+          if (res.statusCode !== 200) { reject(new Error(`HTTP ${res.statusCode}`)); return; }
+          const total = parseInt(res.headers['content-length'] ?? '0', 10);
+          let downloaded = 0;
+          const file = fs.createWriteStream(tmpDmg);
+          res.on('data', (chunk: Buffer) => {
+            downloaded += chunk.length;
+            if (total > 0) send('update:progress', { percent: Math.round(downloaded / total * 100) });
+          });
+          res.pipe(file);
+          file.on('finish', () => file.close(() => resolve()));
+          file.on('error', reject);
+          res.on('error', reject);
+        }).on('error', reject);
+      });
+
+    const exec = (cmd: string, args: string[]): Promise<void> =>
+      new Promise((resolve, reject) =>
+        execFile(cmd, args, (err) => (err ? reject(err) : resolve())),
+      );
+
+    try {
+      await download('https://api.hauddy.com/download/mac');
+      await exec('hdiutil', ['attach', tmpDmg, '-mountpoint', tmpMnt, '-nobrowse']);
+      await exec('ditto', [`${tmpMnt}/hauddy.app`, '/Applications/hauddy.app']);
+      await exec('hdiutil', ['detach', tmpMnt]);
+      await exec('xattr', ['-cr', '/Applications/hauddy.app']);
+      fs.rmSync(tmpDmg, { force: true });
+      send('update:ready');
+    } catch (err) {
+      cleanup();
+      send('update:error', { message: (err as Error).message });
+    } finally {
+      updateInProgress = false;
+    }
+  });
+
+  ipcMain.handle('update:install', () => {
+    app.relaunch();
+    app.exit(0);
+  });
 
   // Notification count → Dock badge (macOS). 0/NaN clears it.
   ipcMain.handle('hauddy:badge', (_e, count?: number) => {

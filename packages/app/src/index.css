@@ -1177,6 +1177,57 @@
   align-self: flex-start;
 }
 
+/* ---------- In-app software update ---------- */
+
+.update-version-row,
+.update-available-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0;
+}
+.update-version-label {
+  font-size: 13px;
+  color: var(--text-faint);
+}
+.update-version-value {
+  font-size: 13px;
+  font-family: var(--font-mono, monospace);
+  color: var(--text);
+}
+.update-available-label {
+  font-size: 13px;
+  color: var(--text);
+}
+.update-up-to-date {
+  font-size: 13px;
+  color: var(--text-faint);
+  margin: 4px 0 0;
+}
+.update-progress-wrap {
+  position: relative;
+  height: 6px;
+  max-width: 320px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.update-progress-bar {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+  transition: width 0.2s ease;
+}
+.update-progress-label {
+  display: block;
+  font-size: 11.5px;
+  color: var(--text-faint);
+  margin-top: 6px;
+}
+
 /* exposed = a network-reach tag, distinct from the local origin tag */
 .origin-network {
   color: var(--accent-hover);
