@@ -224,17 +224,9 @@ function localApiUrl(): string | null {
  *  Checks both the stdio identity (project-local .hauddy/identity.toml) and
  *  the HTTP MCP identity (~/.hauddy/agents/<dir-slug>/identity.toml). */
 function currentAgentId(): string | null {
-  // stdio path: walk up from cwd
-  const file = findIdentityFile();
-  if (file) {
-    try {
-      const id = loadIdentity(file).agent_id;
-      if (id) return id;
-    } catch {
-      /* fall through */
-    }
-  }
-  // HTTP MCP path: check ~/.hauddy/agents/<slug>/identity.toml
+  // HTTP MCP path checked first: patchClaudeJsonMcpUrl() always routes wrapped
+  // Claude sessions through HTTP MCP, so this identity is the correct one to
+  // subscribe to. Stdio identity is checked second as a fallback for stdio-only setups.
   const slug = slugifyNickname(path.basename(process.cwd()));
   if (slug) {
     const httpFile = path.join(hauddyHome(), "agents", slug, "identity.toml");
@@ -243,6 +235,16 @@ function currentAgentId(): string | null {
       if (id) return id;
     } catch {
       /* not provisioned yet */
+    }
+  }
+  // stdio path: walk up from cwd
+  const file = findIdentityFile();
+  if (file) {
+    try {
+      const id = loadIdentity(file).agent_id;
+      if (id) return id;
+    } catch {
+      /* fall through */
     }
   }
   return null;
@@ -263,8 +265,10 @@ async function injectionLoop(child: IPty, alive: () => boolean): Promise<void> {
   }
   if (!agentId) return;
 
-  const url = `${api}/api/inject/${encodeURIComponent(agentId)}`;
   while (alive()) {
+    // Re-read on each reconnect: the agent ID can change if the daemon restarts.
+    agentId = currentAgentId() ?? agentId;
+    const url = `${api}/api/inject/${encodeURIComponent(agentId)}`;
     try {
       const res = await fetch(url, { headers: { accept: "text/event-stream" } });
       if (!res.ok || !res.body) {
