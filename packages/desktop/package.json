@@ -1,6 +1,6 @@
 {
   "name": "@hauddy/desktop",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "private": true,
   "description": "Electron shell for the hauddy local app: macOS menu-bar tray, compact popover, expandable full window. UI is @hauddy/app-ui.",
   "main": "dist/main.js",
