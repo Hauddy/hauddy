@@ -1044,6 +1044,33 @@ export async function startHub(options: HubOptions = {}): Promise<HubHandle> {
           });
           return json(200, { calls });
         }
+        if (req.method === "GET" && path === "/console/dashboard") {
+          const viewerId = resolveConsoleViewer();
+          const threads = history.threadsFor(viewerId).map(withPeerNick);
+          const calls = history.callsFor(viewerId).map((c) => {
+            const incoming = c.callee === viewerId;
+            const peer_id = incoming ? c.caller : c.callee;
+            const peer_nick = (incoming ? c.caller_nick : c.callee_nick) ?? speakingNickname(peer_id) ?? peer_id;
+            return {
+              call_id: c.call_id,
+              direction: incoming ? "incoming" : "outgoing",
+              peer_id,
+              peer_nick,
+              state: c.state,
+              started_ms: c.started_ms,
+              answered_ms: c.answered_ms,
+              ended_ms: c.ended_ms,
+              end_reason: c.end_reason,
+            };
+          });
+          const seen = notifSeen.get(humanId) ?? 0;
+          const notifications = {
+            friend_requests: 0,
+            unread_messages: history.unreadMessageCount(humanId),
+            missed_calls: history.missedCallCount(humanId, seen),
+          };
+          return json(200, { threads, calls, notifications });
+        }
         if (req.method === "GET" && path === "/console/notifications") {
           // Local hub has no account friendships (that's a platform concept); the
           // daemon layer folds in friend_requests. Here: unread + missed only.

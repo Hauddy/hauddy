@@ -139,7 +139,7 @@ async function postResult(path: string, body: unknown): Promise<ContactActionRes
 // The dashboard re-fetches on this heartbeat, so keep it gentle and skip it
 // entirely while the tab is backgrounded (Page Visibility) — an open-but-hidden
 // tab should make zero requests. Refocusing refreshes immediately.
-const POLL_MS = 6000;
+const POLL_MS = 30_000;
 let version = 0;
 const listeners = new Set<() => void>();
 let timer: ReturnType<typeof setInterval> | null = null;
@@ -737,6 +737,13 @@ export const api = {
   },
   consoleSay(text: string, attachments?: Attachment[]): Promise<{ ok?: boolean }> {
     return post('/console/call/say', { text, ...(attachments && attachments.length ? { attachments } : {}) });
+  },
+  consoleDashboard(): Promise<{
+    threads: ThreadSummary[];
+    calls: CallLogEntry[];
+    notifications: Notifications;
+  }> {
+    return get<{ threads: ThreadSummary[]; calls: CallLogEntry[]; notifications: Notifications }>('/console/dashboard');
   },
   /** Upload a file to the platform temp store (Bearer). Metadata as query params
    *  so the browser sends no custom request headers (no CORS preflight snag). */
