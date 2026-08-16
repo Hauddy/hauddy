@@ -1044,6 +1044,20 @@ export async function startHub(options: HubOptions = {}): Promise<HubHandle> {
           });
           return json(200, { calls });
         }
+        if (req.method === "GET" && path === "/console/conversation") {
+          const viewerId = resolveConsoleViewer();
+          const withPeer = url.searchParams.get("with") ?? "";
+          const from = url.searchParams.get("from") ?? undefined;
+          const to = url.searchParams.get("to") ?? undefined;
+          const limit = Number(url.searchParams.get("limit")) || 50;
+          return json(200, history.getConversation(viewerId, withPeer, { from, to, limit }));
+        }
+        if (req.method === "GET" && path === "/console/call-transcript") {
+          const callId = url.searchParams.get("call_id") ?? "";
+          const transcript = history.getCallTranscript(callId);
+          if (!transcript) return json(404, { error: "call transcript not found" });
+          return json(200, transcript);
+        }
         if (req.method === "GET" && path === "/console/notifications") {
           // Local hub has no account friendships (that's a platform concept); the
           // daemon layer folds in friend_requests. Here: unread + missed only.

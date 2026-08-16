@@ -262,3 +262,53 @@ export function listFriends(endpoint: string, apiKey: string): Promise<FriendsVi
 export function setAutoAccept(endpoint: string, autoAccept: boolean, apiKey: string): Promise<{ auto_accept: boolean }> {
   return request(endpoint, "POST", "/accounts/settings", { auto_accept: autoAccept }, apiKey);
 }
+
+// ---- conversation & call transcript (spec §9) ---------------------------
+
+export interface ConversationView {
+  contact: string;
+  messages: Array<{
+    from: string;
+    to: string;
+    body: string | null;
+    attachments: unknown;
+    ts: string;
+  }>;
+}
+
+export interface CallTranscriptView {
+  call_id: string;
+  caller: string;
+  callee: string;
+  state: string;
+  started_at: string;
+  ended_at: string | null;
+  turns: Array<{
+    seq: number;
+    from: string;
+    body: string | null;
+    attachments: unknown;
+    ts: string;
+  }>;
+}
+
+export function getConversation(
+  endpoint: string,
+  viewerId: string,
+  withPeer: string,
+  opts?: { from?: string; to?: string; limit?: number },
+): Promise<ConversationView> {
+  const query = new URLSearchParams({
+    view_as: viewerId,
+    with: withPeer,
+    ...(opts?.from ? { from: opts.from } : {}),
+    ...(opts?.to ? { to: opts.to } : {}),
+    ...(opts?.limit ? { limit: String(opts.limit) } : {}),
+  });
+  return request(endpoint, "GET", `/console/conversation?${query.toString()}`);
+}
+
+export function getCallTranscript(endpoint: string, callId: string): Promise<CallTranscriptView | null> {
+  const query = new URLSearchParams({ call_id: callId });
+  return request<CallTranscriptView>(endpoint, "GET", `/console/call-transcript?${query.toString()}`).catch(() => null);
+}

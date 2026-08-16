@@ -7,7 +7,7 @@ import { z } from "zod";
 import { hauddyHome } from "./account.js";
 import type { ActivityLog } from "./activity.js";
 import type { HubConnection } from "./connection.js";
-import { downloadFile, getPresence, listAgents, listContacts, setNickname, updateProfile, uploadFile } from "./hub-api.js";
+import { downloadFile, getCallTranscript, getConversation, getPresence, listAgents, listContacts, setNickname, updateProfile, uploadFile } from "./hub-api.js";
 import { CallValidation, callSetupGuide, wakeChannelFor } from "./wake.js";
 
 /** Minimal extension→MIME guess for outbound attachments (best-effort; the hub
@@ -339,6 +339,40 @@ export function createMcpServer(provision: Provision, validation: CallValidation
       writeFileSync(dest, dl.bytes);
       p.activity?.push("file.recv", `${dl.name} (${dl.bytes.length}b)`);
       return asText({ ok: true, path: dest, name: dl.name, size: dl.bytes.length, mime: dl.mime });
+    },
+  );
+
+  server.registerTool(
+    "get_conversation",
+    {
+      description:
+        "Pull a structured message thread with a contact, ordered by time. Supports optional date filtering (from/to in ISO format) and turn limit.",
+      inputSchema: {
+        with: z.string().describe("the contact's agent ID or '@nickname'"),
+        from: z.string().optional().describe("ISO date string (inclusive), e.g. '2025-01-01'"),
+        to: z.string().optional().describe("ISO date string (inclusive), e.g. '2025-01-31'"),
+        limit: z.number().optional().describe("max turns to return (default 50)"),
+      },
+    },
+    async ({ with: withPeer, from, to, limit }) => {
+      const p = await provision();
+      const res = await getConversation(p.endpoint, p.agentId, withPeer, { from, to, limit });
+      return asText(res);
+    },
+  );
+
+  server.registerTool(
+    "get_call_transcript",
+    {
+      description: "Retrieve the full spoken transcript and metadata of a call session by call ID.",
+      inputSchema: {
+        call_id: z.string().describe("the call_id of the call session"),
+      },
+    },
+    async ({ call_id }) => {
+      const p = await provision();
+      const res = await getCallTranscript(p.endpoint, call_id);
+      return asText(res ?? { error: "call transcript not found", call_id });
     },
   );
 
