@@ -6,6 +6,7 @@ import {
   type CallLogEntry,
   type ConsoleCallPoll,
   type ConsoleMessage,
+  type DashboardResult,
   type FriendsView,
   type Notifications,
   type ThreadMessage,
@@ -91,6 +92,18 @@ const localApi: Partial<Api> = {
       }
     }
     return out;
+  },
+
+  // ---- dashboard (assembled locally — daemon for threads/notifications, platform for the rest) ----
+  async consoleDashboard(opts?: { as?: string | null }): Promise<DashboardResult> {
+    const [threadsRes, notifications, friends, agents, platform_agents] = await Promise.all([
+      daemonGet<{ threads: ThreadSummary[] }>(`/api/human/threads${asQuery(opts?.as)}`),
+      daemonGet<Notifications>('/api/human/notifications'),
+      httpApi.listFriends().then((r): FriendsView => r ?? { auto_accept: false, linked: [], incoming: [], outgoing: [], linked_agents: [] }).catch((): FriendsView => ({ auto_accept: false, linked: [], incoming: [], outgoing: [], linked_agents: [] })),
+      localApi.listAgents!(),
+      localApi.listPlatformAgents!(),
+    ]);
+    return { threads: threadsRes.threads, notifications, friends, agents, platform_agents };
   },
 
   // ---- persistent history (local hub) ----

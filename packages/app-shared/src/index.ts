@@ -34,6 +34,7 @@ export type {
   ThreadMessage,
   CallLogEntry,
   Notifications,
+  DashboardResult,
 } from './api';
 export type {
   AccountKey,
