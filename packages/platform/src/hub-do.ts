@@ -233,6 +233,12 @@ export class HubDO {
           human: { nickname: humanView.nickname, description: humanView.description },
         });
       }
+      if (method === "DELETE" && (path === "/accounts/me" || path === "/account")) {
+        const accountId = this.requireAccount(request);
+        if (!accountId) return this.unauthorized();
+        const ok = this.db.deleteAccount(accountId);
+        return this.json(200, { ok });
+      }
       if (method === "GET" && path === "/accounts/claims") {
         const accountId = this.requireAccount(request);
         if (!accountId) return this.unauthorized();

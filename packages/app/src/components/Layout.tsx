@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { api, useApiData, useReachable } from '../api';
 import { fetchVersion, hasSoftUpdate, useVersionResult } from '../versionCheck';
-import { IconActivity, IconAgents, IconContacts, IconMessages, IconPlatform } from './icons';
+import { IconActivity, IconAgents, IconContacts, IconMessages, IconPlatform, IconSettings } from './icons';
 import Logo from './Logo';
 import NotificationBell from './NotificationBell';
 
@@ -11,6 +11,7 @@ const NAV = [
   { to: '/messages', label: 'Messages', icon: IconMessages, end: false },
   { to: '/contacts', label: 'Contacts', icon: IconContacts, end: false },
   { to: '/account', label: 'Account', icon: IconPlatform, end: false },
+  { to: '/settings', label: 'Settings', icon: IconSettings, end: false },
   { to: '/activity', label: 'Activity', icon: IconActivity, end: false },
 ];
 

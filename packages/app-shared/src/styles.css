@@ -244,6 +244,37 @@
   font-size: 13px;
 }
 
+/* ---------- danger zone & settings ---------- */
+.btn-danger {
+  background: var(--danger, #dc2626);
+  color: #ffffff;
+  border: none;
+}
+.btn-danger:hover {
+  background: #b91c1c;
+}
+.settings-danger {
+  border-top: 1px solid var(--border);
+  padding-top: 24px;
+  margin-top: 24px;
+}
+.danger-confirm-box {
+  background: var(--surface-2, rgba(220, 38, 38, 0.08));
+  border: 1px solid var(--danger, #dc2626);
+  border-radius: var(--radius-md, 8px);
+  padding: 16px;
+  margin-top: 12px;
+}
+.danger-warning {
+  margin: 0 0 12px;
+  color: var(--text);
+  font-weight: 500;
+}
+.danger-actions {
+  display: flex;
+  gap: 12px;
+}
+
 /* ---------- contacts ---------- */
 
 .search-result {

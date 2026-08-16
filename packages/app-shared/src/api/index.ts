@@ -109,6 +109,12 @@ async function post<T>(path: string, body?: unknown): Promise<T> {
   if (!res.ok) throw new Error(`POST ${path} → HTTP ${res.status}`);
   return (await res.json()) as T;
 }
+async function del<T>(path: string): Promise<T> {
+  const res = await fetch(BASE + path, { method: 'DELETE', headers: authHeaders() });
+  if (res.status === 401) clearKey();
+  if (!res.ok) throw new Error(`DELETE ${path} → HTTP ${res.status}`);
+  return (await res.json()) as T;
+}
 
 /** Authed POST that surfaces the server's `error` string instead of throwing —
  *  for settings mutations where the message matters (username taken, wrong
@@ -691,6 +697,10 @@ export const api = {
       agent_id: requester,
       accept,
     }).catch(() => {});
+  },
+
+  deleteAccount(): Promise<{ ok: boolean }> {
+    return del<{ ok: boolean }>('/accounts/me');
   },
 
   // ---- friends (profile↔profile links, spec §"friends") ----

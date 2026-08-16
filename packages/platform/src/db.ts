@@ -298,6 +298,22 @@ export class Db {
     return this.first<AccountRow>("SELECT * FROM accounts WHERE account_id = ?", accountId);
   }
 
+  deleteAccount(accountId: string): boolean {
+    const acc = this.getAccount(accountId);
+    if (!acc) return false;
+    const nicks = this.all<{ handle: string }>(`SELECT handle FROM profile_nicknames WHERE account_id = ?`, accountId);
+    for (const n of nicks) {
+      this.sql.exec(`DELETE FROM profile_nicknames WHERE handle = ?`, n.handle);
+      this.sql.exec(`DELETE FROM nickname_registry WHERE handle = ?`, n.handle);
+    }
+    this.sql.exec(`DELETE FROM friend_requests WHERE requester_id = ? OR addressee_id = ?`, accountId, accountId);
+    this.sql.exec(`DELETE FROM friendships WHERE account_a = ? OR account_b = ?`, accountId, accountId);
+    this.sql.exec(`DELETE FROM connectors WHERE account_id = ?`, accountId);
+    this.sql.exec(`DELETE FROM agent_exposures WHERE account_id = ?`, accountId);
+    this.sql.exec(`DELETE FROM accounts WHERE account_id = ?`, accountId);
+    return true;
+  }
+
   async verifyLogin(login: string, password: string): Promise<string | null> {
     const account = this.accountByUsername(login) ?? this.accountByEmail(login);
     if (!account || account.revoked || !account.pw_hash || !account.pw_salt) return null;

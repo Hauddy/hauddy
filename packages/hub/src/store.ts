@@ -188,6 +188,16 @@ export class HubStore {
     return this.data.accounts[accountId];
   }
 
+  deleteAccount(accountId: string): boolean {
+    if (!this.data.accounts[accountId]) return false;
+    delete this.data.accounts[accountId];
+    for (const [nick, rec] of Object.entries(this.data.nicknames)) {
+      if (rec.account_id === accountId) delete this.data.nicknames[nick];
+    }
+    this.save();
+    return true;
+  }
+
   /** Verify a password login (by username OR email) → account id, or null. */
   verifyLogin(login: string, password: string): string | null {
     const account = this.accountByUsername(login) ?? this.accountByEmail(login);

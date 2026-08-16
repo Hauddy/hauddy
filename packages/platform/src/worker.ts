@@ -9,7 +9,7 @@ const UPLOAD_HARD_CAP = 12 * 1024 * 1024; // reject before buffering (10MB file 
 function corsHeaders(env: Env): Record<string, string> {
   return {
     "access-control-allow-origin": env.CORS_ORIGIN ?? "*",
-    "access-control-allow-methods": "GET,POST,OPTIONS",
+    "access-control-allow-methods": "GET,POST,DELETE,OPTIONS",
     "access-control-allow-headers": "content-type,authorization,x-hauddy-filename",
     "access-control-max-age": "86400",
   };

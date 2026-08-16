@@ -901,6 +901,13 @@ export async function startHub(options: HubOptions = {}): Promise<HubHandle> {
           agents: store.accountAgents(accountId).map((a) => agentView(a.agent_id)),
         });
       }
+      if (req.method === "DELETE" && (path === "/accounts/me" || path === "/account")) {
+        const accountId = requireAccount(req);
+        if (!accountId) return json(401, { error: "E_AUTH_FAILED" });
+        const ok = store.deleteAccount(accountId);
+        for (const [ws, c] of clients) if (c.accountId === accountId) ws.close();
+        return json(200, { ok });
+      }
       if (req.method === "GET" && path === "/accounts/claims") {
         const accountId = requireAccount(req);
         if (!accountId) return json(401, { error: "E_AUTH_FAILED" });
