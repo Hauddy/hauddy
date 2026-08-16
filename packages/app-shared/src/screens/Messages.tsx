@@ -61,23 +61,97 @@ function MsgTick({ status }: { status: MsgStatus }) {
   );
 }
 
-/** Download chips for received attachments — the platform needs a Bearer token,
- *  so each is a button that pulls the blob (not a plain link). */
+function isImageAttachment(a: Attachment): boolean {
+  if (a.mime && a.mime.startsWith('image/')) return true;
+  return /\.(png|jpg|jpeg|gif|webp|svg)$/i.test(a.name);
+}
+
+function ImageAttachmentItem({ item }: { item: Attachment }) {
+  const [src, setSrc] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<boolean>(false);
+
+  useEffect(() => {
+    let live = true;
+    setLoading(true);
+    setError(false);
+    api.getConsoleFileUrl(item.file_id).then(
+      (url) => {
+        if (!live) {
+          URL.revokeObjectURL(url);
+          return;
+        }
+        setSrc(url);
+        setLoading(false);
+      },
+      () => {
+        if (live) {
+          setError(true);
+          setLoading(false);
+        }
+      },
+    );
+    return () => {
+      live = false;
+      if (src) URL.revokeObjectURL(src);
+    };
+  }, [item.file_id]);
+
+  if (error) {
+    return (
+      <button
+        type="button"
+        className="attach-chip bad"
+        title={`Download ${item.name} (${fmtSize(item.size)})`}
+        onClick={() => void api.downloadConsoleFile(item.file_id, item.name)}
+      >
+        🖼️ {item.name} <span className="attach-size">({fmtSize(item.size)})</span>
+      </button>
+    );
+  }
+
+  if (loading || !src) {
+    return (
+      <div className="attach-image-skeleton" title={`Loading ${item.name}...`}>
+        <div className="skeleton-box" style={{ width: 180, height: 120, borderRadius: 6 }} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="attach-image-container">
+      <img
+        src={src}
+        alt={item.name}
+        className="attach-image-preview"
+        title={`Click to download ${item.name} (${fmtSize(item.size)})`}
+        onClick={() => void api.downloadConsoleFile(item.file_id, item.name)}
+      />
+    </div>
+  );
+}
+
+/** Download chips or image previews for received attachments — the platform needs a Bearer token,
+ *  so each is loaded/pulled via authenticated blob requests. */
 function AttachmentLinks({ items }: { items: Attachment[] }) {
   return (
     <span className="chat-attachments">
-      {items.map((a) => (
-        <button
-          key={a.file_id}
-          type="button"
-          className="attach-chip"
-          title={`Download ${a.name} (${fmtSize(a.size)})`}
-          onClick={() => void api.downloadConsoleFile(a.file_id, a.name)}
-        >
-          📎 {a.name}
-          <span className="attach-size">{fmtSize(a.size)}</span>
-        </button>
-      ))}
+      {items.map((a) =>
+        isImageAttachment(a) ? (
+          <ImageAttachmentItem key={a.file_id} item={a} />
+        ) : (
+          <button
+            key={a.file_id}
+            type="button"
+            className="attach-chip"
+            title={`Download ${a.name} (${fmtSize(a.size)})`}
+            onClick={() => void api.downloadConsoleFile(a.file_id, a.name)}
+          >
+            📎 {a.name}
+            <span className="attach-size">{fmtSize(a.size)}</span>
+          </button>
+        ),
+      )}
     </span>
   );
 }

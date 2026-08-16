@@ -1632,6 +1632,29 @@
 .compose-attachments {
   margin: 8px 0 0;
 }
+.attach-image-container {
+  margin-top: 6px;
+  display: inline-block;
+  max-width: 100%;
+}
+.attach-image-preview {
+  max-width: 240px;
+  max-height: 240px;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--border);
+  object-fit: cover;
+  cursor: pointer;
+  display: block;
+  transition: transform 0.15s, border-color 0.15s;
+}
+.attach-image-preview:hover {
+  border-color: var(--accent);
+  transform: scale(1.02);
+}
+.attach-image-skeleton {
+  margin-top: 6px;
+  display: inline-block;
+}
 .attach-chip {
   display: inline-flex;
   align-items: center;
