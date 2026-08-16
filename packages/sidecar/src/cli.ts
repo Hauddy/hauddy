@@ -9,7 +9,7 @@ import { hauddyHome } from "./account.js";
 import { HubConnection, type CallFrame } from "./connection.js";
 import { Daemon, DEFAULT_HUB_PORT } from "./daemon.js";
 import { registerAgent, setNickname } from "./hub-api.js";
-import { findIdentityFile, loadIdentity, writeIdentity, type Identity } from "./identity.js";
+import { findIdentityFile, loadIdentity, resolveActiveIdentityFile, writeIdentity, type Identity } from "./identity.js";
 import { loadOrCreateKeypair } from "./keys.js";
 import { startLocalApi } from "./local-api.js";
 import { createMcpServer, type Provisioned } from "./mcp.js";
@@ -67,7 +67,7 @@ async function runDaemon(): Promise<void> {
 async function nicknameCmd(args: string[]): Promise<void> {
   const raw = args.find((a) => !a.startsWith("--"));
   if (!raw) die("usage: hauddy nickname <name>");
-  const file = findIdentityFile();
+  const file = resolveActiveIdentityFile();
   if (!file) die("no .hauddy/identity.toml here — run a tool in your harness first (the MCP provisions it)");
   const identity = loadIdentity(file);
   if (!identity.agent_id) die("this session isn't provisioned yet — call a tool in your harness first");

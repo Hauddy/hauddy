@@ -27,6 +27,18 @@ export function findIdentityFile(startDir: string = process.cwd()): string | nul
   }
 }
 
+/** Locate the active identity file for a project directory, prioritizing HTTP MCP agent file over stdio. */
+export function resolveActiveIdentityFile(startDir: string = process.cwd()): string | null {
+  const folderName = path.basename(path.resolve(startDir));
+  // Replace non-alphanumeric chars for slug matching
+  const slug = folderName.toLowerCase().replace(/[^a-z0-9_-]/g, "-").replace(/^-+|-+$/g, "");
+  if (slug) {
+    const httpFile = path.join(process.env.HOME || process.env.USERPROFILE || "~", ".hauddy", "agents", slug, "identity.toml");
+    if (existsSync(httpFile)) return httpFile;
+  }
+  return findIdentityFile(startDir);
+}
+
 export function loadIdentity(file: string): Identity {
   const doc = parseToml(readFileSync(file, "utf8")) as Record<string, unknown>;
   if (typeof doc.grant_scope_id !== "string" || doc.grant_scope_id.length === 0) {
