@@ -1,6 +1,6 @@
 {
   "name": "@hauddy/app-shared",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "private": true,
   "type": "module",
   "description": "Shared platform surface (screens, api facade, components) consumed by @hauddy/web and @hauddy/app-ui. Ships TS source — both consumers are Vite apps.",

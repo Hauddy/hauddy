@@ -1,6 +1,6 @@
 {
   "name": "@hauddy/local-hub",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Hauddy hub: identity registry, consent contact graph, presence, durable inbox, routing (spec §3.1)",
   "license": "Apache-2.0",
   "type": "module",
@@ -17,7 +17,7 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "@hauddy/protocol": "0.1.9",
+    "@hauddy/protocol": "0.1.10",
     "ws": "^8.18.0"
   },
   "devDependencies": {
