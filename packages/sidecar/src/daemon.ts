@@ -444,10 +444,22 @@ export class Daemon {
     // Normalize from/to before injecting into the local hub's history store:
     // - `to` must be the local agent_id — bridge envelopes carry the platform agent_id,
     //   which made history.messagesWithPeer(localAgentId, ...) miss all inbound messages.
-    // - `from` for the account owner → localHumanId so the agent's thread list merges
-    //   bridge-inbound with locally-originated console messages (same person, one thread).
+    // - `from` for the account owner (SMS only) → localHumanId so the agent's thread list
+    //   merges bridge-inbound with locally-originated console messages (same person, one thread).
+    // - `from` for call frames from the owner → keep the routable platform identity so the
+    //   agent's reply frames forward via the bridge back to the platform console. Translating
+    //   to localHumanId here would route replies to the local console buffer, invisible to the
+    //   web dashboard that placed the call.
     // - `from` for other remote senders → their @nickname (gateway-routable for replies).
-    const resolvedFrom = isOwnerMsg
+    const isCallEnvelope = !!(payload.call);
+    // For call envelopes, keep the original platform agent_id as `from` so the
+    // local agent's reply frames use an id the local hub cannot resolve locally —
+    // forcing it to forward via the bridge back to the platform console. Using
+    // localHumanId or a locally-bound nickname (e.g. "@barnaba") would route
+    // replies to the local console buffer, invisible to the web dashboard.
+    const resolvedFrom = isCallEnvelope
+      ? envelope.from
+      : isOwnerMsg
       ? (this.localHumanId ?? (sender ? sender.nickname : envelope.from))
       : (sender ? sender.nickname : envelope.from);
     const injected: Envelope = {

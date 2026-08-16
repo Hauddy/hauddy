@@ -1,6 +1,6 @@
 {
   "name": "hauddy",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "Hauddy app: per-machine daemon holding keys, dialing the hub, hosting a local stdio MCP server (spec §3.2, §9)",
   "license": "Apache-2.0",
   "type": "module",
@@ -22,8 +22,8 @@
     "postinstall": "node scripts/fix-node-pty.mjs"
   },
   "dependencies": {
-    "@hauddy/local-hub": "0.1.10",
-    "@hauddy/protocol": "0.1.10",
+    "@hauddy/local-hub": "0.1.11",
+    "@hauddy/protocol": "0.1.11",
     "@modelcontextprotocol/sdk": "^1.13.0",
     "node-pty": "^1.0.0",
     "smol-toml": "^1.3.1",
