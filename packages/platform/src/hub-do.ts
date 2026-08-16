@@ -1855,6 +1855,23 @@ export class HubDO {
         for (const envelope of this.db.undeliveredFor(agent.agent_id)) {
           this.sendFrame(ws, { type: "deliver", envelope });
         }
+        // Redeliver a pending call invite when the bridge reconnects. Call invites are
+        // stored in the `calls` table (not `messages`), so undeliveredFor() misses them.
+        // Without this, a call placed from the web dashboard while the bridge is briefly
+        // reconnecting is silently lost — desktop app is unaffected because local-hub
+        // calls don't go through the bridge.
+        const openCall = this.db.latestOpenCallFor(agent.agent_id);
+        if (openCall && openCall.callee === agent.agent_id && openCall.state === "ringing") {
+          const invite = {
+            ...this.mkEnvelope(
+              openCall.caller,
+              agent.agent_id,
+              { call: { id: openCall.call_id, kind: "invite" }, body: openCall.caller_nick ?? openCall.caller },
+            ),
+            id: openCall.call_id, // stable id so repeated reconnects don't create duplicate ack entries
+          };
+          this.sendFrame(ws, { type: "deliver", envelope: invite });
+        }
         return;
       }
 
