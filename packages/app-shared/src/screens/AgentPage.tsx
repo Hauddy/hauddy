@@ -321,6 +321,24 @@ function HandleSection({ agentId, current }: { agentId: string; current: string 
             </div>
           )
         ) : null}
+        {avail && !avail.available && avail.suggestions && avail.suggestions.length > 0 && bare !== currentBare && (
+          <div className="suggestion-chips">
+            <span className="suggestion-label">Suggested:</span>
+            {avail.suggestions.map((s) => (
+              <button
+                key={s}
+                type="button"
+                className="chip-btn"
+                onClick={() => {
+                  setValue(s.replace(/^@/, ''));
+                  setNote(null);
+                }}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

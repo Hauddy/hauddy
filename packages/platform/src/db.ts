@@ -121,7 +121,7 @@ export type NicknameOutcome =
 /** Reserving an account-level hold on a handle (distinct reasons from binding). */
 export type ReserveOutcome =
   | { ok: true; nickname: string }
-  | { ok: false; reason: "invalid" | "taken" | "limit"; detail?: string };
+  | { ok: false; reason: "invalid" | "taken" | "limit"; detail?: string; suggestions?: string[] };
 
 /** Whether a handle is free to take, and — if not — why + whose it is. */
 export interface NicknameAvailability {
@@ -130,6 +130,7 @@ export interface NicknameAvailability {
   reason?: "bound" | "reserved" | "invalid";
   /** true when the blocking binding/reservation belongs to the asking account. */
   mine?: boolean;
+  suggestions?: string[];
 }
 
 type Bind = string | number | null;
@@ -860,6 +861,24 @@ export class Db {
     ).map((r) => formatNickname(r.nickname));
   }
 
+  /** Generate deterministic available handle suggestions for a requested base name. */
+  suggestNicknames(rawBase: string, forAccountId?: string, count = 3): string[] {
+    const name = normalizeNickname(rawBase);
+    if (!name) return [];
+    const candidates = [
+      `${name}_1`,
+      `${name}_2`,
+      `${name}_3`,
+      `${name}_bot`,
+      `${name}_ai`,
+      `the_${name}`,
+    ];
+    return candidates
+      .filter((c) => this.nicknameAvailability(c, forAccountId).available)
+      .map((c) => formatNickname(c))
+      .slice(0, count);
+  }
+
   /** Is a handle free across BOTH bound nicknames and reservations? */
   nicknameAvailability(rawName: string, forAccountId?: string): NicknameAvailability {
     const name = normalizeNickname(rawName);
@@ -888,8 +907,9 @@ export class Db {
     const avail = this.nicknameAvailability(name, accountId);
     if (!avail.available) {
       if (avail.reason === "reserved" && avail.mine) return { ok: true, nickname: formatNickname(name) }; // already yours
-      if (avail.reason === "bound" && avail.mine) return { ok: false, reason: "taken", detail: "you already hold that handle on an agent" };
-      return { ok: false, reason: "taken" };
+      const suggestions = this.suggestNicknames(rawName, accountId);
+      if (avail.reason === "bound" && avail.mine) return { ok: false, reason: "taken", detail: "you already hold that handle on an agent", suggestions };
+      return { ok: false, reason: "taken", suggestions };
     }
     const count =
       this.first<{ n: number }>("SELECT COUNT(*) AS n FROM reservations WHERE account_id = ?", accountId)?.n ?? 0;

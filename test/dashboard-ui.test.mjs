@@ -37,3 +37,23 @@ test("dashboard error classification logic", () => {
   assert.equal(parseErrorMessage("GET /accounts/me → HTTP 500").title, "Server temporary issue");
   assert.equal(parseErrorMessage("Unexpected error").title, "Something went wrong");
 });
+
+// Test suggestNicknames candidate generation logic
+function generateCandidateNicknames(base, isTakenFn) {
+  const clean = base.trim().toLowerCase().replace(/^@/, '');
+  if (!clean) return [];
+  const candidates = [
+    `${clean}_1`, `${clean}_2`, `${clean}_3`,
+    `${clean}_bot`, `${clean}_ai`, `the_${clean}`
+  ];
+  return candidates
+    .filter((c) => !isTakenFn(c))
+    .map((c) => `@${c}`)
+    .slice(0, 3);
+}
+
+test("suggestNicknames candidate generation returns available handles", () => {
+  const taken = new Set(["alice", "alice_1"]);
+  const suggestions = generateCandidateNicknames("alice", (c) => taken.has(c));
+  assert.deepEqual(suggestions, ["@alice_2", "@alice_3", "@alice_bot"]);
+});

@@ -733,6 +733,36 @@
   margin-left: 10px;
   flex-wrap: wrap;
 }
+
+.suggestion-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  font-size: 12px;
+}
+.suggestion-label {
+  color: var(--text-faint);
+  font-weight: 500;
+}
+.chip-btn {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm, 4px);
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.chip-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--surface);
+}
+
 .in-chips-label {
   font-size: 11.5px;
   color: var(--text-faint);

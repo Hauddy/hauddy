@@ -69,12 +69,12 @@ export interface PendingContact {
 
 export type NicknameOutcome =
   | { ok: true; nickname: string }
-  | { ok: false; reason: 'taken' | 'invalid' | 'conflict' };
+  | { ok: false; reason: 'taken' | 'invalid' | 'conflict'; suggestions?: string[] };
 
 /** Reserving an account-level hold on a handle (before an agent binds it). */
 export type ReserveOutcome =
   | { ok: true; nickname: string }
-  | { ok: false; reason: 'invalid' | 'taken' | 'limit'; detail?: string };
+  | { ok: false; reason: 'invalid' | 'taken' | 'limit'; detail?: string; suggestions?: string[] };
 
 /** Live availability of a handle across bound nicknames + reservations. */
 export interface NicknameAvailability {
@@ -82,6 +82,7 @@ export interface NicknameAvailability {
   available: boolean;
   reason?: 'bound' | 'reserved' | 'invalid';
   mine?: boolean; // the blocker is your own binding/reservation
+  suggestions?: string[];
 }
 
 export type ContactActionResult = { ok: true } | { ok: false; error: string };

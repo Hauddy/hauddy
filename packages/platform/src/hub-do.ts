@@ -330,7 +330,13 @@ export class HubDO {
       if (method === "GET" && path === "/accounts/nicknames/check") {
         const accountId = this.requireAccount(request);
         if (!accountId) return this.unauthorized();
-        return this.json(200, this.db.nicknameAvailability(url.searchParams.get("name") ?? "", accountId));
+        const rawName = url.searchParams.get("name") ?? "";
+        const avail = this.db.nicknameAvailability(rawName, accountId);
+        if (!avail.available) {
+          const suggestions = this.db.suggestNicknames(rawName, accountId);
+          return this.json(200, { ...avail, suggestions });
+        }
+        return this.json(200, avail);
       }
       if (method === "POST" && path === "/accounts/nicknames/reserve") {
         const accountId = this.requireAccount(request);
