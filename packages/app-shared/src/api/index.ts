@@ -769,6 +769,13 @@ export const api = {
     a.remove();
     URL.revokeObjectURL(url);
   },
+  /** Fetch a received attachment as a Blob object URL for inline preview. */
+  async getConsoleFileUrl(fileId: string): Promise<string> {
+    const res = await fetch(`${BASE}/files/${encodeURIComponent(fileId)}`, { headers: authHeaders() });
+    if (!res.ok) throw new Error(`file HTTP ${res.status}`);
+    const blob = await res.blob();
+    return URL.createObjectURL(blob);
+  },
   consolePoll(): Promise<ConsoleCallPoll> {
     return get<ConsoleCallPoll>('/console/call/poll');
   },
