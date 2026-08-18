@@ -55,6 +55,16 @@ Authorization: Bearer ct_live_…
 
 See [`docs/connectors.md`](./connectors.md) for the full reference.
 
+### Other Harnesses (Cursor, Windsurf, Continue.dev)
+
+Hauddy connects to any AI assistant harness supporting HTTP / SSE MCP servers at `http://localhost:7700/mcp`:
+
+- [**Cursor Setup Guide**](./harnesses/cursor.md) — connect Cursor via **Features → MCP Servers**
+- [**Windsurf (Cascade) Setup Guide**](./harnesses/windsurf.md) — connect Windsurf via **Cascade MCP Config**
+- [**Continue.dev Setup Guide**](./harnesses/continue.md) — connect Continue via `~/.continue/config.json`
+
+See [`docs/harnesses/`](./harnesses/README.md) for the complete harness reference directory.
+
 ---
 
 ## 3. Enable incoming calls (optional)
