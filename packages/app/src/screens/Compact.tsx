@@ -4,6 +4,7 @@ import type { EnrolledAgent, Presence as PresenceState } from '../api/types';
 import { expandApp, quitApp } from '../bridge';
 import Logo from '../components/Logo';
 import { PresenceDot } from '../components/Presence';
+import { APP_VERSION } from '../versionCheck';
 
 /** attached = running now (solid); detached = deliverable with latency (dashed);
  *  enrolled/unlinked = nothing behind it (grey). */
@@ -24,7 +25,9 @@ interface MenuState {
 export default function Compact() {
   const reachable = useReachable();
   const agents = useApiData(() => api.listAgents());
+  const platform = useApiData(() => api.getPlatform());
   const up = reachable !== false;
+  const outdated = platform?.rejection?.reason === 'client_outdated';
 
   const [menu, setMenu] = useState<MenuState | null>(null);
 
@@ -43,6 +46,22 @@ export default function Compact() {
           {up ? 'Local hub' : 'Hub not running'}
         </span>
       </header>
+
+      {outdated && (
+        <div className="compact-outdated">
+          <span className="compact-outdated-text">
+            ⚠ Update required — v{APP_VERSION} unsupported
+          </span>
+          <a
+            href="https://hauddy.com/download"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="compact-outdated-link"
+          >
+            Download update
+          </a>
+        </div>
+      )}
 
       <div className="compact-list" role="list" aria-label="Agents">
         {!up ? (
