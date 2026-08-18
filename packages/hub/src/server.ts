@@ -22,6 +22,18 @@ import { FileStore } from "./files.js";
 import { HubHistory } from "./history.js";
 import { HubStore } from "./store.js";
 
+function semverLt(a: string, b: string): boolean {
+  const pa = a.split(".").map(Number);
+  const pb = b.split(".").map(Number);
+  for (let i = 0; i < 3; i++) {
+    const na = pa[i] ?? 0;
+    const nb = pb[i] ?? 0;
+    if (na < nb) return true;
+    if (na > nb) return false;
+  }
+  return false;
+}
+
 export interface HubOptions {
   port?: number;
   host?: string;
@@ -33,6 +45,10 @@ export interface HubOptions {
    * central hub runs with this off (consent + accounts enforced).
    */
   autoLink?: boolean;
+  /** Minimum client semver version enforced on auth_hello. Default: "0.0.0" */
+  minClientVersion?: string;
+  /** Latest client semver version sent in auth_rejected frames. */
+  latestClientVersion?: string;
   /**
    * Observe every routed sms envelope (payload opaque to the hub). The embedded
    * per-machine daemon uses this to spot a call *invite* and publish the ring on
@@ -508,6 +524,23 @@ export async function startHub(options: HubOptions = {}): Promise<HubHandle> {
 
     switch (frame.type) {
       case "auth_hello": {
+        const minVer = options?.minClientVersion?.trim() || "0.0.0";
+        if (minVer !== "0.0.0") {
+          const clientVer = frame.client_version?.trim() || "0.0.0";
+          if (semverLt(clientVer, minVer)) {
+            sendFrame(ws, {
+              type: "auth_rejected",
+              reason: "client_outdated",
+              min_version: minVer,
+              ...(options?.latestClientVersion?.trim()
+                ? { latest_version: options.latestClientVersion.trim() }
+                : {}),
+              message: `Client version ${clientVer} is below minimum required ${minVer}`,
+            });
+            ws.close(4000, "client_outdated");
+            return;
+          }
+        }
         const agent = store.getAgent(frame.agent_id);
         if (!agent) {
           sendError(ws, "E_UNKNOWN_AGENT", `unknown agent_id ${frame.agent_id}`);
