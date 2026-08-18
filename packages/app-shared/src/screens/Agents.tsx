@@ -119,6 +119,9 @@ function ReservePanel() {
       setAvail(null);
       setError(null);
     } else {
+      if (r.suggestions?.length) {
+        setAvail((prev) => (prev ? { ...prev, suggestions: r.suggestions } : null));
+      }
       setError(
         r.reason === 'invalid'
           ? 'Handles are 2–24 chars: a–z, 0–9, _ or - (no leading symbol).'
@@ -128,6 +131,7 @@ function ReservePanel() {
   };
 
   const canReserve = !!bare && !busy && (avail?.available ?? false);
+  const suggestions = !avail?.available && Array.isArray(avail?.suggestions) ? avail.suggestions : [];
 
   return (
     <div className="reserve-panel">
@@ -164,6 +168,24 @@ function ReservePanel() {
             </div>
           )
         ) : null}
+        {suggestions.length > 0 && !avail?.available && (
+          <div className="suggestion-chips">
+            <span className="suggestion-label">Suggested:</span>
+            {suggestions.map((s) => (
+              <button
+                key={s}
+                type="button"
+                className="chip-btn"
+                onClick={() => {
+                  setValue(s.replace(/^@/, ''));
+                  setError(null);
+                }}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
