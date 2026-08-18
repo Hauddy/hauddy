@@ -265,6 +265,95 @@ export class HubHistory {
     return n;
   }
 
+  /** Full message thread with a contact, filtered by optional date range, ordered ascending. */
+  getConversation(
+    viewerId: string,
+    withPeer: string,
+    opts?: { from?: string; to?: string; limit?: number },
+  ): {
+    contact: string;
+    messages: Array<{
+      from: string;
+      to: string;
+      body: string | null;
+      attachments: Attachment[] | null;
+      ts: string;
+    }>;
+  } {
+    const limit = Math.min(Math.max(opts?.limit ?? 50, 1), 500);
+    const fromMs = opts?.from ? new Date(opts.from).getTime() : 0;
+    const toMs = opts?.to
+      ? opts.to.includes("T")
+        ? new Date(opts.to).getTime()
+        : new Date(`${opts.to}T23:59:59.999Z`).getTime()
+      : Infinity;
+
+    const peerClean = withPeer.trim();
+    const peerBare = peerClean.replace(/^@/, "").toLowerCase();
+
+    const matches = (agentId: string, nick: string | null): boolean => {
+      if (agentId === peerClean) return true;
+      if (nick && nick.replace(/^@/, "").toLowerCase() === peerBare) return true;
+      if (agentId.replace(/^@/, "").toLowerCase() === peerBare) return true;
+      return false;
+    };
+
+    const rows = this.messagesDesc()
+      .filter((r) => {
+        if (Number.isNaN(fromMs) || Number.isNaN(toMs)) return false;
+        if (r.created_ms < fromMs || r.created_ms > toMs) return false;
+        const touchedByViewer = r.from_agent === viewerId || r.to_agent === viewerId;
+        const touchedByPeer = matches(r.from_agent, r.from_nick) || matches(r.to_agent, r.to_nick);
+        return touchedByViewer && touchedByPeer;
+      })
+      .slice(0, limit);
+
+    const formattedMessages = rows
+      .map((r) => ({
+        from: r.from_nick ?? r.from_agent,
+        to: r.to_nick ?? r.to_agent,
+        body: r.body,
+        attachments: r.attachments,
+        ts: r.created_at,
+      }))
+      .reverse();
+
+    return {
+      contact: withPeer.startsWith("@") ? withPeer : `@${withPeer}`,
+      messages: formattedMessages,
+    };
+  }
+
+  /** Retrieve the transcript of a call session by call ID. */
+  getCallTranscript(callId: string): {
+    call_id: string;
+    caller: string;
+    callee: string;
+    state: string;
+    started_at: string;
+    ended_at: string | null;
+    turns: Array<{ seq: number; from: string; body: string | null; attachments: Attachment[] | null; ts: string }>;
+  } | null {
+    const call = this.getCall(callId);
+    if (!call) return null;
+    const frames = this.callFrames(callId);
+    return {
+      call_id: call.call_id,
+      caller: call.caller_nick ?? call.caller,
+      callee: call.callee_nick ?? call.callee,
+      state: call.state,
+      started_at: new Date(call.started_ms).toISOString(),
+      ended_at: call.ended_ms ? new Date(call.ended_ms).toISOString() : null,
+      turns: frames.map((f) => ({
+        seq: f.seq,
+        from: f.from_agent,
+        body: f.body,
+        attachments: (f.attachments as Attachment[]) ?? null,
+        ts: new Date(f.created_ms).toISOString(),
+      })),
+    };
+  }
+
   // ── calls ─────────────────────────────────────────────────────────────
 
   getCall(callId: string): CallRow | undefined {
