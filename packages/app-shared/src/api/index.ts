@@ -746,6 +746,13 @@ export const api = {
   consoleSay(text: string, attachments?: Attachment[]): Promise<{ ok?: boolean }> {
     return post('/console/call/say', { text, ...(attachments && attachments.length ? { attachments } : {}) });
   },
+  consoleDashboard(): Promise<{
+    threads: ThreadSummary[];
+    calls: CallLogEntry[];
+    notifications: Notifications;
+  }> {
+    return get<{ threads: ThreadSummary[]; calls: CallLogEntry[]; notifications: Notifications }>('/console/dashboard');
+  },
   /** Upload a file to the platform temp store (Bearer). Metadata as query params
    *  so the browser sends no custom request headers (no CORS preflight snag). */
   async uploadConsoleFile(file: File, to: string): Promise<Attachment> {

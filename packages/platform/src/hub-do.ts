@@ -1384,6 +1384,34 @@ export class HubDO {
       });
       return this.json(200, { calls });
     }
+    if (method === "GET" && path === "/console/dashboard") {
+      const accountId = this.requireAccount(request);
+      const threads = this.db.consoleThreads(humanId).map((t) => ({
+        peer: t.peer,
+        peer_nick: t.peer_nick,
+        unread: Boolean(t.unread),
+        last_body: t.last_body,
+        last_ts: t.last_ts,
+      }));
+      const calls = this.db.consoleCalls(humanId).map((c) => ({
+        call_id: c.call_id,
+        peer: c.peer,
+        peer_nick: c.peer_nick,
+        dir: c.dir,
+        state: c.state,
+        started_at: c.started_at,
+        ended_at: c.ended_at,
+        end_reason: c.end_reason,
+      }));
+      const friendRequests = accountId ? this.db.listFriendships(accountId).incoming.length : 0;
+      const seen = (await this.ctx.storage.get<number>(`notifseen:${humanId}`)) ?? 0;
+      const notifications = {
+        friend_requests: friendRequests,
+        unread_messages: this.db.unreadMessageCount(humanId),
+        missed_calls: this.db.missedCallCount(humanId, seen),
+      };
+      return this.json(200, { threads, calls, notifications });
+    }
     if (method === "GET" && path === "/console/notifications") {
       // One cheap call for the top-bar bell: pending friend requests + unread
       // threads + missed calls (spec §F). Missed calls have no per-row read flag,
