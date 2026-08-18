@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from 'react';
-import { api, useApiData } from '../api';
+import { api, clearKey, useApiData } from '../api';
 
 /** Account settings: profile (username == your @handle + bio), password, and the
  *  friend auto-accept toggle (rehomed here from the Friends screen). Distinct from
@@ -21,7 +21,75 @@ export default function Settings() {
       <ProfileSection currentName={session?.name} currentBio={identity?.bio} handle={identity?.handle ?? null} />
       <PasswordSection />
       <FriendsSection autoAccept={friends?.auto_accept} loaded={friends !== undefined} />
+      <DangerSection />
     </>
+  );
+}
+
+function DangerSection() {
+  const [confirming, setConfirming] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    setError(null);
+    try {
+      await api.deleteAccount();
+      clearKey();
+      window.location.href = '/';
+    } catch (err: unknown) {
+      setDeleting(false);
+      setError(err instanceof Error ? err.message : 'Failed to delete account');
+    }
+  };
+
+  return (
+    <section className="settings-section settings-danger">
+      <h2 className="section-title bad">Danger Zone</h2>
+      <p className="book-explainer">
+        Deleting your account removes your handle reservations, connectors, and friendships permanently. This action cannot be undone.
+      </p>
+
+      {!confirming ? (
+        <button type="button" className="btn btn-danger" onClick={() => setConfirming(true)}>
+          Delete account…
+        </button>
+      ) : (
+        <div className="danger-confirm-box">
+          <p className="danger-warning">
+            Are you sure you want to permanently delete your account and all associated data?
+          </p>
+          <div className="danger-actions">
+            <button
+              type="button"
+              className="btn btn-danger"
+              disabled={deleting}
+              onClick={() => void handleDelete()}
+            >
+              {deleting ? 'Deleting account…' : 'Yes, delete my account'}
+            </button>
+            <button
+              type="button"
+              className="btn"
+              disabled={deleting}
+              onClick={() => {
+                setConfirming(false);
+                setError(null);
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <div className="notice bad" style={{ marginTop: 12 }} aria-live="polite">
+          {error}
+        </div>
+      )}
+    </section>
   );
 }
 

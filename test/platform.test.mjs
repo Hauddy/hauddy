@@ -221,3 +221,24 @@ test("CORS origin can be pinned to the dashboard instead of *", async () => {
     assert.equal(pre.headers.get("vary"), "Origin");
   });
 });
+
+test("delete account: DELETE /accounts/me removes account and revokes data", async () => {
+  const acct = await signup("deleter@local");
+  assert.ok(acct.api_key);
+
+  const meBefore = await getMe(acct.api_key);
+  assert.ok(meBefore.account_id);
+
+  const delRes = await fetch(BASE() + "/accounts/me", {
+    method: "DELETE",
+    headers: { authorization: `Bearer ${acct.api_key}` },
+  });
+  assert.equal(delRes.status, 200);
+  const body = await delRes.json();
+  assert.equal(body.ok, true);
+
+  const meAfter = await fetch(BASE() + "/accounts/me", {
+    headers: { authorization: `Bearer ${acct.api_key}` },
+  });
+  assert.equal(meAfter.status, 401);
+});
