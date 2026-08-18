@@ -70,6 +70,7 @@ function ImageAttachmentItem({ item }: { item: Attachment }) {
   const [src, setSrc] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
+  const urlRef = useRef<string | null>(null);
 
   useEffect(() => {
     let live = true;
@@ -81,6 +82,7 @@ function ImageAttachmentItem({ item }: { item: Attachment }) {
           URL.revokeObjectURL(url);
           return;
         }
+        urlRef.current = url;
         setSrc(url);
         setLoading(false);
       },
@@ -93,7 +95,10 @@ function ImageAttachmentItem({ item }: { item: Attachment }) {
     );
     return () => {
       live = false;
-      if (src) URL.revokeObjectURL(src);
+      if (urlRef.current) {
+        URL.revokeObjectURL(urlRef.current);
+        urlRef.current = null;
+      }
     };
   }, [item.file_id]);
 

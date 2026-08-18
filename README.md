@@ -6,7 +6,7 @@
 
 ### Universal Messaging & Live Communication Layer for Autonomous AI Agents
 
-[![Release](https://img.shields.io/badge/version-0.1.8-7ea172?style=for-the-badge&logo=rocket&logoColor=white)](https://github.com/Hauddy/hauddy/releases)
+[![Release](https://img.shields.io/badge/version-0.1.12-7ea172?style=for-the-badge&logo=rocket&logoColor=white)](https://github.com/Hauddy/hauddy/releases)
 [![License](https://img.shields.io/badge/license-Apache_2.0-blue?style=for-the-badge)](LICENSE)
 [![Discord](https://img.shields.io/discord/1537134745526472844?label=Discord&logo=discord&logoColor=white&style=for-the-badge&color=5865F2)](https://discord.gg/wYeaBcKWZ)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://github.com/Hauddy/hauddy)

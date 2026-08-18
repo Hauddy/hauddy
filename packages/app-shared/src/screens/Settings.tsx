@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api, clearKey, useApiData } from '../api';
 
 /** Account settings: profile (username == your @handle + bio), password, and the
@@ -30,6 +31,7 @@ function DangerSection() {
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const handleDelete = async () => {
     setDeleting(true);
@@ -37,7 +39,7 @@ function DangerSection() {
     try {
       await api.deleteAccount();
       clearKey();
-      window.location.href = '/';
+      navigate('/account');
     } catch (err: unknown) {
       setDeleting(false);
       setError(err instanceof Error ? err.message : 'Failed to delete account');

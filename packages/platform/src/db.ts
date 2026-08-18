@@ -302,13 +302,14 @@ export class Db {
   deleteAccount(accountId: string): boolean {
     const acc = this.getAccount(accountId);
     if (!acc) return false;
-    const nicks = this.all<{ handle: string }>(`SELECT handle FROM profile_nicknames WHERE account_id = ?`, accountId);
+    const nicks = this.rows<{ handle: string }>(`SELECT handle FROM profile_nicknames WHERE account_id = ?`, accountId);
     for (const n of nicks) {
       this.sql.exec(`DELETE FROM profile_nicknames WHERE handle = ?`, n.handle);
       this.sql.exec(`DELETE FROM nickname_registry WHERE handle = ?`, n.handle);
     }
     this.sql.exec(`DELETE FROM friend_requests WHERE requester_id = ? OR addressee_id = ?`, accountId, accountId);
     this.sql.exec(`DELETE FROM friendships WHERE account_a = ? OR account_b = ?`, accountId, accountId);
+    this.sql.exec(`DELETE FROM oauth_clients WHERE connector_agent_id IN (SELECT agent_id FROM connectors WHERE account_id = ?)`, accountId);
     this.sql.exec(`DELETE FROM connectors WHERE account_id = ?`, accountId);
     this.sql.exec(`DELETE FROM agent_exposures WHERE account_id = ?`, accountId);
     this.sql.exec(`DELETE FROM accounts WHERE account_id = ?`, accountId);
