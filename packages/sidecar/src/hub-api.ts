@@ -231,6 +231,18 @@ export function removeBookContact(endpoint: string, agentId: string, handle: str
   return request(endpoint, "POST", `/accounts/agents/${encodeURIComponent(agentId)}/book/remove`, { handle }, apiKey);
 }
 
+/** Attempt to establish a platform link between agentId and the target handle.
+ *  Returns { status: "linked" } if the target has open_link enabled (link is
+ *  created immediately), or { status: "pending" } if the target must accept. */
+export function requestPlatformContact(
+  endpoint: string,
+  agentId: string,
+  handle: string,
+  apiKey: string,
+): Promise<{ ok: boolean; status: string; message?: string }> {
+  return request(endpoint, "POST", `/accounts/agents/${encodeURIComponent(agentId)}/contacts`, { handle }, apiKey);
+}
+
 // ---- profile friendships (spec §"friends") ------------------------------
 
 export interface FriendAccount {

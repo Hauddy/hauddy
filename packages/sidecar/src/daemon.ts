@@ -161,12 +161,9 @@ export class Daemon {
       onDeliver: (toAgentId, envelope) => this.onHubDeliver(toAgentId, envelope),
       // Gateway: a send to a remote friend → relay it up that sender's bridge.
       forwardRemote: (fromAgentId, envelope) => this.forwardRemote(fromAgentId, envelope),
-      // An agent with a curated book sees exactly it in list_contacts; an empty
-      // book keeps zero-config auto-discovery. Books are keyed by hub agent_id.
-      bookOf: (agentId) => {
-        const book = this.books.list(agentId);
-        return book.length > 0 ? book : null;
-      },
+      // Always return the book (even empty) so list_contacts is exactly the book.
+      // Agents start with an empty book and must add_contact before messaging.
+      bookOf: (agentId) => this.books.list(agentId),
     });
     this.discovery.hub_url = this.hubHandle.wsUrl;
     this.discovery.http_url = this.hubHandle.httpUrl;
@@ -616,6 +613,10 @@ export class Daemon {
           publishInjection: (event) => {
             return Promise.resolve(this.injections.publish(agentId, event));
           },
+          // Contact book — reads directly from the in-memory books store (no IPC).
+          getBook: () => this.books.list(agentId),
+          addContact: (handle) => this.mcpAddContact(localId, handle),
+          removeContact: async (handle) => { await this.removeContact(localId, handle); return { ok: true }; },
         };
         return provisioned;
       })();
@@ -760,6 +761,40 @@ export class Daemon {
     const removed = this.books.removeEverywhere(handle);
     if (removed > 0) this.activity.push("contact.remove-all", `@${handle.replace(/^@+/, "")} × ${removed}`);
     return { ok: true, removed };
+  }
+
+  /** MCP `add_contact` flow: establish a platform link if possible, then update
+   *  the local book. Local agents (same machine) are auto-linked without a
+   *  platform call. Remote agents require an account connection; the target must
+   *  have open_link enabled for an immediate link, otherwise returns "pending". */
+  async mcpAddContact(
+    localId: string,
+    handle: string,
+  ): Promise<{ ok: boolean; status?: string; message?: string; error?: string }> {
+    const agent = await this.agentByLocalId(localId);
+    if (!agent) return { ok: false, error: "unknown agent" };
+    const bare = handle.replace(/^@+/, "").toLowerCase();
+    // Local agents on this machine: auto-link, just add to book
+    const localAgents = await this.agents();
+    if (localAgents.some((a) => a.nicknames.map((n) => n.replace(/^@/, "")).includes(bare))) {
+      const res = this.books.add(agent.agent_id, handle);
+      if (!res.ok) return { ok: false, error: res.error };
+      this.activity.push("contact.add", `${localId} + @${bare}`);
+      return { ok: true, status: "local" };
+    }
+    // Remote: try platform
+    const cfg = loadAccount();
+    if (!cfg?.api_key) return { ok: false, error: "not connected to a platform" };
+    try {
+      const res = await hub.requestPlatformContact(cfg.endpoint, agent.agent_id, handle, cfg.api_key);
+      if (res.ok && res.status === "linked") {
+        this.books.add(agent.agent_id, handle);
+        this.activity.push("contact.add", `${localId} + @${bare}`);
+      }
+      return res;
+    } catch (err) {
+      return { ok: false, error: err instanceof Error ? err.message : String(err) };
+    }
   }
 
   /** Pool entries not yet in this agent's book (and never the agent itself) —

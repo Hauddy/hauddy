@@ -1,7 +1,7 @@
-// The curated contact book drives list_contacts (spec §"contacts"): when the app
-// has set a book for an agent, its contacts are exactly that book; an empty book
-// keeps zero-config auto-discovery (every agent on the machine). Exercised at the
-// hub via the `bookOf` option + the /contacts/:id surface list_contacts uses.
+// The curated contact book drives list_contacts (spec §"contacts"): when bookOf
+// returns a non-null value (even empty), contacts are exactly that book with no
+// fallback. bookOf returning null triggers the zero-config auto-discovery path.
+// Exercised at the hub via the `bookOf` option + the /contacts/:id surface.
 import { after, before, test } from "node:test";
 import assert from "node:assert/strict";
 import { generateKeyPairSync } from "node:crypto";
@@ -46,13 +46,13 @@ test("no book → auto-discovery: every other agent on the machine", async () =>
 test("a curated book → contacts are exactly the book", async () => {
   books.set(ids.ada, ["bo"]); // ada's book holds only @bo
   assert.deepEqual(await nicksOf(ids.ada), ["@bo"], "cy is hidden — not in ada's book");
-  // Other agents are unaffected (they have no book → auto).
+  // Other agents are unaffected (bookOf returns null for them → auto-discovery).
   assert.deepEqual(await nicksOf(ids.bo), ["@ada", "@cy"]);
 });
 
-test("an emptied book falls back to auto-discovery", async () => {
+test("an empty book returns no contacts (no fallback)", async () => {
   books.set(ids.ada, []);
-  assert.deepEqual(await nicksOf(ids.ada), ["@bo", "@cy"]);
+  assert.deepEqual(await nicksOf(ids.ada), []);
 });
 
 test("book handles that don't resolve are dropped, self is never included", async () => {

@@ -59,6 +59,13 @@ export interface Provisioned {
    * the MCP wake notification. Absent ⇒ no daemon stream reachable.
    */
   publishInjection?: (event: { type: "ring" | "validate"; text: string; code?: string }) => Promise<number>;
+  /** Return this agent's contact book as bare handles (e.g. ["ada", "bob"]).
+   *  null = daemon unavailable, gate is skipped. */
+  getBook?: () => string[] | null;
+  /** Add a handle to this agent's contact book; calls the platform if needed. */
+  addContact?: (handle: string) => Promise<{ ok: boolean; status?: string; message?: string; error?: string }>;
+  /** Remove a handle from this agent's contact book. */
+  removeContact?: (handle: string) => Promise<{ ok: boolean }>;
 }
 
 /** Ensures the session is provisioned (identity + keypair + local-hub
@@ -243,11 +250,46 @@ export function createMcpServer(provision: Provision, validation: CallValidation
     "list_contacts",
     {
       description:
-        "List your contacts, with presence. If a contact book has been curated for you in the Hauddy app, this is exactly that book; otherwise it's every agent you can reach on this machine.",
+        "List the agents in your contact book, with presence. Use add_contact to add a peer before messaging them.",
     },
     async () => {
       const p = await provision();
       return asText(await listContacts(p.endpoint, p.agentId));
+    },
+  );
+
+  server.registerTool(
+    "add_contact",
+    {
+      description:
+        "Add an agent to your contact book so you can message or call them. If their account has auto-accept enabled, the link is established immediately. Otherwise a request is sent and they must accept.",
+      inputSchema: { handle: z.string().describe("the agent's @handle, e.g. '@ada'") },
+    },
+    async ({ handle }) => {
+      const p = await provision();
+      if (!p.addContact) return asText({ ok: false, error: "contact management not available in this session mode" });
+      const result = await p.addContact(handle);
+      if (!result.ok) return asText({ ok: false, error: result.error });
+      const bare = handle.replace(/^@+/, "");
+      if (result.status === "pending") {
+        return asText({ ok: true, status: "pending", message: result.message ?? `@${bare} must accept your contact request` });
+      }
+      return asText({ ok: true, status: result.status ?? "linked", message: `Added @${bare} to your contacts. You can now message and call them.` });
+    },
+  );
+
+  server.registerTool(
+    "remove_contact",
+    {
+      description: "Remove an agent from your contact book. Does not revoke any platform link — just removes them from your local book.",
+      inputSchema: { handle: z.string().describe("the agent's @handle, e.g. '@ada'") },
+    },
+    async ({ handle }) => {
+      const p = await provision();
+      if (!p.removeContact) return asText({ ok: false, error: "contact management not available in this session mode" });
+      await p.removeContact(handle);
+      const bare = handle.replace(/^@+/, "");
+      return asText({ ok: true, message: `Removed @${bare} from your contacts.` });
     },
   );
 
@@ -279,6 +321,13 @@ export function createMcpServer(provision: Provision, validation: CallValidation
     },
     async ({ to, body, attachments }) => {
       const p = await provision();
+      if (to.startsWith("@") && p.getBook) {
+        const bare = to.slice(1).toLowerCase();
+        const book = p.getBook();
+        if (book !== null && !book.includes(bare)) {
+          return asText({ ok: false, error: `@${bare} is not in your contacts. Use add_contact("@${bare}") first.` });
+        }
+      }
       const atts = attachments?.length ? await uploadAttachments(p, attachments, to) : undefined;
       const receipt = await p.connection.sendSms(to, body, atts);
       p.activity?.push("sms", `→ ${to}: ${receipt.status}${atts?.length ? ` (+${atts.length} file)` : ""}`);
@@ -430,6 +479,13 @@ export function createMcpServer(provision: Provision, validation: CallValidation
     },
     async ({ to }) => {
       const p = await provision();
+      if (to.startsWith("@") && p.getBook) {
+        const bare = to.slice(1).toLowerCase();
+        const book = p.getBook();
+        if (book !== null && !book.includes(bare)) {
+          return asText({ ok: false, error: `@${bare} is not in your contacts. Use add_contact("@${bare}") first.` });
+        }
+      }
       const self = await me(p);
       const callId = `call_${crypto.randomBytes(5).toString("hex")}`;
       p.connection.activeCall = { id: callId, peer: to };

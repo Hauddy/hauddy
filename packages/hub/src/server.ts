@@ -285,13 +285,13 @@ export async function startHub(options: HubOptions = {}): Promise<HubHandle> {
     return `session ${c.sessionId} · started ${clock(c.connectedAt)}`;
   }
 
-  /** Contacts of an agent. If the app has curated a book for it, that book *is*
-   *  its contacts (resolved locally or via the gateway). Otherwise: everyone
-   *  else in autoLink mode; on the platform, its own account + friends (allow-
-   *  all) + legacy links; plus remote friend agents (gateway directory). */
+  /** Contacts of an agent. If the app has curated a book for it (even empty),
+   *  that book *is* its contacts — no fallback. Without a bookOf callback or
+   *  when bookOf returns null, falls back to all reachable agents (autoLink) or
+   *  the platform-derived set. */
   function contactsOf(agentId: string): string[] {
     const book = options.bookOf?.(agentId);
-    if (book && book.length > 0) {
+    if (book !== null && book !== undefined) {
       const ids = new Set<string>();
       for (const handle of book) {
         const id = store.resolveAgentId(handle) ?? resolveRemote(handle);

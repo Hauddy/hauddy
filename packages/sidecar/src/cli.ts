@@ -155,6 +155,7 @@ async function serve(): Promise<void> {
           resolve();
         });
       });
+      const localId = identity.local_id!;
       provisioned = {
         endpoint,
         agentId: identity.agent_id!,
@@ -179,6 +180,39 @@ async function serve(): Promise<void> {
             return typeof body.delivered === "number" ? body.delivered : 0;
           } catch {
             return 0;
+          }
+        },
+        // Contact book — delegate to daemon API (daemon manages books.json).
+        // getBook returns null (no gate) in the stdio path: daemon is async so we
+        // can't block synchronously, and the HTTP MCP path (recommended) has full
+        // gating through daemon.books which is co-located.
+        getBook: () => null,
+        addContact: async (handle: string) => {
+          const api = localApiUrl();
+          if (!api) return { ok: false, error: "daemon not running — start hauddy daemon" };
+          try {
+            const res = await fetch(`${api}/api/mcp/contacts/add`, {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({ localId, handle }),
+            });
+            return (await res.json()) as { ok: boolean; status?: string; message?: string; error?: string };
+          } catch (err) {
+            return { ok: false, error: err instanceof Error ? err.message : String(err) };
+          }
+        },
+        removeContact: async (handle: string) => {
+          const api = localApiUrl();
+          if (!api) return { ok: false };
+          try {
+            const res = await fetch(`${api}/api/mcp/contacts/remove`, {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({ localId, handle }),
+            });
+            return (await res.json()) as { ok: boolean };
+          } catch {
+            return { ok: false };
           }
         },
       };

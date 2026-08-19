@@ -531,6 +531,31 @@ export class HubDO {
         return this.json(200, { ok: true });
       }
 
+      // ── MCP add_contact: establish a platform link if the target accepts it ──
+      // Auth: account key. Verifies the agent belongs to the authenticated account.
+      // If the target has open_link, grants immediate reachability (grantAgent) so
+      // future areLinked() checks pass. Otherwise returns "pending".
+      const agentContactRoute = path.match(/^\/accounts\/agents\/([^/]+)\/contacts$/);
+      if (method === "POST" && agentContactRoute) {
+        const accountId = this.requireAccount(request);
+        if (!accountId) return this.unauthorized();
+        const agentId = decodeURIComponent(agentContactRoute[1]!);
+        const agent = this.db.getAgent(agentId);
+        if (!agent || agent.account_id !== accountId) return this.json(404, { ok: false, error: "not your agent" });
+        const body = await this.readBody(request);
+        const handle = String(body.handle ?? "");
+        const targetId = this.db.resolveAgentId(handle);
+        if (!targetId) return this.json(404, { ok: false, error: "E_UNKNOWN_AGENT" });
+        if (targetId === agentId) return this.json(400, { ok: false, error: "can't add yourself" });
+        if (this.areLinked(agentId, targetId)) return this.json(200, { ok: true, status: "linked" });
+        if (this.db.isOpenLink(targetId)) {
+          this.db.grantAgent(targetId, accountId);
+          return this.json(200, { ok: true, status: "linked" });
+        }
+        const bare = handle.replace(/^@/, "");
+        return this.json(200, { ok: true, status: "pending", message: `@${bare} must accept your contact request` });
+      }
+
       // ── human console (virtual HTTP client over the DB) ───────────────
       if (path.startsWith("/console")) return await this.console(request, url);
 

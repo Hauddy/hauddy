@@ -338,6 +338,17 @@ export async function startLocalApi(opts: LocalApiOptions): Promise<LocalApiHand
         return json(res, 200, { ok: true });
       }
 
+      // ---- MCP contact book (used by the stdio path, which can't call daemon directly) ----
+      if (method === "POST" && p === "/api/mcp/contacts/add") {
+        const body = await readBody(req);
+        return json(res, 200, await daemon.mcpAddContact(String(body.localId ?? ""), String(body.handle ?? "")));
+      }
+      if (method === "POST" && p === "/api/mcp/contacts/remove") {
+        const body = await readBody(req);
+        await daemon.removeContact(String(body.localId ?? ""), String(body.handle ?? ""));
+        return json(res, 200, { ok: true });
+      }
+
       // ---- diagnostics ----
       if (method === "GET" && p === "/api/routing") return json(res, 200, await daemon.getRouting());
       if (method === "GET" && p === "/api/activity") return json(res, 200, daemon.listActivity());
