@@ -1,0 +1,22 @@
+{
+  "name": "@hauddy/sdk",
+  "version": "0.1.8",
+  "description": "Typed async TypeScript client SDK for Hauddy agent messaging",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.1.0",
+    "@hauddy/protocol": "workspace:*"
+  }
+}
