@@ -1024,27 +1024,53 @@
 .chat-compose .input {
   flex: 1;
 }
-.call-panel {
-  border-top: 1px dashed var(--border);
-  padding-top: 14px;
-  margin-top: 14px;
-}
-.call-incoming,
-.call-head {
+/* Incoming-call banner — sits at the top of the thread panel */
+.call-banner {
   display: flex;
   align-items: center;
-  gap: 12px;
-}
-.call-incoming {
-  padding: 10px 12px;
-  border: 1px solid var(--accent-border);
-  border-radius: var(--radius-md);
+  gap: 10px;
+  padding: 10px 14px;
   background: var(--surface-2);
-  margin-bottom: 12px;
+  border-bottom: 1px solid var(--accent-border);
+  font-size: 14px;
 }
-.call-head {
-  justify-content: space-between;
-  margin-bottom: 8px;
+.call-banner > span:first-child { flex: 1; }
+
+/* Phone icon in chat header */
+.call-btn {
+  font-size: 16px;
+  padding: 4px 8px;
+}
+.call-btn:disabled { opacity: 0.35; cursor: default; }
+
+/* "● On call  [Hang up]" widget in the header */
+.call-active-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--fg-muted);
+}
+.call-live-dot {
+  color: #22c55e;
+  font-size: 10px;
+}
+
+/* Divider line inside the thread separating SMS from the live call */
+.call-inline-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 6px;
+  font-size: 12px;
+  color: var(--fg-muted);
+}
+.call-inline-divider::before,
+.call-inline-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
 }
 
 .account-legal {
