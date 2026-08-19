@@ -321,8 +321,8 @@ export function createMcpServer(provision: Provision, validation: CallValidation
     },
     async ({ to, body, attachments }) => {
       const p = await provision();
-      if (to.startsWith("@") && p.getBook) {
-        const bare = to.slice(1).toLowerCase();
+      if (p.getBook) {
+        const bare = to.replace(/^@+/, "").toLowerCase();
         const book = p.getBook();
         if (book !== null && !book.includes(bare)) {
           return asText({ ok: false, error: `@${bare} is not in your contacts. Use add_contact("@${bare}") first.` });
@@ -479,8 +479,8 @@ export function createMcpServer(provision: Provision, validation: CallValidation
     },
     async ({ to }) => {
       const p = await provision();
-      if (to.startsWith("@") && p.getBook) {
-        const bare = to.slice(1).toLowerCase();
+      if (p.getBook) {
+        const bare = to.replace(/^@+/, "").toLowerCase();
         const book = p.getBook();
         if (book !== null && !book.includes(bare)) {
           return asText({ ok: false, error: `@${bare} is not in your contacts. Use add_contact("@${bare}") first.` });
