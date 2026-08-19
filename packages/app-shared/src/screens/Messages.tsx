@@ -264,6 +264,14 @@ export default function Messages() {
   const [lines, setLines] = useState<Line[]>([]);
   const [draft, setDraft] = useState('');
   const [files, setFiles] = useState<File[]>([]);
+
+  // ── call state (lifted from the old CallPanel, now session-wide) ──────────
+  const [callActive, setCallActive] = useState(false);
+  const [callTarget, setCallTarget] = useState<string | null>(null);
+  const [callTranscript, setCallTranscript] = useState<{ from: string; body: string; attachments?: Attachment[] }[]>([]);
+  const [callIncoming, setCallIncoming] = useState<{ callId: string; from: string } | null>(null);
+  const [callSay, setCallSay] = useState('');
+  const [callFiles, setCallFiles] = useState<File[]>([]);
   // Session-wide dedup: history load + the live tail both add ids here so a
   // message that appears via both paths is only rendered once.
   const seen = useRef(new Set<string>());
@@ -422,6 +430,32 @@ export default function Messages() {
     };
   }, [selected, selectedId, isAgentView, viewAs]);
 
+  // Call polling — runs whenever the console is open (not agent-view). 1s tick
+  // during an active call; 4s when idle so incoming invites surface quickly.
+  useEffect(() => {
+    if (isAgentView) return;
+    let live = true;
+    const tick = async () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
+      const res = await api.consolePoll().catch(() => null);
+      if (!live || !res) return;
+      if (callActive) {
+        for (const f of res.frames)
+          if (f.kind === 'frame')
+            setCallTranscript((p) => [...p, { from: f.from, body: String(f.body ?? ''), attachments: f.attachments }]);
+        if (res.ended) {
+          setCallActive(false);
+          setCallTranscript((p) => [...p, { from: 'system', body: 'call ended' }]);
+        }
+      } else {
+        const invite = res.frames.find((f) => f.kind === 'invite');
+        if (invite) setCallIncoming({ callId: invite.id, from: invite.from });
+      }
+    };
+    const t = setInterval(tick, callActive ? 1000 : 4000);
+    return () => { live = false; clearInterval(t); };
+  }, [callActive, isAgentView]);
+
   // Opening a thread: `peer` is the display @handle, `id` the authoritative peer
   // agent_id from the thread list. History loads by `id` when we have it — the
   // handle can fail to resolve back (a deleted connector or an unexposed peer
@@ -469,6 +503,41 @@ export default function Messages() {
     setLines((p) => [...p, { id: uid(), from: 'you', body, mine: true, attachments: staged.length ? staged : undefined, status: 'sent' }]);
     const res = await api.consoleSms(selected, body, staged.length ? staged : undefined);
     if (res.error) setLines((p) => [...p, { id: uid(), from: 'system', body: `couldn't send: ${res.error}`, mine: false }]);
+  };
+
+  const placeCall = async () => {
+    if (!selected) return;
+    setCallTranscript([]);
+    setCallTarget(selected);
+    const res = await api.consoleCall(selected);
+    if (res.call_id) setCallActive(true);
+  };
+  const answerCall = async () => {
+    if (!callIncoming) return;
+    await api.consolePickup(callIncoming.callId, callIncoming.from);
+    const fromNick = nickOf(callIncoming.from);
+    setCallTranscript([{ from: 'system', body: `on a call with ${fromNick}` }]);
+    setCallTarget(fromNick);
+    setCallIncoming(null);
+    setCallActive(true);
+  };
+  const speak = async () => {
+    const text = callSay.trim();
+    if (!text && callFiles.length === 0) return;
+    setCallSay('');
+    const pending = callFiles;
+    setCallFiles([]);
+    const staged: Attachment[] = [];
+    for (const f of pending) {
+      try { staged.push(await api.uploadConsoleFile(f, callTarget ?? '')); }
+      catch { /* skip */ }
+    }
+    setCallTranscript((p) => [...p, { from: 'you', body: text, attachments: staged.length ? staged : undefined }]);
+    await api.consoleSay(text, staged.length ? staged : undefined);
+  };
+  const hangup = async () => {
+    await api.consoleHangup();
+    setCallActive(false);
   };
 
   return (
@@ -618,6 +687,14 @@ export default function Messages() {
         </aside>
 
         <section className="thread-panel">
+          {/* Incoming-call banner — floats above everything, regardless of open thread */}
+          {callIncoming && !callActive && !isAgentView && (
+            <div className="call-banner">
+              <span>📞 Incoming call from <strong>{nickOf(callIncoming.from)}</strong></span>
+              <button type="button" className="btn btn-primary btn-sm" onClick={() => void answerCall()}>Answer</button>
+              <button type="button" className="btn btn-ghost btn-sm" onClick={() => setCallIncoming(null)}>Ignore</button>
+            </div>
+          )}
           {selectedCall ? (
             <CallTranscript call={selectedCall} selfLabel={selfLabel} presenceOf={presenceOf} onOpenMessages={openMessagesFor} />
           ) : !(view === 'chats' && selected) ? (
@@ -637,11 +714,27 @@ export default function Messages() {
                 <span className="thread-peer">
                   <PresenceDot state={presenceOf(selected)} /> {selected}
                 </span>
-                {isAgentView && <span className="readonly-badge">Read-only · {selfLabel}'s inbox</span>}
+                {isAgentView ? (
+                  <span className="readonly-badge">Read-only · {selfLabel}'s inbox</span>
+                ) : callActive && callTarget === selected ? (
+                  <span className="call-active-badge">
+                    <span className="call-live-dot" aria-hidden>●</span> On call
+                    <button type="button" className="btn btn-ghost btn-sm" onClick={() => void hangup()}>Hang up</button>
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm call-btn"
+                    title={`Call ${selected}`}
+                    disabled={callActive}
+                    onClick={() => void placeCall()}
+                  >
+                    📞
+                  </button>
+                )}
               </div>
-              {!isAgentView && <CallPanel target={selected} nickOf={nickOf} />}
               <div className="chat-thread" aria-label="Conversation" ref={threadRef} onScroll={onThreadScroll}>
-                {lines.length === 0 ? (
+                {lines.length === 0 && !(callActive && callTarget === selected) ? (
                   <EmptyState
                     icon="message"
                     title="No messages yet"
@@ -663,6 +756,21 @@ export default function Messages() {
                     </div>
                   ))
                 )}
+                {/* Active call transcript — inline after SMS history */}
+                {callActive && callTarget === selected && (
+                  <>
+                    <div className="call-inline-divider"><span>📞 Call in progress</span></div>
+                    {callTranscript.map((l, i) => (
+                      <div key={`cf-${i}`} className={`chat-line${l.from === 'you' ? ' mine' : ''}`}>
+                        <span className="chat-from">{l.from === 'you' ? selfLabel : nickOf(l.from)}</span>
+                        <span className="chat-body">
+                          {l.body}
+                          {l.attachments && l.attachments.length > 0 && <AttachmentLinks items={l.attachments} />}
+                        </span>
+                      </div>
+                    ))}
+                  </>
+                )}
               </div>
               {hasNew && (
                 <button type="button" className="jump-latest" onClick={scrollToBottom}>
@@ -670,7 +778,16 @@ export default function Messages() {
                 </button>
               )}
               {isAgentView ? (
-                <p className="readonly-note">You're viewing {selfLabel}'s inbox. Switch to “You” to send or call.</p>
+                <p className="readonly-note">You're viewing {selfLabel}'s inbox. Switch to "You" to send or call.</p>
+              ) : callActive && callTarget === selected ? (
+                <>
+                  <PendingFiles files={callFiles} setFiles={setCallFiles} />
+                  <form className="chat-compose" onSubmit={(e) => { e.preventDefault(); void speak(); }}>
+                    <AttachControl setFiles={setCallFiles} disabled={false} />
+                    <input className="input" value={callSay} placeholder="Say something…" onChange={(e) => setCallSay(e.target.value)} aria-label="Say on the call" />
+                    <button type="submit" className="btn btn-inverse" disabled={!callSay.trim() && callFiles.length === 0}>Say</button>
+                  </form>
+                </>
               ) : (
                 <>
                   <PendingFiles files={files} setFiles={setFiles} />
@@ -694,120 +811,6 @@ export default function Messages() {
         </section>
       </div>
     </>
-  );
-}
-
-function CallPanel({ target, nickOf }: { target: string; nickOf: (id: string) => string }) {
-  const [active, setActive] = useState(false);
-  const [transcript, setTranscript] = useState<{ from: string; body: string; attachments?: Attachment[] }[]>([]);
-  const [incoming, setIncoming] = useState<{ callId: string; from: string } | null>(null);
-  const [say, setSay] = useState('');
-  const [files, setFiles] = useState<File[]>([]);
-
-  useEffect(() => {
-    let live = true;
-    const tick = async () => {
-      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
-      const res = await api.consolePoll().catch(() => null);
-      if (!live || !res) return;
-      if (active) {
-        for (const f of res.frames) if (f.kind === 'frame') setTranscript((p) => [...p, { from: f.from, body: String(f.body ?? ''), attachments: f.attachments }]);
-        if (res.ended) {
-          setActive(false);
-          setTranscript((p) => [...p, { from: 'system', body: 'call ended' }]);
-        }
-      } else {
-        const invite = res.frames.find((f) => f.kind === 'invite');
-        if (invite) setIncoming({ callId: invite.id, from: invite.from });
-      }
-    };
-    // Fast (1s) only during a live call; slow (4s) when idle just watching for an invite.
-    const t = setInterval(tick, active ? 1000 : 4000);
-    return () => {
-      live = false;
-      clearInterval(t);
-    };
-  }, [active]);
-
-  const place = async () => {
-    setTranscript([]);
-    const res = await api.consoleCall(target);
-    if (res.call_id) setActive(true);
-  };
-  const answer = async () => {
-    if (!incoming) return;
-    await api.consolePickup(incoming.callId, incoming.from);
-    setTranscript([{ from: 'system', body: `on a call with ${nickOf(incoming.from)}` }]);
-    setIncoming(null);
-    setActive(true);
-  };
-  const speak = async () => {
-    const text = say.trim();
-    if (!text && files.length === 0) return;
-    setSay('');
-    const pending = files;
-    setFiles([]);
-    const staged: Attachment[] = [];
-    for (const f of pending) {
-      try {
-        staged.push(await api.uploadConsoleFile(f, target));
-      } catch {
-        /* skip a file that failed to stage */
-      }
-    }
-    setTranscript((p) => [...p, { from: 'you', body: text, attachments: staged.length ? staged : undefined }]);
-    await api.consoleSay(text, staged.length ? staged : undefined);
-  };
-  const hangup = async () => {
-    await api.consoleHangup();
-    setActive(false);
-  };
-
-  return (
-    <div className="call-panel">
-      {incoming && !active && (
-        <div className="call-incoming">
-          <span>📞 Incoming call from <strong>{nickOf(incoming.from)}</strong></span>
-          <button type="button" className="btn btn-primary btn-sm" onClick={() => void answer()}>Answer</button>
-          <button type="button" className="btn btn-ghost btn-sm" onClick={() => setIncoming(null)}>Ignore</button>
-        </div>
-      )}
-      {!active ? (
-        <button type="button" className="btn btn-ghost" onClick={() => void place()}>
-          📞 Call {target}
-        </button>
-      ) : (
-        <div className="call-live">
-          <div className="call-head">
-            <span className="presence presence-online">On call with {target}</span>
-            <button type="button" className="btn btn-ghost btn-sm" onClick={() => void hangup()}>Hang up</button>
-          </div>
-          <div className="chat-thread call-transcript">
-            {transcript.map((l, i) => (
-              <div key={i} className={`chat-line${l.from === 'you' ? ' mine' : ''}`}>
-                <span className="chat-from">{nickOf(l.from)}</span>
-                <span className="chat-body">
-                  {l.body}
-                  {l.attachments && l.attachments.length > 0 && <AttachmentLinks items={l.attachments} />}
-                </span>
-              </div>
-            ))}
-          </div>
-          <PendingFiles files={files} setFiles={setFiles} />
-          <form
-            className="chat-compose"
-            onSubmit={(e) => {
-              e.preventDefault();
-              void speak();
-            }}
-          >
-            <AttachControl setFiles={setFiles} disabled={false} />
-            <input className="input" value={say} placeholder="Say something…" onChange={(e) => setSay(e.target.value)} aria-label="Say on the call" />
-            <button type="submit" className="btn btn-inverse" disabled={!say.trim() && files.length === 0}>Say</button>
-          </form>
-        </div>
-      )}
-    </div>
   );
 }
 
