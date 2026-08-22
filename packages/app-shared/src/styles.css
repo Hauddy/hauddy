@@ -367,6 +367,24 @@
 .contact-last {
   color: var(--text-faint);
 }
+.origin-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.origin-badge.origin-local {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-surface);
+}
+.origin-badge.origin-network {
+  color: var(--text-faint);
+}
 /* a whole contact row that links out (e.g. Your agents → agent page) */
 .contact-row-link {
   text-decoration: none;

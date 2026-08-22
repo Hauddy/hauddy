@@ -58,6 +58,7 @@ export interface BookContact {
   handle: string | null;
   description: string | null;
   online: boolean;
+  origin?: 'local' | 'network';
 }
 
 /** An incoming contact request awaiting one of your agents' response. */

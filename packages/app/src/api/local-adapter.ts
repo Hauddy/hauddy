@@ -3,6 +3,7 @@ import {
   type Agent,
   type Api,
   type Attachment,
+  type BookContact,
   type CallLogEntry,
   type ConsoleCallPoll,
   type ConsoleMessage,
@@ -180,6 +181,29 @@ const localApi: Partial<Api> = {
   },
   consoleHangup() {
     return httpApi.humanHangup();
+  },
+
+  // ---- per-agent contact books (daemon routes, not platform book endpoint) ----
+  async getAgentBook(agentId: string): Promise<{ book: BookContact[]; bookable: BookContact[] }> {
+    const [book, bookable] = await Promise.all([
+      httpApi.listBook(agentId),
+      httpApi.listBookable(agentId),
+    ]);
+    const adapt = (c: { handle: string; presence: string; origin: 'local' | 'network'; description: string | null }): BookContact => ({
+      agent_id: c.handle,
+      handle: c.handle,
+      description: c.description,
+      online: c.presence === 'online',
+      origin: c.origin,
+    });
+    return { book: book.map(adapt), bookable: bookable.map(adapt) };
+  },
+  async addAgentBookContact(agentId: string, handle: string) {
+    return httpApi.addContact(agentId, handle);
+  },
+  async removeAgentBookContact(agentId: string, handle: string) {
+    await httpApi.removeContact(agentId, handle);
+    return { ok: true as const };
   },
 };
 

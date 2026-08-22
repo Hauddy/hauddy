@@ -490,11 +490,13 @@ export class HubDO {
         if (!agent || agent.account_id !== accountId) return this.json(404, { ok: false, error: "not your agent" });
         const shape = (id: string) => {
           const p = this.presenceOf(id);
+          const origin = this.db.getAgent(id)?.account_id === accountId ? "local" : "network";
           return {
             agent_id: id,
-            handle: p.nickname, // already @-prefixed (speakingNickname → formatNickname)
+            handle: p.nickname,
             description: this.db.getAgent(id)?.description ?? null,
             online: p.state === "online",
+            origin,
           };
         };
         if (method === "GET") {

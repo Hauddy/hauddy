@@ -74,7 +74,7 @@ export default function AgentPage() {
       <HandleSection agentId={agent.id} current={handle} />
       <BioSection agentId={agent.id} current={agent.description} />
       {isConnector && <NetworkVisibilitySection agentId={agent.id} on={!!agent.listed} />}
-      {isConnector && <ContactBookSection agentId={agent.id} />}
+      <ContactBookSection agentId={agent.id} />
       <ExternalSection agentId={agent.id} on={!!agent.openLink} count={agent.externalLinks ?? 0} />
       <AccessSection agent={agent} onRevoked={() => navigate('/')} />
 
@@ -469,8 +469,8 @@ function ContactBookSection({ agentId }: { agentId: string }) {
         )}
       </div>
       <p className="book-explainer">
-        Curate what this connector sees in <code>list_contacts</code>. With a book set it sees exactly these; leave
-        it empty and it sees your reachable agents and contacts by default. You can only add contacts it can reach.
+        Curate what this agent sees in <code>list_contacts</code>. With a book set it sees exactly these; leave it
+        empty and it sees your reachable agents and contacts by default. You can only add contacts it can reach.
       </p>
       {note && <div className={`notice ${note.ok ? 'ok' : 'bad'}`}>{note.text}</div>}
       {adding && (
@@ -489,13 +489,13 @@ function ContactBookSection({ agentId }: { agentId: string }) {
       ) : book.length === 0 ? (
         <EmptyState
           icon="contact"
-          title="No book contacts yet"
-          description="No book yet — this connector sees your reachable contacts by default. Add one to curate the list."
+          title="No contacts yet"
+          description="No book yet — this agent sees your reachable contacts by default. Add one to curate the list."
         />
       ) : (
         <div className="contact-list">
           {book.map((c: BookContact) => (
-            <div className="contact-row" key={c.agent_id}>
+            <div className="contact-row" key={c.handle ?? c.agent_id}>
               <div className="contact-main">
                 <span className="contact-nick">
                   <PresenceDot state={c.online ? 'online' : 'offline'} /> {c.handle ?? c.agent_id}
@@ -503,6 +503,7 @@ function ContactBookSection({ agentId }: { agentId: string }) {
                 {c.description && <span className="contact-desc"> — {c.description}</span>}
               </div>
               <div className="contact-meta">
+                {c.origin && <span className={`origin-badge origin-${c.origin}`}>{c.origin}</span>}
                 <button type="button" className="btn btn-ghost btn-sm" onClick={() => void remove(c.handle ?? '')}>
                   Remove
                 </button>

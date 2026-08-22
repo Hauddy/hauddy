@@ -39,6 +39,7 @@ export type {
 export type {
   AccountKey,
   Agent,
+  BookContact,
   Contact,
   ContactActionResult,
   Nickname,
