@@ -1479,6 +1479,17 @@
   font-size: 13px;
   color: var(--text);
 }
+.thread-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: none;
+}
+.thread-ts {
+  font-size: 11px;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
 .thread-unread {
   flex: none;
   min-width: 18px;

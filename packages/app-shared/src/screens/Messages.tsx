@@ -37,6 +37,15 @@ function fmtWhen(ms: number): string {
   return new Date(ms).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
+function fmtCallPreview(call: { state: string; duration_s?: number }): string {
+  if (call.state === 'ended' && call.duration_s != null) {
+    const m = Math.floor(call.duration_s / 60);
+    const s = call.duration_s % 60;
+    return `📞 Call · ${m}:${String(s).padStart(2, '0')}`;
+  }
+  return '📞 Missed call';
+}
+
 /** Duration of an answered call as m:ss. */
 function fmtDuration(answeredMs: number, endedMs: number): string {
   const s = Math.max(0, Math.round((endedMs - answeredMs) / 1000));
@@ -634,9 +643,16 @@ export default function Messages() {
                         <span className="thread-peer">
                           <PresenceDot state={presenceOf(t.peer_nick)} /> {t.peer_nick}
                         </span>
-                        {t.unread > 0 && <span className="thread-unread">{t.unread}</span>}
+                        <span className="thread-row-meta">
+                          <span className="thread-ts">{fmtWhen(t.last_ms ?? t.last_ts)}</span>
+                          {t.unread > 0 && <span className="thread-unread">{t.unread}</span>}
+                        </span>
                       </span>
-                      <span className="thread-last">{t.last_body || (t.has_attach ? '📎 attachment' : '…')}</span>
+                      <span className="thread-last">
+                        {t.last_call
+                          ? fmtCallPreview(t.last_call)
+                          : t.last_body || (t.has_attach ? '📎 attachment' : '…')}
+                      </span>
                     </button>
                   ))}
                 </div>

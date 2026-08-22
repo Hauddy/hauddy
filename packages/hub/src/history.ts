@@ -49,6 +49,8 @@ export interface ThreadSummary {
   peer_nick: string | null;
   last_body: string | null;
   last_ts: number;
+  last_ms: number;
+  last_call?: { state: string; duration_s?: number };
   has_attach: boolean;
   unread: number;
 }
@@ -211,7 +213,7 @@ export class HubHistory {
     const byPeer = new Map<string, ThreadSummary>();
     for (const r of this.messagesDesc()) {
       const outbound = r.from_agent === viewerId;
-      if (!outbound && r.to_agent !== viewerId) continue; // viewer not a party
+      if (!outbound && r.to_agent !== viewerId) continue;
       const peerId = outbound ? r.to_agent : r.from_agent;
       const peerNick = outbound ? r.to_nick : r.from_nick;
       let t = byPeer.get(peerId);
@@ -221,6 +223,7 @@ export class HubHistory {
           peer_nick: peerNick,
           last_body: r.body,
           last_ts: r.created_ms,
+          last_ms: r.created_ms,
           has_attach: r.attachments != null,
           unread: 0,
         };
@@ -230,6 +233,38 @@ export class HubHistory {
       }
       if (!outbound && r.read_at == null) t.unread += 1;
     }
+
+    // Merge latest call per peer
+    const seenCall = new Set<string>();
+    for (const c of this.callsFor(viewerId)) {
+      const peerId = c.caller === viewerId ? c.callee : c.caller;
+      if (seenCall.has(peerId)) continue;
+      seenCall.add(peerId);
+      const duration_s =
+        c.ended_ms != null && c.answered_ms != null
+          ? Math.round((c.ended_ms - c.answered_ms) / 1000)
+          : undefined;
+      const callSummary = { state: c.state, duration_s };
+      let t = byPeer.get(peerId);
+      if (!t) {
+        const peerNick = c.caller === viewerId ? c.callee_nick : c.caller_nick;
+        t = {
+          peer_id: peerId,
+          peer_nick: peerNick,
+          last_body: null,
+          last_ts: 0,
+          last_ms: c.started_ms,
+          has_attach: false,
+          unread: 0,
+          last_call: callSummary,
+        };
+        byPeer.set(peerId, t);
+      } else if (c.started_ms > t.last_ms) {
+        t.last_ms = c.started_ms;
+        t.last_call = callSummary;
+      }
+    }
+
     return [...byPeer.values()];
   }
 

@@ -329,6 +329,9 @@ export interface ThreadSummary {
   peer_nick: string;
   last_body: string | null;
   last_ts: number;
+  /** Epoch ms of the last event (SMS or call); falls back to last_ts if absent. */
+  last_ms?: number;
+  last_call?: { state: string; duration_s?: number };
   has_attach: boolean;
   unread: number;
 }

@@ -78,6 +78,8 @@ export interface ThreadSummary {
   peer_nick: string | null;
   last_body: string | null;
   last_ts: number;
+  last_ms: number;
+  last_call?: { state: string; duration_s?: number };
   has_attach: boolean;
   unread: number;
 }
@@ -1336,21 +1338,64 @@ export class Db {
         : r.from_nick == null ? null : String(r.from_nick);
       let t = byPeer.get(peerId);
       if (!t) {
-        // rows are DESC, so the first we see for a peer is the latest message
+        const ms = Number(r.created_ms);
         t = {
           peer_id: peerId,
           peer_nick: peerNick,
           last_body: r.body == null ? null : String(r.body),
-          last_ts: Number(r.created_ms),
+          last_ts: ms,
+          last_ms: ms,
           has_attach: r.attachments != null,
           unread: 0,
         };
         byPeer.set(peerId, t);
       } else if (!t.peer_nick && peerNick) {
-        t.peer_nick = peerNick; // backfill from an older row if the latest lacked a nick
+        t.peer_nick = peerNick;
       }
       if (!outbound && r.read_at == null) t.unread += 1;
     }
+
+    // Merge latest call per peer
+    const callRows = this.rows<Record<string, Bind>>(
+      `SELECT caller, callee, caller_nick, callee_nick, state, started_ms, answered_ms, ended_ms
+         FROM calls WHERE caller = ? OR callee = ? ORDER BY started_ms DESC`,
+      humanId,
+      humanId,
+    );
+    const seenCall = new Set<string>();
+    for (const r of callRows) {
+      const isCaller = String(r.caller) === humanId;
+      const peerId = isCaller ? String(r.callee) : String(r.caller);
+      if (seenCall.has(peerId)) continue;
+      seenCall.add(peerId);
+      const startedMs = Number(r.started_ms);
+      const endedMs = r.ended_ms != null ? Number(r.ended_ms) : null;
+      const answeredMs = r.answered_ms != null ? Number(r.answered_ms) : null;
+      const duration_s =
+        endedMs != null && answeredMs != null ? Math.round((endedMs - answeredMs) / 1000) : undefined;
+      const callSummary = { state: String(r.state), duration_s };
+      let t = byPeer.get(peerId);
+      if (!t) {
+        const peerNick = isCaller
+          ? r.callee_nick == null ? null : String(r.callee_nick)
+          : r.caller_nick == null ? null : String(r.caller_nick);
+        t = {
+          peer_id: peerId,
+          peer_nick: peerNick,
+          last_body: null,
+          last_ts: 0,
+          last_ms: startedMs,
+          has_attach: false,
+          unread: 0,
+          last_call: callSummary,
+        };
+        byPeer.set(peerId, t);
+      } else if (startedMs > (t.last_ms ?? t.last_ts)) {
+        t.last_ms = startedMs;
+        t.last_call = callSummary;
+      }
+    }
+
     return [...byPeer.values()];
   }
 
