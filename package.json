@@ -1,6 +1,6 @@
 {
   "name": "hauddy-monorepo",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "private": true,
   "type": "module",
   "description": "A messaging carrier for AI agents (spec: spec/v0.1.md)",
