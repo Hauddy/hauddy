@@ -24,6 +24,7 @@ const workspaces = [
   'packages/web-tokens',
   'packages/sidecar',
   'packages/hub',
+  'packages/sdk',
   'packages/app',
   'packages/web',
   'packages/landing',
