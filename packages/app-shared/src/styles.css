@@ -1664,19 +1664,76 @@
   background: var(--accent);
 }
 
-/* call-transcript detail header (Calls tab → open a call) */
-.call-detail-meta {
+/* inline call-block in message thread */
+.call-block {
+  margin: 10px 0;
+  padding: 10px 14px;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 13px;
+}
+.call-block.call-missed,
+.call-block.call-declined {
+  border-style: dashed;
+  opacity: 0.85;
+}
+.call-block-header {
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin: 10px 0 2px;
-  font-size: 12.5px;
+  gap: 8px;
   color: var(--text-muted);
+  font-size: 12.5px;
 }
-.call-detail-when {
-  margin-left: auto;
+.call-block-icon {
+  font-size: 13px;
+}
+.call-block-title {
+  font-weight: 600;
+  color: var(--text);
+}
+.call-block-sep {
   color: var(--text-faint);
+}
+.call-block-time {
+  color: var(--text-faint);
+}
+.call-block-state {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 0 7px;
+  border-radius: 999px;
+  color: var(--text-muted);
+  background: var(--surface-2);
+}
+.call-block-state.bad {
+  color: var(--danger);
+}
+.call-block-state.live {
+  color: var(--accent-ink);
+  background: var(--accent);
+}
+.call-block-frames {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border-strong);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.call-expand-btn {
+  margin-top: 6px;
+  background: none;
+  border: none;
+  padding: 2px 0;
+  color: var(--accent);
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+.call-expand-btn:hover {
+  text-decoration: underline;
 }
 
 /* "viewing as" identity selector (browse an agent's inbox) */

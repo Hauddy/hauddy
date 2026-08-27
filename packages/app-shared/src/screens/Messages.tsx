@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { api, useApiState, type Attachment, type CallLogEntry } from '../api';
+import { api, useApiState, type Attachment, type ThreadCallFrame } from '../api';
 import type { Presence } from '../api/types';
 import Combobox from '../components/Combobox';
 import { PresenceDot } from '../components/Presence';
@@ -11,14 +11,30 @@ import { SkeletonList } from '../components/LoadingSkeleton';
 /** Sender-side delivery state → ✓ (sent) / ✓✓ (delivered) / ✓✓ accent (read). */
 type MsgStatus = 'sent' | 'delivered' | 'read';
 
-interface Line {
+export interface TimelineMessage {
+  kind: 'message';
   id: string;
   from: string;
   body: string;
   mine: boolean;
   attachments?: Attachment[] | null;
   status?: MsgStatus;
+  ts: number;
 }
+
+export interface TimelineCall {
+  kind: 'call';
+  id: string;
+  direction: 'incoming' | 'outgoing';
+  state: string;
+  started_ms: number;
+  answered_ms?: number | null;
+  ended_ms?: number | null;
+  end_reason?: string | null;
+  frames: ThreadCallFrame[];
+}
+
+export type TimelineItem = TimelineMessage | TimelineCall;
 
 const uid = () => `local-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
@@ -28,7 +44,7 @@ function fmtSize(n: number): string {
   return `${(n / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-/** Relative time for the call log ("just now", "5m", "3h", "Aug 4"). */
+/** Relative time for the thread / call ("just now", "5m", "3h", "Aug 4"). */
 function fmtWhen(ms: number): string {
   const diff = Date.now() - ms;
   if (diff < 60_000) return 'just now';
@@ -50,15 +66,6 @@ function fmtCallPreview(call: { state: string; duration_s?: number }): string {
 function fmtDuration(answeredMs: number, endedMs: number): string {
   const s = Math.max(0, Math.round((endedMs - answeredMs) / 1000));
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
-}
-
-/** Label + severity class for a call-log row from its final state. */
-function callState(c: CallLogEntry): { text: string; cls: string } {
-  if (c.state === 'missed') return { text: 'Missed', cls: 'bad' };
-  if (c.state === 'declined') return { text: 'Declined', cls: 'bad' };
-  if (c.state === 'ringing' || c.state === 'active') return { text: 'Live', cls: 'live' };
-  if (c.answered_ms && c.ended_ms) return { text: fmtDuration(c.answered_ms, c.ended_ms), cls: '' };
-  return { text: 'Ended', cls: '' };
 }
 
 /** ✓ sent · ✓✓ delivered · ✓✓ (accent) read — on your own outbound lines. */
@@ -212,6 +219,97 @@ function PendingFiles({ files, setFiles }: { files: File[]; setFiles: React.Disp
   );
 }
 
+/** Inline call block rendered inside the unified timeline */
+function CallBlock({
+  call,
+  selfLabel,
+  peerId,
+  nickOf,
+}: {
+  call: TimelineCall;
+  selfLabel: string;
+  peerId: string | null;
+  nickOf: (id: string) => string;
+}) {
+  const [expanded, setExpanded] = useState(call.frames.length <= 5);
+  const isIncoming = call.direction === 'incoming';
+  const when = new Date(call.started_ms).toLocaleString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+  const isMissed = call.state === 'missed';
+  const isDeclined = call.state === 'declined';
+  const isLive = call.state === 'ringing' || call.state === 'active';
+
+  let statusText = '';
+  let statusCls = '';
+  if (isMissed) {
+    statusText = 'Missed call · no answer';
+    statusCls = 'bad';
+  } else if (isDeclined) {
+    statusText = 'Declined';
+    statusCls = 'bad';
+  } else if (isLive) {
+    statusText = 'Live';
+    statusCls = 'live';
+  } else if (call.answered_ms && call.ended_ms) {
+    statusText = fmtDuration(call.answered_ms, call.ended_ms);
+  } else if (call.state === 'ended') {
+    statusText = 'Ended';
+  }
+
+  const visibleFrames = expanded ? call.frames : call.frames.slice(0, 5);
+
+  return (
+    <div className={`call-block${isMissed ? ' call-missed' : isDeclined ? ' call-declined' : ''}`}>
+      <div className="call-block-header">
+        <span className="call-block-icon" aria-hidden>📞</span>
+        <span className={`call-dir call-dir-${call.direction}`} aria-hidden>
+          {isIncoming ? '↙' : '↗'}
+        </span>
+        <span className="call-block-title">{isIncoming ? 'Incoming call' : 'Outgoing call'}</span>
+        <span className="call-block-sep">·</span>
+        <span className="call-block-time">{when}</span>
+        {statusText && (
+          <>
+            <span className="call-block-sep">·</span>
+            <span className={`call-block-state${statusCls ? ` ${statusCls}` : ''}`}>{statusText}</span>
+          </>
+        )}
+      </div>
+
+      {call.frames.length > 0 && (
+        <div className="call-block-frames">
+          {visibleFrames.map((f, i) => {
+            const isMine = f.from_agent === 'you' || (peerId ? f.from_agent !== peerId : false);
+            const atts = Array.isArray(f.attachments) ? (f.attachments as Attachment[]) : null;
+            return (
+              <div key={f.seq ?? i} className={`chat-line${isMine ? ' mine' : ''}`}>
+                <span className="chat-from">{isMine ? selfLabel : nickOf(f.from_agent)}</span>
+                <span className="chat-body">
+                  {f.body}
+                  {atts && atts.length > 0 && <AttachmentLinks items={atts} />}
+                </span>
+              </div>
+            );
+          })}
+          {call.frames.length > 5 && (
+            <button
+              type="button"
+              className="call-expand-btn"
+              onClick={() => setExpanded(!expanded)}
+            >
+              {expanded ? 'Show less ↑' : `Show full transcript (${call.frames.length} turns) ↓`}
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /** Message or call your agents (and friends' agents) yourself, as the account's
  *  human identity (spec §"human messaging"). SMS is async; a call holds the line.
  *  Either can carry files (≤10MB total). */
@@ -220,7 +318,7 @@ export default function Messages() {
   // otherwise one of your own agents' ids (read-only, incl. agent↔agent history).
   const [viewAs, setViewAs] = useState<string | null>(null);
 
-  // Single dashboard fetch replaces 4 separate per-tick API calls (threads +
+  // Single dashboard fetch replaces separate per-tick API calls (threads +
   // friends + agents + platform_agents), cutting DO requests by ~4×.
   const { data: dashboard, loading: threadsLoading, error: threadsError, refetch: refetchThreads } = useApiState(
     () => api.consoleDashboard({ as: viewAs }),
@@ -234,20 +332,6 @@ export default function Messages() {
   const isAgentView = viewAs !== null;
   const agentIdentities = agents.filter((a) => a.kind !== 'human' && a.nickname);
   const selfLabel = viewAs ? agentIdentities.find((a) => a.id === viewAs)?.nickname ?? 'agent' : 'you';
-
-  const [view, setView] = useState<'chats' | 'calls'>('chats');
-  // Only fetch the call log while the Calls tab is showing (keeps polling cheap).
-  // `withFrames` pulls each call's transcript so opening one is instant (no
-  // extra request); fine for alpha volumes.
-  const { data: callsData, loading: callsLoading, error: callsError, refetch: refetchCalls } = useApiState(
-    () => (view === 'calls' ? api.consoleCalls({ withFrames: true, as: viewAs ?? undefined }) : Promise.resolve({ calls: [] as CallLogEntry[] })),
-    [view, viewAs],
-  );
-  const calls = callsData?.calls ?? [];
-  // Which past call's transcript is open (right pane). Derived from the live list
-  // by id so each poll refreshes it (a still-active call's transcript grows).
-  const [selectedCallId, setSelectedCallId] = useState<string | null>(null);
-  const selectedCall = calls.find((c) => c.call_id === selectedCallId) ?? null;
 
   const [selected, setSelected] = useState<string | null>(null);
   // The open thread's authoritative peer agent_id (from the thread list), used to
@@ -263,14 +347,13 @@ export default function Messages() {
     if (!to) return;
     setSelected(to);
     setSelectedId(null);
-    setSelectedCallId(null);
     setComposing(false);
     const next = new URLSearchParams(searchParams);
     next.delete('to');
     setSearchParams(next, { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const [lines, setLines] = useState<Line[]>([]);
+  const [items, setItems] = useState<TimelineItem[]>([]);
   const [draft, setDraft] = useState('');
   const [files, setFiles] = useState<File[]>([]);
 
@@ -334,23 +417,23 @@ export default function Messages() {
   // Stay pinned to the newest line when already at the bottom; otherwise flag
   // that new lines arrived below the fold (drives the "new messages" pill).
   useEffect(() => {
-    if (lines.length > prevLen.current) {
+    if (items.length > prevLen.current) {
       if (atBottom) requestAnimationFrame(scrollToBottom);
       else setHasNew(true);
     }
-    prevLen.current = lines.length;
+    prevLen.current = items.length;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lines]);
+  }, [items]);
 
   // Load persisted history when the open conversation (or identity) changes.
   useEffect(() => {
     peerIdRef.current = null;
     if (!selected) {
-      setLines([]);
+      setItems([]);
       return;
     }
     let live = true;
-    setLines([]);
+    setItems([]);
     setAtBottom(true);
     setHasNew(false);
     api
@@ -358,22 +441,57 @@ export default function Messages() {
       .then((res) => {
         if (!live) return;
         peerIdRef.current = res.peer_id;
-        for (const m of res.messages) seen.current.add(m.id);
-        setLines(
-          res.messages.map<Line>((m) => ({
-            id: m.id,
-            // Prefer the clicked @handle over the server's resolved nick, which
-            // degrades to `@<id>` for a peer whose handle no longer resolves.
-            from: selected ?? res.peer_nick,
-            body: m.body ?? '',
-            mine: m.mine,
-            attachments: m.attachments,
-            status: m.mine ? (m.read_at ? 'read' : m.delivered_at ? 'delivered' : 'sent') : undefined,
-          })),
-        );
+        const timeline: TimelineItem[] = [];
+
+        if (res.items && res.items.length > 0) {
+          for (const item of res.items) {
+            if (item.kind === 'message') {
+              seen.current.add(item.id);
+              timeline.push({
+                kind: 'message',
+                id: item.id,
+                from: selected ?? res.peer_nick,
+                body: item.body ?? '',
+                mine: item.mine,
+                attachments: item.attachments,
+                status: item.mine ? (item.read_at ? 'read' : item.delivered_at ? 'delivered' : 'sent') : undefined,
+                ts: item.ts,
+              });
+            } else if (item.kind === 'call') {
+              seen.current.add(item.call_id);
+              timeline.push({
+                kind: 'call',
+                id: item.call_id,
+                direction: item.direction,
+                state: item.state,
+                started_ms: item.started_ms,
+                answered_ms: item.answered_ms,
+                ended_ms: item.ended_ms,
+                end_reason: item.end_reason,
+                frames: item.frames ?? [],
+              });
+            }
+          }
+        } else {
+          for (const m of res.messages) {
+            seen.current.add(m.id);
+            timeline.push({
+              kind: 'message',
+              id: m.id,
+              from: selected ?? res.peer_nick,
+              body: m.body ?? '',
+              mine: m.mine,
+              attachments: m.attachments,
+              status: m.mine ? (m.read_at ? 'read' : m.delivered_at ? 'delivered' : 'sent') : undefined,
+              ts: m.ts,
+            });
+          }
+        }
+
+        setItems(timeline);
         requestAnimationFrame(scrollToBottom);
       })
-      .catch(() => live && setLines([]));
+      .catch(() => live && setItems([]));
     return () => {
       live = false;
     };
@@ -389,16 +507,24 @@ export default function Messages() {
       if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
       const res = await api.consoleInbox().catch(() => null);
       if (!live || !res) return;
-      const fresh: Line[] = [];
+      const fresh: TimelineItem[] = [];
       for (const m of res.messages) {
         const atts = m.payload?.attachments;
         if (seen.current.has(m.id) || (!m.payload?.body && !(atts && atts.length))) continue;
         seen.current.add(m.id);
         if (selected && (m.from === peerIdRef.current || m.from === selected)) {
-          fresh.push({ id: m.id, from: selected, body: m.payload.body ?? '', mine: false, attachments: atts });
+          fresh.push({
+            kind: 'message',
+            id: m.id,
+            from: selected,
+            body: m.payload.body ?? '',
+            mine: false,
+            attachments: atts,
+            ts: Date.now(),
+          });
         }
       }
-      if (fresh.length) setLines((p) => [...p, ...fresh]);
+      if (fresh.length) setItems((p) => [...p, ...fresh]);
     };
     const t = setInterval(tick, 3000);
     void tick();
@@ -417,20 +543,57 @@ export default function Messages() {
       if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
       const res = await api.consoleThread(selectedId ?? selected, { as: viewAs ?? undefined }).catch(() => null);
       if (!live || !res) return;
-      const fresh: Line[] = [];
-      for (const m of res.messages) {
-        if (seen.current.has(m.id)) continue;
-        seen.current.add(m.id);
-        fresh.push({
-          id: m.id,
-          from: selected ?? res.peer_nick,
-          body: m.body ?? '',
-          mine: m.mine,
-          attachments: m.attachments,
-          status: m.mine ? (m.read_at ? 'read' : m.delivered_at ? 'delivered' : 'sent') : undefined,
-        });
+      const fresh: TimelineItem[] = [];
+
+      if (res.items && res.items.length > 0) {
+        for (const item of res.items) {
+          if (item.kind === 'message') {
+            if (seen.current.has(item.id)) continue;
+            seen.current.add(item.id);
+            fresh.push({
+              kind: 'message',
+              id: item.id,
+              from: selected ?? res.peer_nick,
+              body: item.body ?? '',
+              mine: item.mine,
+              attachments: item.attachments,
+              status: item.mine ? (item.read_at ? 'read' : item.delivered_at ? 'delivered' : 'sent') : undefined,
+              ts: item.ts,
+            });
+          } else if (item.kind === 'call') {
+            if (seen.current.has(item.call_id)) continue;
+            seen.current.add(item.call_id);
+            fresh.push({
+              kind: 'call',
+              id: item.call_id,
+              direction: item.direction,
+              state: item.state,
+              started_ms: item.started_ms,
+              answered_ms: item.answered_ms,
+              ended_ms: item.ended_ms,
+              end_reason: item.end_reason,
+              frames: item.frames ?? [],
+            });
+          }
+        }
+      } else {
+        for (const m of res.messages) {
+          if (seen.current.has(m.id)) continue;
+          seen.current.add(m.id);
+          fresh.push({
+            kind: 'message',
+            id: m.id,
+            from: selected ?? res.peer_nick,
+            body: m.body ?? '',
+            mine: m.mine,
+            attachments: m.attachments,
+            status: m.mine ? (m.read_at ? 'read' : m.delivered_at ? 'delivered' : 'sent') : undefined,
+            ts: m.ts,
+          });
+        }
       }
-      if (fresh.length) setLines((p) => [...p, ...fresh]);
+
+      if (fresh.length) setItems((p) => [...p, ...fresh]);
     };
     const t = setInterval(tick, 4000);
     return () => {
@@ -472,26 +635,6 @@ export default function Messages() {
   const openThread = (peer: string, id?: string | null) => {
     setSelected(peer || null);
     setSelectedId(id ?? null);
-    setSelectedCallId(null);
-    setComposing(false);
-  };
-  const openCall = (callId: string) => {
-    setSelectedCallId(callId);
-    setSelected(null);
-    setSelectedId(null);
-    setComposing(false);
-  };
-  // Jump from a call transcript to that peer's message thread.
-  const openMessagesFor = (peer: string) => {
-    setView('chats');
-    openThread(peer);
-  };
-  // Switching tabs clears both selections so the right pane resets predictably.
-  const switchView = (v: 'chats' | 'calls') => {
-    setView(v);
-    setSelected(null);
-    setSelectedId(null);
-    setSelectedCallId(null);
     setComposing(false);
   };
 
@@ -506,12 +649,47 @@ export default function Messages() {
       try {
         staged.push(await api.uploadConsoleFile(f, selected));
       } catch (e) {
-        setLines((p) => [...p, { id: uid(), from: 'system', body: `couldn't attach ${f.name}: ${e instanceof Error ? e.message : e}`, mine: false }]);
+        setItems((p) => [
+          ...p,
+          {
+            kind: 'message',
+            id: uid(),
+            from: 'system',
+            body: `couldn't attach ${f.name}: ${e instanceof Error ? e.message : e}`,
+            mine: false,
+            ts: Date.now(),
+          },
+        ]);
       }
     }
-    setLines((p) => [...p, { id: uid(), from: 'you', body, mine: true, attachments: staged.length ? staged : undefined, status: 'sent' }]);
+    const msgId = uid();
+    setItems((p) => [
+      ...p,
+      {
+        kind: 'message',
+        id: msgId,
+        from: 'you',
+        body,
+        mine: true,
+        attachments: staged.length ? staged : undefined,
+        status: 'sent',
+        ts: Date.now(),
+      },
+    ]);
     const res = await api.consoleSms(selected, body, staged.length ? staged : undefined);
-    if (res.error) setLines((p) => [...p, { id: uid(), from: 'system', body: `couldn't send: ${res.error}`, mine: false }]);
+    if (res.error) {
+      setItems((p) => [
+        ...p,
+        {
+          kind: 'message',
+          id: uid(),
+          from: 'system',
+          body: `couldn't send: ${res.error}`,
+          mine: false,
+          ts: Date.now(),
+        },
+      ]);
+    }
   };
 
   const placeCall = async () => {
@@ -574,130 +752,78 @@ export default function Messages() {
       <div className="chat-layout">
         <aside className="thread-list" aria-label="Conversations">
           <div className="thread-list-head">
-            <div className="seg" role="tablist" aria-label="Chats or calls">
-              <button type="button" role="tab" aria-selected={view === 'chats'} className={`seg-btn${view === 'chats' ? ' active' : ''}`} onClick={() => switchView('chats')}>
-                Chats
-              </button>
-              <button type="button" role="tab" aria-selected={view === 'calls'} className={`seg-btn${view === 'calls' ? ' active' : ''}`} onClick={() => switchView('calls')}>
-                Calls
-              </button>
-            </div>
-            {view === 'chats' && !isAgentView && (
+            <span className="thread-list-title">Conversations</span>
+            {!isAgentView && (
               <button type="button" className="btn btn-sm btn-ghost" onClick={() => setComposing((c) => !c)}>
                 {composing ? 'Cancel' : '+ New'}
               </button>
             )}
           </div>
 
-          {view === 'chats' ? (
-            <>
-              {composing && (
-                <div className="thread-new">
-                  <Combobox
-                    items={targets.map((t) => ({ value: t, label: t, presence: presenceOf(t) }))}
-                    onSelect={openThread}
-                    placeholder="Type an @handle…"
-                    ariaLabel="Start a conversation"
-                    clearOnSelect
-                  />
-                </div>
-              )}
-              {threadsLoading && !dashboard ? (
-                <SkeletonList count={3} className="thread-empty" />
-              ) : threadsError && !dashboard ? (
-                <ErrorState
-                  title="Unable to load conversations"
-                  error={threadsError}
-                  onRetry={refetchThreads}
-                  compact
-                  className="thread-empty"
-                />
-              ) : threads.length === 0 ? (
-                <EmptyState
-                  icon="message"
-                  title="No conversations"
-                  description="No conversations yet."
-                  action={
-                    !isAgentView ? (
-                      <button
-                        type="button"
-                        className="btn btn-primary btn-sm"
-                        onClick={() => setComposing(true)}
-                      >
-                        + New conversation
-                      </button>
-                    ) : null
-                  }
-                  className="thread-empty"
-                />
-              ) : (
-                <div className="thread-rows">
-                  {threads.map((t) => (
-                    <button
-                      key={t.peer_id}
-                      type="button"
-                      className={`thread-row${selected === t.peer_nick ? ' active' : ''}`}
-                      onClick={() => openThread(t.peer_nick, t.peer_id)}
-                    >
-                      <span className="thread-row-top">
-                        <span className="thread-peer">
-                          <PresenceDot state={presenceOf(t.peer_nick)} /> {t.peer_nick}
-                        </span>
-                        <span className="thread-row-meta">
-                          <span className="thread-ts">{fmtWhen(t.last_ms ?? t.last_ts)}</span>
-                          {t.unread > 0 && <span className="thread-unread">{t.unread}</span>}
-                        </span>
-                      </span>
-                      <span className="thread-last">
-                        {t.last_call
-                          ? fmtCallPreview(t.last_call)
-                          : t.last_body || (t.has_attach ? '📎 attachment' : '…')}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </>
-          ) : callsLoading && !callsData ? (
+          {composing && (
+            <div className="thread-new">
+              <Combobox
+                items={targets.map((t) => ({ value: t, label: t, presence: presenceOf(t) }))}
+                onSelect={openThread}
+                placeholder="Type an @handle…"
+                ariaLabel="Start a conversation"
+                clearOnSelect
+              />
+            </div>
+          )}
+          {threadsLoading && !dashboard ? (
             <SkeletonList count={3} className="thread-empty" />
-          ) : callsError && !callsData ? (
+          ) : threadsError && !dashboard ? (
             <ErrorState
-              title="Unable to load call log"
-              error={callsError}
-              onRetry={refetchCalls}
+              title="Unable to load conversations"
+              error={threadsError}
+              onRetry={refetchThreads}
               compact
               className="thread-empty"
             />
-          ) : calls.length === 0 ? (
-            <EmptyState icon="message" title="No calls" description="No calls yet." className="thread-empty" />
+          ) : threads.length === 0 ? (
+            <EmptyState
+              icon="message"
+              title="No conversations"
+              description="No conversations yet."
+              action={
+                !isAgentView ? (
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-sm"
+                    onClick={() => setComposing(true)}
+                  >
+                    + New conversation
+                  </button>
+                ) : null
+              }
+              className="thread-empty"
+            />
           ) : (
             <div className="thread-rows">
-              {calls.map((c) => {
-                const st = callState(c);
-                return (
-                  <button
-                    key={c.call_id}
-                    type="button"
-                    className={`thread-row call-row${selectedCallId === c.call_id ? ' active' : ''}`}
-                    onClick={() => openCall(c.call_id)}
-                    title={`${c.direction === 'incoming' ? 'Incoming' : 'Outgoing'} call · ${st.text}`}
-                  >
-                    <span className="thread-row-top">
-                      <span className="thread-peer">
-                        <span className={`call-dir call-dir-${c.direction}`} aria-hidden>
-                          {c.direction === 'incoming' ? '↙' : '↗'}
-                        </span>{' '}
-                        {c.peer_nick}
-                      </span>
-                      {st.cls && <span className={`call-state ${st.cls}`}>{st.text}</span>}
+              {threads.map((t) => (
+                <button
+                  key={t.peer_id}
+                  type="button"
+                  className={`thread-row${selected === t.peer_nick ? ' active' : ''}`}
+                  onClick={() => openThread(t.peer_nick, t.peer_id)}
+                >
+                  <span className="thread-row-top">
+                    <span className="thread-peer">
+                      <PresenceDot state={presenceOf(t.peer_nick)} /> {t.peer_nick}
                     </span>
-                    <span className="thread-last">
-                      {fmtWhen(c.started_ms)}
-                      {!st.cls && ` · ${st.text}`}
+                    <span className="thread-row-meta">
+                      <span className="thread-ts">{fmtWhen(t.last_ms ?? t.last_ts)}</span>
+                      {t.unread > 0 && <span className="thread-unread">{t.unread}</span>}
                     </span>
-                  </button>
-                );
-              })}
+                  </span>
+                  <span className="thread-last">
+                    {t.last_call
+                      ? fmtCallPreview(t.last_call)
+                      : t.last_body || (t.has_attach ? '📎 attachment' : '…')}
+                  </span>
+                </button>
+              ))}
             </div>
           )}
         </aside>
@@ -711,17 +837,11 @@ export default function Messages() {
               <button type="button" className="btn btn-ghost btn-sm" onClick={() => setCallIncoming(null)}>Ignore</button>
             </div>
           )}
-          {selectedCall ? (
-            <CallTranscript call={selectedCall} selfLabel={selfLabel} presenceOf={presenceOf} onOpenMessages={openMessagesFor} />
-          ) : !(view === 'chats' && selected) ? (
+          {!selected ? (
             <EmptyState
               icon="message"
-              title={view === 'calls' ? 'Select a call' : 'Select a conversation'}
-              description={
-                view === 'calls'
-                  ? 'Pick a call from the sidebar to view its transcript.'
-                  : 'Pick a conversation from the sidebar or start a new one to begin messaging.'
-              }
+              title="Select a conversation"
+              description="Pick a conversation from the sidebar or start a new one to begin messaging."
               className="thread-placeholder"
             />
           ) : (
@@ -750,7 +870,7 @@ export default function Messages() {
                 )}
               </div>
               <div className="chat-thread" aria-label="Conversation" ref={threadRef} onScroll={onThreadScroll}>
-                {lines.length === 0 && !(callActive && callTarget === selected) ? (
+                {items.length === 0 && !(callActive && callTarget === selected) ? (
                   <EmptyState
                     icon="message"
                     title="No messages yet"
@@ -761,18 +881,28 @@ export default function Messages() {
                     }
                   />
                 ) : (
-                  lines.map((l) => (
-                    <div key={l.id} className={`chat-line${l.mine ? ' mine' : ''}`}>
-                      <span className="chat-from">{l.mine ? selfLabel : l.from}</span>
-                      <span className="chat-body">
-                        {l.body}
-                        {l.attachments && l.attachments.length > 0 && <AttachmentLinks items={l.attachments} />}
-                        {l.mine && l.status && <MsgTick status={l.status} />}
-                      </span>
-                    </div>
-                  ))
+                  items.map((item) =>
+                    item.kind === 'message' ? (
+                      <div key={item.id} className={`chat-line${item.mine ? ' mine' : ''}`}>
+                        <span className="chat-from">{item.mine ? selfLabel : item.from}</span>
+                        <span className="chat-body">
+                          {item.body}
+                          {item.attachments && item.attachments.length > 0 && <AttachmentLinks items={item.attachments} />}
+                          {item.mine && item.status && <MsgTick status={item.status} />}
+                        </span>
+                      </div>
+                    ) : (
+                      <CallBlock
+                        key={item.id}
+                        call={item}
+                        selfLabel={selfLabel}
+                        peerId={peerIdRef.current}
+                        nickOf={nickOf}
+                      />
+                    ),
+                  )
                 )}
-                {/* Active call transcript — inline after SMS history */}
+                {/* Active call transcript — inline after history */}
                 {callActive && callTarget === selected && (
                   <>
                     <div className="call-inline-divider"><span>📞 Call in progress</span></div>
@@ -825,67 +955,6 @@ export default function Messages() {
             </>
           )}
         </section>
-      </div>
-    </>
-  );
-}
-
-/** Read-only transcript of a past (or still-active) call, opened from the Calls
- *  tab. `mine` = anything not from the peer (the human or the viewed agent). */
-function CallTranscript({
-  call,
-  selfLabel,
-  presenceOf,
-  onOpenMessages,
-}: {
-  call: CallLogEntry;
-  selfLabel: string;
-  presenceOf: (handle: string) => Presence;
-  onOpenMessages: (peer: string) => void;
-}) {
-  const st = callState(call);
-  const frames = call.frames ?? [];
-  const when = new Date(call.started_ms).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
-  const emptyMsg =
-    call.state === 'missed' || call.state === 'declined'
-      ? "This call wasn't answered — no transcript."
-      : 'No words were exchanged on this call.';
-  return (
-    <>
-      <div className="thread-panel-head">
-        <span className="thread-peer">
-          <PresenceDot state={presenceOf(call.peer_nick)} /> {call.peer_nick}
-        </span>
-        <button type="button" className="btn btn-sm btn-ghost" onClick={() => onOpenMessages(call.peer_nick)}>
-          Messages
-        </button>
-      </div>
-      <div className="call-detail-meta">
-        <span className={`call-dir call-dir-${call.direction}`} aria-hidden>
-          {call.direction === 'incoming' ? '↙' : '↗'}
-        </span>
-        <span>{call.direction === 'incoming' ? 'Incoming call' : 'Outgoing call'}</span>
-        <span className={`call-state ${st.cls}`}>{st.text}</span>
-        <span className="call-detail-when">{when}</span>
-      </div>
-      <div className="chat-thread call-transcript" aria-label="Call transcript">
-        {frames.length === 0 ? (
-          <div className="empty-state">{emptyMsg}</div>
-        ) : (
-          frames.map((f) => {
-            const mine = f.from_agent !== call.peer_id;
-            const atts = Array.isArray(f.attachments) ? (f.attachments as Attachment[]) : null;
-            return (
-              <div key={f.seq} className={`chat-line${mine ? ' mine' : ''}`}>
-                <span className="chat-from">{mine ? selfLabel : call.peer_nick}</span>
-                <span className="chat-body">
-                  {f.body}
-                  {atts && atts.length > 0 && <AttachmentLinks items={atts} />}
-                </span>
-              </div>
-            );
-          })
-        )}
       </div>
     </>
   );

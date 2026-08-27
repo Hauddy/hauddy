@@ -1447,6 +1447,20 @@ export class Db {
     );
   }
 
+  /** Call sessions with one peer, newest-first-paged. */
+  callsWithPeer(humanId: string, peerId: string, beforeMs: number | null = null, limit = 50): CallRow[] {
+    const hasBefore = beforeMs != null;
+    return this.rows<CallRow>(
+      `SELECT * FROM calls
+         WHERE ((caller = ? AND callee = ?) OR (caller = ? AND callee = ?))
+           ${hasBefore ? "AND started_ms < ?" : ""}
+         ORDER BY started_ms DESC LIMIT ?`,
+      ...(hasBefore
+        ? [humanId, peerId, peerId, humanId, beforeMs, limit]
+        : [humanId, peerId, peerId, humanId, limit]),
+    );
+  }
+
   /** Unread inbound messages across all threads (badge count). */
   unreadMessageCount(humanId: string): number {
     return Number(
