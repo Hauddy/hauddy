@@ -247,6 +247,37 @@
   font-size: 13px;
 }
 
+/* ---------- danger zone & settings ---------- */
+.hauddy-msgs .btn-danger {
+  background: var(--danger, #dc2626);
+  color: #ffffff;
+  border: none;
+}
+.hauddy-msgs .btn-danger:hover {
+  background: #b91c1c;
+}
+.hauddy-msgs .settings-danger {
+  border-top: 1px solid var(--border);
+  padding-top: 24px;
+  margin-top: 24px;
+}
+.hauddy-msgs .danger-confirm-box {
+  background: var(--surface-2, rgba(220, 38, 38, 0.08));
+  border: 1px solid var(--danger, #dc2626);
+  border-radius: var(--radius-md, 8px);
+  padding: 16px;
+  margin-top: 12px;
+}
+.hauddy-msgs .danger-warning {
+  margin: 0 0 12px;
+  color: var(--text);
+  font-weight: 500;
+}
+.hauddy-msgs .danger-actions {
+  display: flex;
+  gap: 12px;
+}
+
 /* ---------- contacts ---------- */
 
 .hauddy-msgs .search-result {
@@ -337,6 +368,24 @@
   font-size: 12.5px;
 }
 .hauddy-msgs .contact-last {
+  color: var(--text-faint);
+}
+.hauddy-msgs .origin-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.hauddy-msgs .origin-badge.origin-local {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-surface);
+}
+.hauddy-msgs .origin-badge.origin-network {
   color: var(--text-faint);
 }
 /* a whole contact row that links out (e.g. Your agents → agent page) */
@@ -736,6 +785,36 @@
   margin-left: 10px;
   flex-wrap: wrap;
 }
+
+.hauddy-msgs .suggestion-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  font-size: 12px;
+}
+.hauddy-msgs .suggestion-label {
+  color: var(--text-faint);
+  font-weight: 500;
+}
+.hauddy-msgs .chip-btn {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm, 4px);
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.hauddy-msgs .chip-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--surface);
+}
+
 .hauddy-msgs .in-chips-label {
   font-size: 11.5px;
   color: var(--text-faint);
@@ -966,28 +1045,65 @@
 .hauddy-msgs .chat-compose .input {
   flex: 1;
 }
-.hauddy-msgs .call-panel {
-  border-top: 1px dashed var(--border);
-  padding-top: 14px;
-  margin-top: 14px;
-}
-.hauddy-msgs .call-incoming,
-.hauddy-msgs .call-head {
+/* Incoming-call banner — sits at the top of the thread panel */
+.hauddy-msgs .call-banner {
   display: flex;
   align-items: center;
-  gap: 12px;
-}
-.hauddy-msgs .call-incoming {
-  padding: 10px 12px;
-  border: 1px solid var(--accent-border);
-  border-radius: var(--radius-md);
+  gap: 10px;
+  padding: 10px 14px;
   background: var(--surface-2);
-  margin-bottom: 12px;
+  border-bottom: 1px solid var(--accent-border);
+  font-size: 14px;
 }
-.hauddy-msgs .call-head {
-  justify-content: space-between;
-  margin-bottom: 8px;
+.hauddy-msgs .call-banner > span:first-child { flex: 1; }
+
+/* Phone icon in chat header */
+.hauddy-msgs .call-btn {
+  font-size: 16px;
+  padding: 4px 8px;
 }
+.hauddy-msgs .call-btn:disabled { opacity: 0.35; cursor: default; }
+
+/* "● On call  [Hang up]" widget in the header */
+.hauddy-msgs .call-active-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--fg-muted);
+}
+.hauddy-msgs .call-live-dot {
+  color: #22c55e;
+  font-size: 10px;
+}
+
+/* Divider line inside the thread separating SMS from the live call */
+.hauddy-msgs .call-inline-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 6px;
+  font-size: 12px;
+  color: var(--fg-muted);
+}
+.hauddy-msgs .call-inline-divider::before,
+.hauddy-msgs .call-inline-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.hauddy-msgs .account-legal {
+  margin-top: 40px;
+  font-size: 12px;
+  color: var(--fg-muted);
+}
+.hauddy-msgs .account-legal a {
+  color: inherit;
+  text-decoration: underline;
+}
+.hauddy-msgs .account-legal a:hover { opacity: 0.75; }
 
 /* API-key card: pad the surface, stack the key over its actions */
 .hauddy-msgs .conn-card {
@@ -1384,6 +1500,17 @@
   font-size: 13px;
   color: var(--text);
 }
+.hauddy-msgs .thread-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: none;
+}
+.hauddy-msgs .thread-ts {
+  font-size: 11px;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
 .hauddy-msgs .thread-unread {
   flex: none;
   min-width: 18px;
@@ -1624,6 +1751,29 @@
 .hauddy-msgs .compose-attachments {
   margin: 8px 0 0;
 }
+.hauddy-msgs .attach-image-container {
+  margin-top: 6px;
+  display: inline-block;
+  max-width: 100%;
+}
+.hauddy-msgs .attach-image-preview {
+  max-width: 240px;
+  max-height: 240px;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--border);
+  object-fit: cover;
+  cursor: pointer;
+  display: block;
+  transition: transform 0.15s, border-color 0.15s;
+}
+.hauddy-msgs .attach-image-preview:hover {
+  border-color: var(--accent);
+  transform: scale(1.02);
+}
+.hauddy-msgs .attach-image-skeleton {
+  margin-top: 6px;
+  display: inline-block;
+}
 .hauddy-msgs .attach-chip {
   display: inline-flex;
   align-items: center;
@@ -1755,4 +1905,176 @@
   color: var(--danger);
   border-color: var(--danger);
 }
+
+/* ---------- EmptyState, ErrorState & Loading Skeleton ---------- */
+
+.hauddy-msgs .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: 32px 24px;
+  text-align: center;
+  color: var(--text-faint);
+  font-size: 13.5px;
+  background: rgba(26, 29, 30, 0.4);
+}
+.hauddy-msgs .empty-state-svg {
+  width: 36px;
+  height: 36px;
+  color: var(--text-faint);
+  margin-bottom: 12px;
+  opacity: 0.85;
+}
+.hauddy-msgs .empty-state-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 6px;
+}
+.hauddy-msgs .empty-state-desc {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  max-width: 440px;
+  line-height: 1.5;
+}
+.hauddy-msgs .empty-state-action {
+  margin-top: 16px;
+}
+.hauddy-msgs .thread-empty {
+  margin: 12px;
+}
+
+/* Error State */
+.hauddy-msgs .error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(194, 86, 74, 0.08);
+  border: 1px solid rgba(194, 86, 74, 0.3);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+.hauddy-msgs .error-state-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hauddy-msgs .error-state-svg {
+  width: 18px;
+  height: 18px;
+  color: var(--danger);
+  flex: none;
+}
+.hauddy-msgs .error-state-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text);
+}
+.hauddy-msgs .error-state-desc {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+.hauddy-msgs .error-retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+.hauddy-msgs .error-retry-btn:hover {
+  border-color: var(--text-faint);
+  background: var(--surface);
+}
+
+.hauddy-msgs .error-state-compact {
+  padding: 12px 14px;
+  gap: 8px;
+  margin: 8px 0;
+}
+.hauddy-msgs .error-state-compact .error-state-title {
+  font-size: 13.5px;
+}
+.hauddy-msgs .error-state-compact .error-state-desc {
+  font-size: 12.5px;
+}
+
+/* Loading Skeletons */
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.hauddy-msgs .skeleton-box {
+  background: linear-gradient(90deg, var(--surface) 0%, var(--surface-2) 50%, var(--surface) 100%);
+  background-size: 200px 100%;
+  animation: skeleton-shimmer 1.5s infinite ease-in-out;
+}
+
+.hauddy-msgs .skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hauddy-msgs .skeleton-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+}
+.hauddy-msgs .skeleton-row-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+.hauddy-msgs .skeleton-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  flex: none;
+}
+.hauddy-msgs .skeleton-row-right {
+  display: flex;
+  align-items: center;
+}
+
+.hauddy-msgs .skeleton-card {
+  padding: 18px;
+  margin-bottom: 12px;
+}
+.hauddy-msgs .skeleton-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.hauddy-msgs .skeleton-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hauddy-msgs .skeleton-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 

@@ -10,7 +10,8 @@
     "bundle-daemon": "node scripts/bundle-daemon.mjs",
     "build": "npm run build -w @hauddy/app-ui && node scripts/make-icons.mjs && node scripts/bundle-daemon.mjs && tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "dist": "npm run build && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg"
+    "dist": "npm run build && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg",
+    "dist:linux": "npm run build && electron-builder --linux deb AppImage"
   },
   "devDependencies": {
     "@types/node": "^22.5.0",
@@ -67,6 +68,18 @@
           "path": "/Applications"
         }
       ]
+    },
+    "linux": {
+      "target": [
+        "deb",
+        "AppImage"
+      ],
+      "category": "Utility",
+      "icon": "assets/icon.png"
+    },
+    "deb": {
+      "packageCategory": "utils",
+      "priority": "optional"
     },
     "asar": true,
     "npmRebuild": false

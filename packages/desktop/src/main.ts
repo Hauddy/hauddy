@@ -50,11 +50,19 @@ function startDaemon(): void {
     daemon = null;
   });
 }
+function setActivation(mode: 'accessory' | 'regular'): void {
+  if (process.platform === 'darwin') {
+    app.setActivationPolicy(mode);
+  }
+}
+
 /** The Hauddy Dock icon — re-applied after every dock.show() since a
  *  setIcon done in accessory mode doesn't always stick once the Dock appears. */
 let appIcon: Electron.NativeImage | null = null;
 function applyDockIcon(): void {
-  if (appIcon && !appIcon.isEmpty()) app.dock?.setIcon(appIcon);
+  if (process.platform === 'darwin' && appIcon && !appIcon.isEmpty()) {
+    app.dock?.setIcon(appIcon);
+  }
 }
 
 function uiIndexPath(): string {
@@ -113,7 +121,14 @@ function showPopover(): void {
       area.x + area.width - POPOVER_W - 8,
     ),
   );
-  const y = Math.round(bounds.y + bounds.height + 6);
+  let y: number;
+  if (bounds.y > area.y + area.height / 2) {
+    // Tray is near the bottom of the screen (e.g. Windows taskbar)
+    y = Math.round(bounds.y - POPOVER_H - 6);
+  } else {
+    // Tray is near the top of the screen (e.g. macOS menu bar)
+    y = Math.round(bounds.y + bounds.height + 6);
+  }
   popover.setPosition(x, y, false);
   popover.show();
   popover.focus();
@@ -150,7 +165,7 @@ function createFullWindow(initialRoute: string): BrowserWindow {
   win.on('closed', () => {
     fullWin = null;
     // back to menu-bar-only presence
-    app.setActivationPolicy('accessory');
+    setActivation('accessory');
   });
   return win;
 }
@@ -158,9 +173,11 @@ function createFullWindow(initialRoute: string): BrowserWindow {
 /** Show the full window at a route — the "expand" path from the compact UI. */
 function expandTo(route: string): void {
   hidePopover();
-  app.setActivationPolicy('regular');
-  app.dock?.show();
-  applyDockIcon(); // re-assert our icon now that the Dock is visible
+  setActivation('regular');
+  if (process.platform === 'darwin') {
+    app.dock?.show();
+    applyDockIcon(); // re-assert our icon now that the Dock is visible
+  }
   if (!fullWin) {
     fullWin = createFullWindow(route);
     fullWin.once('ready-to-show', () => {
@@ -182,16 +199,24 @@ function expandTo(route: string): void {
 app.whenReady().then(() => {
   startDaemon();
 
-  // menu-bar accessory: no Dock icon while only the popover exists
-  app.setActivationPolicy('accessory');
+  // menu-bar accessory: no Dock icon while only the popover exists (macOS)
+  setActivation('accessory');
 
-  // Brand the Dock icon (shown once the full window expands) with the Hauddy mark.
+  // Brand the Dock/app icon (shown once the full window expands) with the Hauddy mark.
   appIcon = nativeImage.createFromPath(path.join(__dirname, '..', 'assets', 'icon.png'));
   applyDockIcon();
 
-  const icon = nativeImage.createFromPath(path.join(__dirname, '..', 'assets', 'trayTemplate.png'));
-  icon.setTemplateImage(true);
-  tray = new Tray(icon);
+  const isMac = process.platform === 'darwin';
+  const trayIconFile = isMac ? 'trayTemplate.png' : 'tray.png';
+  let trayIconPath = path.join(__dirname, '..', 'assets', trayIconFile);
+  if (!fs.existsSync(trayIconPath)) {
+    trayIconPath = path.join(__dirname, '..', 'assets', 'icon.png');
+  }
+  const icon = nativeImage.createFromPath(trayIconPath);
+  if (isMac) {
+    icon.setTemplateImage(true);
+  }
+  tray = new Tray(isMac ? icon : icon.resize({ width: 24, height: 24 }));
   tray.setToolTip('Hauddy — contact & comms for AI agents');
   tray.on('click', togglePopover);
   tray.setContextMenu(
@@ -225,9 +250,16 @@ app.whenReady().then(() => {
   ipcMain.handle('update:download', async (event) => {
     if (updateInProgress) return;
     updateInProgress = true;
+    const send = (ch: string, data?: unknown) => event.sender.send(ch, data);
+
+    if (process.platform !== 'darwin') {
+      send('update:error', { message: 'In-app auto-update is currently supported on macOS. Please download the latest release installer.' });
+      updateInProgress = false;
+      return;
+    }
+
     const tmpDmg = path.join(os.tmpdir(), 'hauddy-update.dmg');
     const tmpMnt = path.join(os.tmpdir(), 'hauddy-mnt');
-    const send = (ch: string, data?: unknown) => event.sender.send(ch, data);
     const cleanup = () => {
       try { fs.rmSync(tmpDmg, { force: true }); } catch { /* ignore */ }
       try { execFile('hdiutil', ['detach', tmpMnt, '-quiet', '-force']); } catch { /* ignore */ }
@@ -282,10 +314,14 @@ app.whenReady().then(() => {
     app.exit(0);
   });
 
-  // Notification count → Dock badge (macOS). 0/NaN clears it.
+  // Notification count → Dock badge (macOS) or app badge. 0/NaN clears it.
   ipcMain.handle('hauddy:badge', (_e, count?: number) => {
     const n = typeof count === 'number' && count > 0 ? count : 0;
-    app.dock?.setBadge(n > 0 ? String(n) : '');
+    if (process.platform === 'darwin') {
+      app.dock?.setBadge(n > 0 ? String(n) : '');
+    } else if (app.setBadgeCount) {
+      app.setBadgeCount(n);
+    }
   });
   // Fire a native OS notification (clicking it opens the full window).
   ipcMain.handle('hauddy:notify', (_e, input?: { title?: string; body?: string }) => {
