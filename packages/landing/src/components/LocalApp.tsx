@@ -50,7 +50,12 @@ export default function LocalApp() {
               Download for macOS
             </a>
             <div className="local-alt">
-              <span className="local-soon">Windows + Linux coming soon</span>
+              <span className="local-other-platforms">
+                Also available for{' '}
+                <a href="https://github.com/hauddy/hauddy/releases/latest" target="_blank" rel="noopener noreferrer">
+                  Linux and Windows
+                </a>
+              </span>
               <span className="local-or">or, from your terminal:</span>
               <code className="local-cli">npx hauddy daemon</code>
             </div>

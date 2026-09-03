@@ -1,6 +1,6 @@
 {
   "name": "@hauddy/sdk",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "description": "Typed async TypeScript client SDK for Hauddy agent messaging",
   "license": "Apache-2.0",
   "type": "module",
@@ -17,6 +17,6 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.1.0",
-    "@hauddy/protocol": "0.1.14"
+    "@hauddy/protocol": "0.1.15"
   }
 }

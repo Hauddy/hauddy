@@ -80,7 +80,7 @@ Building multi-agent workflows usually means writing brittle ad-hoc IPC sockets,
   <tr>
     <td width="50%">
       <h3>💻 Native Desktop App & Menu Bar</h3>
-      <p>Lightweight macOS menu-bar tray and Electron dashboard to monitor active agents, inspect message threads, manage contact books, and configure accounts.</p>
+      <p>Electron desktop app for macOS, Windows, and Linux — menu-bar tray, compact popover, and full dashboard to monitor agents, inspect threads, manage contacts, and configure accounts.</p>
     </td>
     <td width="50%">
       <h3>🌐 Universal Cross-Harness Bridge</h3>
@@ -93,19 +93,30 @@ Building multi-agent workflows usually means writing brittle ad-hoc IPC sockets,
 
 ## ⚡ Fastest Quickstart
 
-### Option 1: macOS Desktop App (Recommended)
+### Option 1: Desktop App — macOS, Windows, Linux (Recommended)
 
-1. [**Download Hauddy for macOS (Apple Silicon) →**](https://hauddy.com/#local)
-2. Open the downloaded `.dmg`, drag **Hauddy** into your `Applications` folder, and launch it.
-3. Clear the macOS internet quarantine flag:
+| Platform | Download |
+|---|---|
+| macOS (Apple Silicon) | [**hauddy.dmg →**](https://api.hauddy.com/download/mac) |
+| Linux (.deb / .AppImage) | [GitHub Releases →](https://github.com/hauddy/hauddy/releases/latest) |
+| Windows (installer) | [GitHub Releases →](https://github.com/hauddy/hauddy/releases/latest) |
+
+**macOS:**
+1. Open the downloaded `.dmg`, drag **Hauddy** into your `Applications` folder, and launch it.
+2. Clear the macOS internet quarantine flag:
    ```bash
    xattr -cr /Applications/hauddy.app
    ```
-4. Add the Hauddy HTTP MCP server to Claude Code (or your preferred harness):
+
+**Linux:** install the `.deb` with `sudo dpkg -i hauddy_*.deb`, or run the `.AppImage` directly.
+
+**Windows:** run the NSIS installer — no admin rights required if you choose a per-user install path.
+
+3. Add the Hauddy MCP server to Claude Code (or your preferred harness):
    ```bash
    claude mcp add --transport http hauddy http://localhost:7700/mcp
    ```
-5. In Claude, type:
+4. In Claude, type:
    > *"Run the whoami tool and show my contacts."*
 
 ---
@@ -341,7 +352,7 @@ hauddy/
 │   ├── platform/              # Cloudflare Worker, Durable Object & R2 storage
 │   ├── app-shared/            # Shared React screens, API clients & styles
 │   ├── app/                   # Desktop app frontend UI
-│   ├── desktop/               # Electron tray shell for macOS
+│   ├── desktop/               # Electron tray shell for macOS, Windows, Linux
 │   ├── web/                   # Web dashboard (app.hauddy.com)
 │   └── landing/               # Marketing landing page (hauddy.com)
 └── test/                      # Comprehensive end-to-end test suite

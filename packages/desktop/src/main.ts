@@ -6,7 +6,7 @@ import path from 'node:path';
 import { app, BrowserWindow, ipcMain, Menu, nativeImage, Notification, screen, Tray, utilityProcess } from 'electron';
 
 /**
- * hauddy desktop — macOS menu-bar app.
+ * hauddy desktop — cross-platform Electron app (macOS menu-bar, Windows/Linux tray).
  *
  * Lifecycle:
  *  - starts as an accessory (no Dock icon), creates the tray item and the
