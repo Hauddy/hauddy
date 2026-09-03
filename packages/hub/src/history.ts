@@ -484,6 +484,19 @@ export class HubHistory {
       .slice(0, limit);
   }
 
+  /** Call sessions with one peer, newest-first-paged. */
+  callsWithPeer(viewerId: string, peerId: string, beforeMs: number | null = null, limit = 50): CallRow[] {
+    return Object.values(this.data.calls)
+      .filter(
+        (c) =>
+          ((c.caller === viewerId && c.callee === peerId) ||
+            (c.caller === peerId && c.callee === viewerId)) &&
+          (beforeMs == null || c.started_ms < beforeMs),
+      )
+      .sort((a, b) => b.started_ms - a.started_ms)
+      .slice(0, limit);
+  }
+
   /** Missed inbound calls (rings never answered) started after `sinceMs`. */
   missedCallCount(viewerId: string, sinceMs = 0): number {
     let n = 0;

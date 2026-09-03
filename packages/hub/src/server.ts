@@ -1058,9 +1058,33 @@ export async function startHub(options: HubOptions = {}): Promise<HubHandle> {
           const before = beforeRaw && Number.isFinite(Number(beforeRaw)) ? Number(beforeRaw) : null;
           const limit = Math.min(Math.max(Number(url.searchParams.get("limit")) || 50, 1), 200);
           const messages = history.messagesWithPeer(viewerId, peerId, before, limit);
+          const calls = history.callsWithPeer(viewerId, peerId, before, limit);
+          const callItems = calls.map((c) => {
+            const incoming = c.callee === viewerId;
+            return {
+              kind: "call" as const,
+              call_id: c.call_id,
+              direction: incoming ? ("incoming" as const) : ("outgoing" as const),
+              state: c.state,
+              started_ms: c.started_ms,
+              answered_ms: c.answered_ms,
+              ended_ms: c.ended_ms,
+              end_reason: c.end_reason,
+              frames: history.callFrames(c.call_id),
+            };
+          });
+          const messageItems = messages.map((m) => ({
+            kind: "message" as const,
+            ...m,
+          }));
+          const items = [...messageItems, ...callItems].sort((a, b) => {
+            const tsA = a.kind === "message" ? a.ts : a.started_ms;
+            const tsB = b.kind === "message" ? b.ts : b.started_ms;
+            return tsA - tsB;
+          });
           if (viewerId === humanId) history.markThreadRead(viewerId, peerId); // browsing an agent is read-only
           const peer_nick = speakingNickname(peerId) ?? (ref.startsWith("@") ? ref : `@${ref}`);
-          return json(200, { peer_id: peerId, peer_nick, messages });
+          return json(200, { peer_id: peerId, peer_nick, messages, items });
         }
         if (req.method === "GET" && path === "/console/calls") {
           const viewerId = resolveConsoleViewer();

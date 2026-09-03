@@ -10,6 +10,7 @@ import {
   type DashboardResult,
   type FriendsView,
   type Notifications,
+  type ThreadItem,
   type ThreadMessage,
   type ThreadSummary,
 } from '@hauddy/app-shared';
@@ -114,9 +115,10 @@ const localApi: Partial<Api> = {
   consoleThread(
     peer: string,
     opts?: { before?: number; limit?: number; as?: string | null },
-  ): Promise<{ peer_id: string; peer_nick: string; messages: ThreadMessage[] }> {
+  ): Promise<{ peer_id: string; peer_nick: string; messages: ThreadMessage[]; items?: ThreadItem[] }> {
     const qs = new URLSearchParams();
     if (opts?.before) qs.set('before', String(opts.before));
+    if (opts?.limit) qs.set('limit', String(opts.limit));
     if (opts?.as) qs.set('as', opts.as);
     const q = qs.toString();
     return daemonGet(`/api/human/thread/${encodeURIComponent(peer)}${q ? `?${q}` : ''}`);

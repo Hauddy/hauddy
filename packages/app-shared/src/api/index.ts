@@ -348,6 +348,28 @@ export interface ThreadMessage {
   delivered_at: string | null;
   read_at: string | null;
 }
+export interface ThreadMessageItem extends ThreadMessage {
+  kind: 'message';
+}
+export interface ThreadCallFrame {
+  seq: number;
+  from_agent: string;
+  body: string | null;
+  attachments: unknown;
+  created_ms: number;
+}
+export interface ThreadCallItem {
+  kind: 'call';
+  call_id: string;
+  direction: 'incoming' | 'outgoing';
+  state: string; // ringing | active | ended | missed | declined
+  started_ms: number;
+  answered_ms?: number | null;
+  ended_ms?: number | null;
+  end_reason?: string | null;
+  frames: ThreadCallFrame[];
+}
+export type ThreadItem = ThreadMessageItem | ThreadCallItem;
 export interface CallLogEntry {
   call_id: string;
   direction: 'incoming' | 'outgoing';
@@ -807,7 +829,7 @@ export const api = {
   consoleThread(
     peer: string,
     opts?: { before?: number; limit?: number; as?: string | null },
-  ): Promise<{ peer_id: string; peer_nick: string; messages: ThreadMessage[] }> {
+  ): Promise<{ peer_id: string; peer_nick: string; messages: ThreadMessage[]; items?: ThreadItem[] }> {
     const qs = new URLSearchParams();
     if (opts?.before) qs.set('before', String(opts.before));
     if (opts?.limit) qs.set('limit', String(opts.limit));

@@ -1389,10 +1389,34 @@ export class HubDO {
       const before = beforeRaw && Number.isFinite(Number(beforeRaw)) ? Number(beforeRaw) : null;
       const limit = Math.min(Math.max(Number(url.searchParams.get("limit")) || 50, 1), 200);
       const messages = this.db.messagesWithPeer(viewerId, peerId, before, limit);
+      const calls = this.db.callsWithPeer(viewerId, peerId, before, limit);
+      const callItems = calls.map((c) => {
+        const incoming = c.callee === viewerId;
+        return {
+          kind: "call" as const,
+          call_id: c.call_id,
+          direction: incoming ? ("incoming" as const) : ("outgoing" as const),
+          state: c.state,
+          started_ms: Number(c.started_ms),
+          answered_ms: c.answered_ms != null ? Number(c.answered_ms) : null,
+          ended_ms: c.ended_ms != null ? Number(c.ended_ms) : null,
+          end_reason: c.end_reason ?? null,
+          frames: this.db.callFrames(c.call_id),
+        };
+      });
+      const messageItems = messages.map((m) => ({
+        kind: "message" as const,
+        ...m,
+      }));
+      const items = [...messageItems, ...callItems].sort((a, b) => {
+        const tsA = a.kind === "message" ? a.ts : a.started_ms;
+        const tsB = b.kind === "message" ? b.ts : b.started_ms;
+        return tsA - tsB;
+      });
       // Only the human's OWN view clears unread; browsing an agent's inbox is read-only.
       if (viewerId === humanId) this.db.markThreadRead(viewerId, peerId);
       const peer_nick = this.db.speakingNickname(peerId) ?? (ref.startsWith("@") ? ref : `@${ref}`);
-      return this.json(200, { peer_id: peerId, peer_nick, messages });
+      return this.json(200, { peer_id: peerId, peer_nick, messages, items });
     }
     if (method === "GET" && path === "/console/calls") {
       const viewerId = this.resolveConsoleViewer(request, url.searchParams.get("as"), humanId);
