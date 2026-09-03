@@ -44,6 +44,14 @@ const appIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height=
   <path d="M14.2 22 Q24 12 33.8 22" fill="none" stroke="#6FA06A" stroke-width="3.5" stroke-linecap="round"/>
 </svg>`;
 
+async function renderColoredTrayIcon() {
+  await sharp(Buffer.from(appIconSvg), { density: 512 })
+    .resize(32, 32)
+    .png()
+    .toFile(path.join(outDir, 'tray.png'));
+  console.log('wrote assets/tray.png (32x32)');
+}
+
 async function renderAppIcon() {
   await sharp(Buffer.from(appIconSvg), { density: 512 })
     .resize(1024, 1024)
@@ -55,4 +63,5 @@ async function renderAppIcon() {
 await mkdir(outDir, { recursive: true });
 await render(18, 15, 'trayTemplate.png');
 await render(36, 30, 'trayTemplate@2x.png');
+await renderColoredTrayIcon();
 await renderAppIcon();

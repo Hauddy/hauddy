@@ -58,10 +58,51 @@ jobs:
           path: packages/desktop/release/*.dmg
           retention-days: 1
 
+  # ── Build the Linux .deb and .AppImage on an Ubuntu runner ────────────────
+  build-linux:
+    name: Build Linux Packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Resolve version from tag
+        id: ver
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Sync version across all packages
+        run: |
+          node scripts/set-version.mjs ${{ steps.ver.outputs.version }}
+          node packages/sidecar/scripts/gen-version.mjs
+
+      - name: Build TypeScript packages
+        run: npm run build
+
+      - name: Build desktop app (Linux)
+        working-directory: packages/desktop
+        run: npm run dist:linux
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-packages
+          path: |
+            packages/desktop/release/*.deb
+            packages/desktop/release/*.AppImage
+          retention-days: 1
+
   # ── Upload to R2, deploy Cloudflare, create GitHub Release ───────────────
   deploy:
     name: Deploy & Release
-    needs: build-mac
+    needs: [build-mac, build-linux]
     runs-on: ubuntu-latest
     permissions:
       contents: write  # needed for creating a GitHub Release
@@ -86,11 +127,11 @@ jobs:
       - name: Build TypeScript packages
         run: npm run build
 
-      - name: Download DMG
+      - name: Download all release artifacts
         uses: actions/download-artifact@v4
         with:
-          name: mac-dmg
           path: dist-artifacts
+          merge-multiple: true
 
       # Upload the DMG to R2 under two keys:
       #   downloads/mac-arm64-latest.dmg  — stable "latest" pointer (served by /download/mac)
@@ -133,6 +174,7 @@ jobs:
           npx wrangler pages project create hauddy-landing --production-branch main 2>/dev/null || true
           npx wrangler pages deploy dist
 
+      # Create GitHub Release
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -143,10 +185,15 @@ jobs:
             | Platform | File |
             |---|---|
             | macOS (Apple Silicon) | `hauddy-${{ env.VERSION }}-arm64.dmg` |
+            | Linux (Debian/Ubuntu) | `hauddy_${{ env.VERSION }}_amd64.deb` |
+            | Linux (Universal) | `hauddy-${{ env.VERSION }}.AppImage` |
 
             Or use the direct link: **https://api.hauddy.com/download/mac**
 
             ---
             See [CHANGELOG](https://github.com/hauddy/hauddy/blob/main/CHANGELOG.md) for what's new.
-          files: dist-artifacts/${{ env.DMG }}
-          fail_on_unmatched_files: true
+          files: |
+            dist-artifacts/*.dmg
+            dist-artifacts/*.deb
+            dist-artifacts/*.AppImage
+          fail_on_unmatched_files: false
