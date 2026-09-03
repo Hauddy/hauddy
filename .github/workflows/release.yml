@@ -196,4 +196,4 @@ jobs:
             dist-artifacts/*.dmg
             dist-artifacts/*.deb
             dist-artifacts/*.AppImage
-          fail_on_unmatched_files: false
+          fail_on_unmatched_files: true

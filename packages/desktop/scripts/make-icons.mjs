@@ -46,10 +46,10 @@ const appIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height=
 
 async function renderColoredTrayIcon() {
   await sharp(Buffer.from(appIconSvg), { density: 512 })
-    .resize(32, 32)
+    .resize(24, 24)
     .png()
     .toFile(path.join(outDir, 'tray.png'));
-  console.log('wrote assets/tray.png (32x32)');
+  console.log('wrote assets/tray.png (24x24)');
 }
 
 async function renderAppIcon() {

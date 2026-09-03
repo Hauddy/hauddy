@@ -123,7 +123,7 @@ function showPopover(): void {
   );
   let y: number;
   if (bounds.y > area.y + area.height / 2) {
-    // Tray is near the bottom of the screen (e.g. Windows taskbar)
+    // Tray is near the bottom of the screen (e.g. Linux bottom panel)
     y = Math.round(bounds.y - POPOVER_H - 6);
   } else {
     // Tray is near the top of the screen (e.g. macOS menu bar)
@@ -216,7 +216,7 @@ app.whenReady().then(() => {
   if (isMac) {
     icon.setTemplateImage(true);
   }
-  tray = new Tray(isMac ? icon : icon.resize({ width: 24, height: 24 }));
+  tray = new Tray(icon);
   tray.setToolTip('Hauddy — contact & comms for AI agents');
   tray.on('click', togglePopover);
   tray.setContextMenu(
