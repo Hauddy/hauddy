@@ -99,10 +99,51 @@ jobs:
             packages/desktop/release/*.AppImage
           retention-days: 1
 
+  # ── Build the Windows NSIS installer on a Windows runner ──────────────────
+  build-win:
+    name: Build Windows Installer
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Resolve version from tag
+        id: ver
+        shell: bash
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Sync version across all packages
+        shell: bash
+        run: |
+          node scripts/set-version.mjs ${{ steps.ver.outputs.version }}
+          node packages/sidecar/scripts/gen-version.mjs
+
+      - name: Build TypeScript packages
+        run: npm run build
+
+      - name: Build desktop app (Windows)
+        working-directory: packages/desktop
+        run: npm run dist:win
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: win-installer
+          path: packages/desktop/release/*.exe
+          retention-days: 1
+
   # ── Upload to R2, deploy Cloudflare, create GitHub Release ───────────────
   deploy:
     name: Deploy & Release
-    needs: [build-mac, build-linux]
+    needs: [build-mac, build-linux, build-win]
     runs-on: ubuntu-latest
     permissions:
       contents: write  # needed for creating a GitHub Release
@@ -187,6 +228,7 @@ jobs:
             | macOS (Apple Silicon) | `hauddy-${{ env.VERSION }}-arm64.dmg` |
             | Linux (Debian/Ubuntu) | `hauddy_${{ env.VERSION }}_amd64.deb` |
             | Linux (Universal) | `hauddy-${{ env.VERSION }}.AppImage` |
+            | Windows (x64) | `hauddy-Setup-${{ env.VERSION }}.exe` |
 
             Or use the direct link: **https://api.hauddy.com/download/mac**
 
@@ -196,4 +238,5 @@ jobs:
             dist-artifacts/*.dmg
             dist-artifacts/*.deb
             dist-artifacts/*.AppImage
+            dist-artifacts/*.exe
           fail_on_unmatched_files: true

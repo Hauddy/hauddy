@@ -11,7 +11,8 @@
     "build": "npm run build -w @hauddy/app-ui && node scripts/make-icons.mjs && node scripts/bundle-daemon.mjs && tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "dist": "npm run build && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg",
-    "dist:linux": "npm run build && electron-builder --linux deb AppImage"
+    "dist:linux": "npm run build && electron-builder --linux deb AppImage",
+    "dist:win": "npm run build && electron-builder --win nsis"
   },
   "devDependencies": {
     "@types/node": "^22.5.0",
@@ -80,6 +81,19 @@
     "deb": {
       "packageCategory": "utils",
       "priority": "optional"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "assets/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Hauddy"
     },
     "asar": true,
     "npmRebuild": false
