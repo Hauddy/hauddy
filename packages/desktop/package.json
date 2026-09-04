@@ -3,6 +3,11 @@
   "version": "0.1.15",
   "private": true,
   "description": "Electron shell for the hauddy local app: macOS menu-bar tray, compact popover, expandable full window. UI is @hauddy/app-ui.",
+  "homepage": "https://hauddy.com",
+  "author": {
+    "name": "Hauddy",
+    "email": "hello@hauddy.com"
+  },
   "main": "dist/main.js",
   "scripts": {
     "dev": "node scripts/dev.mjs",
