@@ -81,7 +81,8 @@
         "AppImage"
       ],
       "category": "Utility",
-      "icon": "assets/icon.png"
+      "icon": "assets/icon.png",
+      "artifactName": "${productName}_${version}_${arch}.${ext}"
     },
     "deb": {
       "packageCategory": "utils",
