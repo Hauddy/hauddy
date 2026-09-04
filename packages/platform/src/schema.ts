@@ -118,6 +118,7 @@ CREATE TABLE IF NOT EXISTS messages (
   created_ms    INTEGER NOT NULL,
   delivered_at  TEXT,
   read_at       TEXT,
+  agent_read_at TEXT,
   account_scope TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_msg_undelivered ON messages(to_agent, delivered_at);

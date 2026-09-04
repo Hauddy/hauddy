@@ -1167,6 +1167,12 @@ export async function startHub(options: HubOptions = {}): Promise<HubHandle> {
           return json(200, { ok: true });
         }
 
+        if (req.method === "POST" && path === "/console/sms/agent-read") {
+          const body = await readBody(req);
+          const ids = Array.isArray(body.message_ids) ? (body.message_ids as string[]).filter((x) => typeof x === "string") : [];
+          if (ids.length) history.markAgentRead(ids);
+          return json(200, { ok: true, marked: ids.length });
+        }
         if (req.method === "POST" && path === "/console/sms") {
           const body = await readBody(req);
           const atts = Array.isArray(body.attachments) && body.attachments.length ? { attachments: body.attachments } : {};

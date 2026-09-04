@@ -32,6 +32,8 @@ interface Cursors {
   pushMs: number;
   /** Platform server clock up to which we've pulled down. */
   pullMs: number;
+  /** Max agent_read_at epoch ms already forwarded to the platform. */
+  agentReadMs: number;
 }
 
 const toAttArray = (v: unknown): import("@hauddy/protocol").Attachment[] | null =>
@@ -66,9 +68,10 @@ export class SyncEngine {
     this.cursorsFile = path.join(dataDir, "sync.json");
     this.cursors = existsSync(this.cursorsFile)
       ? (JSON.parse(readFileSync(this.cursorsFile, "utf8")) as Cursors)
-      : { pushMs: 0, pullMs: 0 };
+      : { pushMs: 0, pullMs: 0, agentReadMs: 0 };
     this.cursors.pushMs ??= 0;
     this.cursors.pullMs ??= 0;
+    this.cursors.agentReadMs ??= 0;
   }
 
   private saveCursors(): void {
@@ -103,6 +106,7 @@ export class SyncEngine {
       if (!ctx) return;
       await this.pushUp(ctx);
       await this.pullDown(ctx);
+      await this.pushAgentReads(ctx);
     } catch {
       /* transient (platform down / race) — next tick retries */
     } finally {
@@ -208,6 +212,16 @@ export class SyncEngine {
 
     if (typeof res.now === "number" && res.now > this.cursors.pullMs) {
       this.cursors.pullMs = res.now;
+      this.saveCursors();
+    }
+  }
+
+  private async pushAgentReads(ctx: SyncContext): Promise<void> {
+    const ids = this.history.agentReadSince(this.cursors.agentReadMs);
+    if (!ids.length) return;
+    const res = await this.post(ctx, "/messages/agent-read", { message_ids: ids });
+    if (res.ok) {
+      this.cursors.agentReadMs = Date.now();
       this.saveCursors();
     }
   }

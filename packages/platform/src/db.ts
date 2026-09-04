@@ -94,10 +94,12 @@ export interface HistoryMessage {
   ts: number;
   created_at: string;
   /** Delivery/read state (drives the sender's ✓ / ✓✓ ticks). `delivered_at` is
-   *  stamped when the recipient acks; `read_at` only when a console-human opens
-   *  the thread (agent recipients never mark read). */
+   *  stamped when the recipient acks; `read_at` when the console-human opens the
+   *  thread (for the unread badge); `agent_read_at` when the recipient agent calls
+   *  check_messages — this is the one that turns the tick green. */
   delivered_at: string | null;
   read_at: string | null;
+  agent_read_at: string | null;
 }
 
 /** A full message row on the sync wire (local hub ⇄ platform mirror). */
@@ -113,6 +115,7 @@ export interface SyncMessage {
   created_ms: number;
   delivered_at: string | null;
   read_at: string | null;
+  agent_read_at: string | null;
   account_scope: string | null;
 }
 
@@ -247,6 +250,12 @@ export class Db {
     // Created here (not in SCHEMA) so it's only built once the column above is
     // guaranteed present — SCHEMA runs before this and would fault on an old DB.
     this.sql.exec("CREATE INDEX IF NOT EXISTS idx_oauth_connector ON oauth_clients(connector_agent_id)");
+    const msgCols = new Set(
+      this.rows<{ name: string }>("PRAGMA table_info(messages)").map((c) => c.name),
+    );
+    if (!msgCols.has("agent_read_at")) {
+      this.sql.exec("ALTER TABLE messages ADD COLUMN agent_read_at TEXT");
+    }
   }
 
   private rows<T = Record<string, Bind>>(query: string, ...binds: Bind[]): T[] {
@@ -1403,7 +1412,7 @@ export class Db {
   messagesWithPeer(humanId: string, peerId: string, beforeMs: number | null, limit = 50): HistoryMessage[] {
     const hasBefore = beforeMs != null;
     const rows = this.rows<Record<string, Bind>>(
-      `SELECT message_id, from_agent, to_agent, body, attachments, created_ms, created_at, delivered_at, read_at
+      `SELECT message_id, from_agent, to_agent, body, attachments, created_ms, created_at, delivered_at, read_at, agent_read_at
          FROM messages
         WHERE ((from_agent = ? AND to_agent = ?) OR (from_agent = ? AND to_agent = ?))
           ${hasBefore ? "AND created_ms < ?" : ""}
@@ -1423,11 +1432,12 @@ export class Db {
         created_at: String(r.created_at),
         delivered_at: r.delivered_at == null ? null : String(r.delivered_at),
         read_at: r.read_at == null ? null : String(r.read_at),
+        agent_read_at: r.agent_read_at == null ? null : String(r.agent_read_at),
       }))
       .reverse();
   }
 
-  /** Mark every inbound message from a peer as read (clears the thread's unread). */
+  /** Mark every inbound message from a peer as read (clears the thread's unread badge). */
   markThreadRead(humanId: string, peerId: string): void {
     this.sql.exec(
       "UPDATE messages SET read_at = ? WHERE to_agent = ? AND from_agent = ? AND read_at IS NULL",
@@ -1435,6 +1445,19 @@ export class Db {
       humanId,
       peerId,
     );
+  }
+
+  /** Mark specific messages as agent-read (agent called check_messages). */
+  markAgentRead(messageIds: string[]): void {
+    if (!messageIds.length) return;
+    const now = nowIso();
+    for (const id of messageIds) {
+      this.sql.exec(
+        "UPDATE messages SET agent_read_at = ? WHERE message_id = ? AND agent_read_at IS NULL",
+        now,
+        id,
+      );
+    }
   }
 
   /** The human's call sessions, newest first (SMS≠Call — from the `calls` table). */
@@ -1494,8 +1517,8 @@ export class Db {
       row.attachments == null ? null : typeof row.attachments === "string" ? row.attachments : JSON.stringify(row.attachments);
     this.sql.exec(
       `INSERT OR IGNORE INTO messages
-         (message_id, from_agent, to_agent, from_nick, to_nick, body, attachments, created_at, created_ms, delivered_at, read_at, account_scope)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         (message_id, from_agent, to_agent, from_nick, to_nick, body, attachments, created_at, created_ms, delivered_at, read_at, agent_read_at, account_scope)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       row.message_id,
       row.from_agent,
       row.to_agent,
@@ -1507,6 +1530,7 @@ export class Db {
       row.created_ms,
       row.delivered_at ?? null,
       row.read_at ?? null,
+      row.agent_read_at ?? null,
       row.account_scope ?? null,
     );
   }
@@ -1553,6 +1577,7 @@ export class Db {
       created_ms: Number(r.created_ms),
       delivered_at: r.delivered_at == null ? null : String(r.delivered_at),
       read_at: r.read_at == null ? null : String(r.read_at),
+      agent_read_at: r.agent_read_at == null ? null : String(r.agent_read_at),
       account_scope: r.account_scope == null ? null : String(r.account_scope),
     }));
   }

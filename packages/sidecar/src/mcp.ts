@@ -347,6 +347,16 @@ export function createMcpServer(provision: Provision, validation: CallValidation
     async ({ since }) => {
       const p = await provision();
       const messages = p.connection.checkMessages(since);
+      // Notify the local hub that the agent read these messages so agent_read_at
+      // is stamped (for the sender's read receipt tick).
+      const inboundIds = messages.filter((m) => m.to === p.agentId && m.type === "sms").map((m) => m.id);
+      if (inboundIds.length) {
+        fetch(`${p.endpoint}/console/sms/agent-read`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ message_ids: inboundIds }),
+        }).catch(() => {});
+      }
       // HTTP-MCP ring polling fallback: if a call arrived but the out-of-band
       // notification didn't wake the session (no persistent SSE GET stream), surface
       // it here so the agent can still answer. The invite stays buffered until

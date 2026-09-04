@@ -16,6 +16,7 @@ export interface MessageRow {
   created_ms: number;
   delivered_at: string | null;
   read_at: string | null;
+  agent_read_at: string | null;
 }
 
 /** One call session (SMS≠Call — calls live here, never in messages). */
@@ -66,6 +67,7 @@ export interface HistoryMessage {
   created_at: string;
   delivered_at: string | null;
   read_at: string | null;
+  agent_read_at: string | null;
 }
 
 interface HistoryData {
@@ -129,6 +131,7 @@ export class HubHistory {
       created_ms,
       delivered_at: null,
       read_at: null,
+      agent_read_at: null,
     };
     this.save();
   }
@@ -190,6 +193,20 @@ export class HubHistory {
       m.delivered_at = nowIso();
       this.save();
     }
+  }
+
+  /** Mark specific messages as agent-read (agent called check_messages). */
+  markAgentRead(messageIds: string[]): void {
+    let touched = false;
+    const now = nowIso();
+    for (const id of messageIds) {
+      const m = this.data.messages[id];
+      if (m && m.agent_read_at == null) {
+        m.agent_read_at = now;
+        touched = true;
+      }
+    }
+    if (touched) this.save();
   }
 
   /** Mark every inbound message from a peer as read (clears the thread's unread). */
@@ -289,6 +306,7 @@ export class HubHistory {
         created_at: r.created_at,
         delivered_at: r.delivered_at,
         read_at: r.read_at,
+        agent_read_at: r.agent_read_at ?? null,
       }))
       .reverse();
   }
@@ -507,6 +525,17 @@ export class HubHistory {
   }
 
   // ── bulk reads for the sync engine (cursor-paged, ascending) ────────────
+
+  /** Message IDs where agent_read_at was set after `sinceMs` (for sync push). */
+  agentReadSince(sinceMs: number): string[] {
+    return Object.values(this.data.messages)
+      .filter((m) => {
+        if (!m.agent_read_at) return false;
+        const ms = Date.parse(m.agent_read_at);
+        return Number.isFinite(ms) && ms > sinceMs;
+      })
+      .map((m) => m.message_id);
+  }
 
   /** Messages touching any of `scopeIds`, created after `sinceMs`, oldest-first. */
   messagesSince(scopeIds: Set<string>, sinceMs: number): MessageRow[] {

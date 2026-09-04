@@ -871,11 +871,22 @@ export class HubDO {
     return this.routeFromAgent(auth.agentId, this.mkEnvelope(auth.agentId, to, { body, ...atts }));
   }
 
-  /** Non-destructive read of the caller identity's messages (does NOT mark
-   *  delivered — the dashboard "view as agent" still sees history). */
+  /** Return messages for the connector agent, stamping `agent_read_at` on inbound
+   *  ones (to_agent === auth.agentId) that haven't been agent-read yet. */
   private connMessages(auth: ConnAuth, sinceMs: number) {
     this.db.consoleTouch(auth.agentId, Date.now());
-    return this.db.messagesForScope([auth.agentId], sinceMs);
+    const messages = this.db.messagesForScope([auth.agentId], sinceMs);
+    const unread = messages
+      .filter((m) => m.to_agent === auth.agentId && m.agent_read_at == null)
+      .map((m) => m.message_id);
+    if (unread.length) {
+      this.db.markAgentRead(unread);
+      const now = new Date().toISOString();
+      for (const m of messages) {
+        if (unread.includes(m.message_id)) m.agent_read_at = now;
+      }
+    }
+    return messages;
   }
 
   // ── public REST surface (/v1/*) ────────────────────────────────────────
@@ -1458,6 +1469,13 @@ export class HubDO {
       // Acknowledge missed calls up to now (called when the bell dropdown opens).
       await this.ctx.storage.put(`notifseen:${humanId}`, Date.now());
       return this.json(200, { ok: true });
+    }
+    if (method === "POST" && path === "/console/messages/agent-read") {
+      // Local hub calls this after an agent drains check_messages locally.
+      const body = await this.readBody(request);
+      const ids = Array.isArray(body.message_ids) ? (body.message_ids as string[]).filter((x) => typeof x === "string") : [];
+      if (ids.length) this.db.markAgentRead(ids);
+      return this.json(200, { ok: true, marked: ids.length });
     }
     if (method === "POST" && path === "/console/sms") {
       const body = await this.readBody(request);

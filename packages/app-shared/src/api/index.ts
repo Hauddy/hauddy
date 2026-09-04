@@ -343,10 +343,12 @@ export interface ThreadMessage {
   attachments?: Attachment[] | null;
   ts: number;
   created_at: string;
-  /** Sender-side delivery ticks: `delivered_at` set on recipient ack, `read_at`
-   *  only when a console-human opens the thread (null for agent recipients). */
+  /** Sender-side delivery ticks: `delivered_at` set on recipient ack; `read_at`
+   *  when a console-human opens the thread (for the unread badge); `agent_read_at`
+   *  when the recipient agent calls check_messages (turns the tick green). */
   delivered_at: string | null;
   read_at: string | null;
+  agent_read_at: string | null;
 }
 export interface ThreadMessageItem extends ThreadMessage {
   kind: 'message';

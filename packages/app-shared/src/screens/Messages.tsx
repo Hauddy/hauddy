@@ -53,6 +53,17 @@ function fmtWhen(ms: number): string {
   return new Date(ms).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
+/** Per-bubble clock: HH:MM today, "Wed HH:MM" this week, "Aug 4 HH:MM" older. */
+function fmtMsgTime(ms: number): string {
+  const d = new Date(ms);
+  const now = new Date();
+  const hhmm = d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false });
+  const diffDays = Math.floor((now.getTime() - ms) / 86_400_000);
+  if (diffDays < 1 && d.getDate() === now.getDate()) return hhmm;
+  if (diffDays < 7) return `${d.toLocaleDateString(undefined, { weekday: 'short' })} ${hhmm}`;
+  return `${d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} ${hhmm}`;
+}
+
 function fmtCallPreview(call: { state: string; duration_s?: number }): string {
   if (call.state === 'ended' && call.duration_s != null) {
     const m = Math.floor(call.duration_s / 60);
@@ -454,7 +465,7 @@ export default function Messages() {
                 body: item.body ?? '',
                 mine: item.mine,
                 attachments: item.attachments,
-                status: item.mine ? (item.read_at ? 'read' : item.delivered_at ? 'delivered' : 'sent') : undefined,
+                status: item.mine ? (item.agent_read_at ? 'read' : item.delivered_at ? 'delivered' : 'sent') : undefined,
                 ts: item.ts,
               });
             } else if (item.kind === 'call') {
@@ -482,7 +493,7 @@ export default function Messages() {
               body: m.body ?? '',
               mine: m.mine,
               attachments: m.attachments,
-              status: m.mine ? (m.read_at ? 'read' : m.delivered_at ? 'delivered' : 'sent') : undefined,
+              status: m.mine ? (m.agent_read_at ? 'read' : m.delivered_at ? 'delivered' : 'sent') : undefined,
               ts: m.ts,
             });
           }
@@ -557,7 +568,7 @@ export default function Messages() {
               body: item.body ?? '',
               mine: item.mine,
               attachments: item.attachments,
-              status: item.mine ? (item.read_at ? 'read' : item.delivered_at ? 'delivered' : 'sent') : undefined,
+              status: item.mine ? (item.agent_read_at ? 'read' : item.delivered_at ? 'delivered' : 'sent') : undefined,
               ts: item.ts,
             });
           } else if (item.kind === 'call') {
@@ -587,7 +598,7 @@ export default function Messages() {
             body: m.body ?? '',
             mine: m.mine,
             attachments: m.attachments,
-            status: m.mine ? (m.read_at ? 'read' : m.delivered_at ? 'delivered' : 'sent') : undefined,
+            status: m.mine ? (m.agent_read_at ? 'read' : m.delivered_at ? 'delivered' : 'sent') : undefined,
             ts: m.ts,
           });
         }
@@ -888,7 +899,10 @@ export default function Messages() {
                         <span className="chat-body">
                           {item.body}
                           {item.attachments && item.attachments.length > 0 && <AttachmentLinks items={item.attachments} />}
-                          {item.mine && item.status && <MsgTick status={item.status} />}
+                          <span className="msg-meta">
+                            <span className="msg-time">{fmtMsgTime(item.ts)}</span>
+                            {item.mine && item.status && <MsgTick status={item.status} />}
+                          </span>
                         </span>
                       </div>
                     ) : (
