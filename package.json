@@ -20,7 +20,10 @@
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "4.62.4",
-    "@rollup/rollup-win32-x64-msvc": "4.62.4"
+    "@rollup/rollup-win32-x64-msvc": "4.62.4",
+    "@img/sharp-linux-x64": "0.33.5",
+    "@img/sharp-libvips-linux-x64": "1.0.4",
+    "@img/sharp-win32-x64": "0.33.5"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260804.1",
