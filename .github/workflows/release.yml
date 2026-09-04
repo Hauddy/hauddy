@@ -31,7 +31,7 @@ jobs:
         run: |
           VERSION=${GITHUB_REF_NAME#v}
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "dmg=hauddy-${VERSION}-arm64.dmg" >> $GITHUB_OUTPUT
+          echo "dmg=Hauddy-${VERSION}-arm64.dmg" >> $GITHUB_OUTPUT
 
       - name: Sync version across all packages
         run: |
@@ -184,7 +184,7 @@ jobs:
             --file "$GITHUB_WORKSPACE/dist-artifacts/$DMG" \
             --content-type application/octet-stream \
             --remote
-          npx wrangler r2 object put "hauddy-releases/downloads/hauddy-${VERSION}-arm64.dmg" \
+          npx wrangler r2 object put "hauddy-releases/downloads/Hauddy-${VERSION}-arm64.dmg" \
             --file "$GITHUB_WORKSPACE/dist-artifacts/$DMG" \
             --content-type application/octet-stream \
             --remote
@@ -225,7 +225,7 @@ jobs:
 
             | Platform | File |
             |---|---|
-            | macOS (Apple Silicon) | `hauddy-${{ env.VERSION }}-arm64.dmg` |
+            | macOS (Apple Silicon) | `Hauddy-${{ env.VERSION }}-arm64.dmg` |
             | Linux (Debian/Ubuntu) | `hauddy_${{ env.VERSION }}_amd64.deb` |
             | Linux (Universal) | `hauddy-${{ env.VERSION }}.AppImage` |
             | Windows (x64) | `hauddy-Setup-${{ env.VERSION }}.exe` |

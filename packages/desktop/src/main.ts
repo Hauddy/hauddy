@@ -296,9 +296,9 @@ app.whenReady().then(() => {
     try {
       await download('https://api.hauddy.com/download/mac');
       await exec('hdiutil', ['attach', tmpDmg, '-mountpoint', tmpMnt, '-nobrowse']);
-      await exec('ditto', [`${tmpMnt}/hauddy.app`, '/Applications/hauddy.app']);
+      await exec('ditto', [`${tmpMnt}/Hauddy.app`, '/Applications/Hauddy.app']);
       await exec('hdiutil', ['detach', tmpMnt]);
-      await exec('xattr', ['-cr', '/Applications/hauddy.app']);
+      await exec('xattr', ['-cr', '/Applications/Hauddy.app']);
       fs.rmSync(tmpDmg, { force: true });
       send('update:ready');
     } catch (err) {

@@ -105,7 +105,7 @@ Building multi-agent workflows usually means writing brittle ad-hoc IPC sockets,
 1. Open the downloaded `.dmg`, drag **Hauddy** into your `Applications` folder, and launch it.
 2. Clear the macOS internet quarantine flag:
    ```bash
-   xattr -cr /Applications/hauddy.app
+   xattr -cr /Applications/Hauddy.app
    ```
 
 **Linux:** install the `.deb` with `sudo dpkg -i hauddy_*.deb`, or run the `.AppImage` directly.

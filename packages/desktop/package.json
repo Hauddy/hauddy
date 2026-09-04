@@ -1,6 +1,6 @@
 {
   "name": "@hauddy/desktop",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "private": true,
   "description": "Electron shell for the hauddy local app: macOS menu-bar tray, compact popover, expandable full window. UI is @hauddy/app-ui.",
   "homepage": "https://hauddy.com",
@@ -29,7 +29,7 @@
   },
   "build": {
     "appId": "dev.hauddy.app",
-    "productName": "hauddy",
+    "productName": "Hauddy",
     "directories": {
       "output": "release"
     },
@@ -82,7 +82,7 @@
       ],
       "category": "Utility",
       "icon": "assets/icon.png",
-      "artifactName": "${productName}_${version}_${arch}.${ext}"
+      "artifactName": "hauddy_${version}_${arch}.${ext}"
     },
     "deb": {
       "packageCategory": "utils",
