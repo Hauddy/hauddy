@@ -6,3 +6,5 @@ export * from "./presence.js";
 export * from "./contact.js";
 export * from "./nickname.js";
 export * from "./frames.js";
+export * from "./history-merge.js";
+export * from "./pagination.js";

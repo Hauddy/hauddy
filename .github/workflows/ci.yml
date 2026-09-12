@@ -16,8 +16,10 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
-      - name: Build (tsc -b all packages)
+      - name: Build core packages
         run: npm run build
+      - name: Typecheck every workspace
+        run: npm run typecheck --workspaces --if-present
 
   test:
     name: Test
@@ -31,3 +33,29 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+
+  platform-integration:
+    name: Local Cloudflare integration
+    needs: typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Exercise disposable Durable Object storage
+        run: |
+          npx wrangler dev -c packages/platform/wrangler.toml --local --port 8799 --persist-to /tmp/hauddy-ci --var RATE_LIMIT:off > /tmp/workerd.log 2>&1 &
+          runtime_pid=$!
+          trap 'kill "$runtime_pid" || true' EXIT
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:8799/health; then break; fi
+            sleep 1
+          done
+          node packages/platform/test/p1-http.mjs http://127.0.0.1:8799
+          node packages/platform/test/p7-sync.mjs http://127.0.0.1:8799
+          node packages/platform/test/p16-account-deletion.mjs http://127.0.0.1:8799
+          node packages/platform/test/p17-sync-revisions.mjs http://127.0.0.1:8799

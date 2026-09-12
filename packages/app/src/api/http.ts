@@ -113,8 +113,8 @@ export const httpApi = {
 
   // ---- human console (message/call agents as the person) ----
   humanIdentity: () => get<HumanIdentity>('/api/human'),
-  async humanSms(to: string, body: string, attachments?: Attachment[]): Promise<{ status?: string; error?: string }> {
-    return post('/api/human/sms', { to, body, ...(attachments && attachments.length ? { attachments } : {}) });
+  async humanSms(to: string, body: string, attachments?: Attachment[], messageId?: string): Promise<{ status?: string; error?: string }> {
+    return post('/api/human/sms', { to, body, message_id: messageId, ...(attachments && attachments.length ? { attachments } : {}) });
   },
   /** Stage a file to send: uploads bytes to the daemon (which puts them on the
    *  right hub for `to`) and returns the reference to pass to humanSms. */

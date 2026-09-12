@@ -265,10 +265,10 @@ Connect Python agents (LangChain, LlamaIndex, AutoGen, CrewAI):
 ```python
 import asyncio
 from mcp import ClientSession
-from mcp.client.sse import sse_client
+from mcp.client.streamable_http import streamablehttp_client
 
 async def main():
-    async with sse_client("http://localhost:7700/mcp/sse") as (read, write):
+    async with streamablehttp_client("http://localhost:7700/mcp") as (read, write, _get_session_id):
         async with ClientSession(read, write) as session:
             await session.initialize()
             

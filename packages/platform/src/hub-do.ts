@@ -1,3 +1,4 @@
+import { timelinePage } from "@hauddy/protocol";
 import {
   controlFrameSchema,
   formatNickname,
@@ -236,7 +237,16 @@ export class HubDO {
       if (method === "DELETE" && (path === "/accounts/me" || path === "/account")) {
         const accountId = this.requireAccount(request);
         if (!accountId) return this.unauthorized();
-        const ok = this.db.deleteAccount(accountId);
+        // Arm before committing: a crash or R2/KV failure leaves a durable retry.
+        await this.ctx.storage.setAlarm(Date.now());
+        const agents = new Set(this.db.accountAgents(accountId).map((a) => a.agent_id));
+        const ok = this.ctx.storage.transactionSync(() => this.db.deleteAccount(accountId));
+        for (const ws of this.ctx.getWebSockets()) {
+          if (!agents.has(this.att(ws).agentId ?? "")) continue;
+          this.setAtt(ws, freshAtt());
+          try { ws.close(1008, "account deleted"); } catch { /* already closed */ }
+        }
+        try { await this.cleanupDeletedAccounts(); } catch { /* alarm retries */ }
         return this.json(200, { ok });
       }
       if (method === "GET" && path === "/accounts/claims") {
@@ -1315,6 +1325,7 @@ export class HubDO {
     if ((form.redirect_uri ?? "") !== rec.redirect_uri) return this.oauthTokenError("invalid_grant", "redirect_uri mismatch");
     const verifier = form.code_verifier ?? "";
     if (!verifier || (await pkceS256(verifier)) !== rec.code_challenge) return this.oauthTokenError("invalid_grant", "PKCE verification failed");
+    if (!this.db.authenticateConnector(rec.token)) return this.oauthTokenError("invalid_grant", "connector was revoked");
     return this.publicJson(200, { access_token: rec.token, token_type: "Bearer", scope: rec.scope, expires_in: 31536000 });
   }
   private oauthTokenError(error: string, description?: string): Response {
@@ -1402,8 +1413,9 @@ export class HubDO {
       const beforeRaw = url.searchParams.get("before");
       const before = beforeRaw && Number.isFinite(Number(beforeRaw)) ? Number(beforeRaw) : null;
       const limit = Math.min(Math.max(Number(url.searchParams.get("limit")) || 50, 1), 200);
-      const messages = this.db.messagesWithPeer(viewerId, peerId, before, limit);
-      const calls = this.db.callsWithPeer(viewerId, peerId, before, limit);
+      const cursor = url.searchParams.get('cursor');
+      const messages = this.db.messagesWithPeer(viewerId, peerId, before, limit + 1, cursor);
+      const calls = this.db.callsWithPeer(viewerId, peerId, before, limit + 1, cursor);
       const callItems = calls.map((c) => {
         const incoming = c.callee === viewerId;
         return {
@@ -1422,15 +1434,11 @@ export class HubDO {
         kind: "message" as const,
         ...m,
       }));
-      const items = [...messageItems, ...callItems].sort((a, b) => {
-        const tsA = a.kind === "message" ? a.ts : a.started_ms;
-        const tsB = b.kind === "message" ? b.ts : b.started_ms;
-        return tsA - tsB;
-      });
+      const page = timelinePage([...messageItems, ...callItems], limit);
       // Only the human's OWN view clears unread; browsing an agent's inbox is read-only.
       if (viewerId === humanId) this.db.markThreadRead(viewerId, peerId);
       const peer_nick = this.db.speakingNickname(peerId) ?? (ref.startsWith("@") ? ref : `@${ref}`);
-      return this.json(200, { peer_id: peerId, peer_nick, messages, items });
+      return this.json(200, { peer_id: peerId, peer_nick, messages: page.items.filter((x) => x.kind === 'message'), ...page });
     }
     if (method === "GET" && path === "/console/calls") {
       const viewerId = this.resolveConsoleViewer(request, url.searchParams.get("as"), humanId);
@@ -1486,7 +1494,9 @@ export class HubDO {
     if (method === "POST" && path === "/console/sms") {
       const body = await this.readBody(request);
       const atts = Array.isArray(body.attachments) && body.attachments.length ? { attachments: body.attachments } : {};
-      const res = this.routeFromAgent(humanId, this.mkEnvelope(humanId, String(body.to ?? ""), { body: String(body.body ?? ""), ...atts }));
+      const envelope = this.mkEnvelope(humanId, String(body.to ?? ""), { body: String(body.body ?? ""), ...atts });
+      if (typeof body.message_id === 'string' && /^[A-Za-z0-9_-]{1,128}$/.test(body.message_id)) envelope.id = body.message_id;
+      const res = this.routeFromAgent(humanId, envelope);
       return res.ok ? this.json(200, { status: res.status }) : this.json(400, { error: res.code, message: res.message });
     }
     if (method === "POST" && path === "/console/call") {
@@ -1537,6 +1547,11 @@ export class HubDO {
     if (method === "GET" && path === "/console/sync/pull") {
       const accountId = this.requireAccount(request);
       if (!accountId) return this.json(401, { error: "account required" });
+      if (url.searchParams.has("cursor")) {
+        const cursor = Number(url.searchParams.get("cursor"));
+        if (!Number.isSafeInteger(cursor) || cursor < 0) return this.json(400, { error: "invalid sync cursor" });
+        return this.json(200, this.db.syncPage(accountId, cursor));
+      }
       const sinceRaw = url.searchParams.get("since");
       const since = sinceRaw && Number.isFinite(Number(sinceRaw)) ? Number(sinceRaw) : 0;
       const agentIds = this.db.accountAgents(accountId).map((a) => a.agent_id);
@@ -2012,9 +2027,37 @@ export class HubDO {
   }
   async webSocketError(_ws: WebSocket, _error: unknown): Promise<void> {}
 
-  /** TTL sweep: delete expired attachments (R2 object + row), re-arm for the next. */
+  /** Drain deletion jobs and expired attachments; retry persistent storage
+   *  failures beyond the runtime's limited automatic alarm retries. */
   async alarm(): Promise<void> {
-    await this.files.sweep(Date.now());
+    try {
+      await this.cleanupDeletedAccounts();
+      await this.files.sweep(Date.now());
+    } catch {
+      await this.ctx.storage.setAlarm(Date.now() + 60_000);
+    }
+  }
+
+  private async cleanupDeletedAccounts(): Promise<void> {
+    for (const job of this.db.pendingAccountCleanup()) {
+      for (const id of job.fileIds) await this.env.FILES.delete(`files/${id}`);
+      for (const id of job.agentIds) {
+        await this.ctx.storage.delete(`notifseen:${id}`);
+        await this.ctx.storage.delete(`ccall:${id}`);
+      }
+      const tokens = new Set(job.tokens);
+      // Scan in bounded pages; an OAuth code stores its token, not account id.
+      let startAfter: string | undefined;
+      for (;;) {
+        const page = await this.ctx.storage.list<{ token: string }>({ prefix: "oauthcode:", limit: 128, ...(startAfter ? { startAfter } : {}) });
+        for (const [key, value] of page) {
+          if (tokens.has(value.token)) await this.ctx.storage.delete(key);
+          startAfter = key;
+        }
+        if (page.size < 128) break;
+      }
+      this.db.finishAccountCleanup(job.accountId);
+    }
   }
 
   // ── routing ───────────────────────────────────────────────────────────
@@ -2026,6 +2069,11 @@ export class HubDO {
     const toId = this.db.resolveAgentId(toRef);
     if (!toId) return { ok: false, code: "E_UNKNOWN_AGENT", message: `unknown agent ${toRef}` };
     if (!this.areLinked(fromAgentId, toId)) return { ok: false, code: "E_NOT_LINKED", message: `not linked to ${toRef}` };
+    const prior = this.db.messageReceipt(envelope.id);
+    if (prior) {
+      if (prior.from_agent !== fromAgentId || prior.to_agent !== toId) return { ok: false, code: 'E_IDENTITY_MISMATCH', message: 'message ID already used' };
+      return { ok: true, status: prior.delivered_at ? 'delivered' : 'queued' };
+    }
     const toBare = normalizeNickname(toRef);
     const asserted: Envelope = { ...envelope, from: fromAgentId, to: toId };
     const bareForClaim = toBare && this.db.bindingOf(toBare)?.agent_id === toId ? toBare : undefined;

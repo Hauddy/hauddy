@@ -1,10 +1,13 @@
+import { parseTimelineCursor } from "@hauddy/protocol";
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { nowIso, type Attachment, type Envelope } from "@hauddy/protocol";
+import { mergeReceipts, mergeCall, nowIso, type Attachment, type Envelope } from "@hauddy/protocol";
 
 /** One persisted SMS. Mirrors the platform `messages` table (packages/platform
  *  src/db.ts) so a later SQLite swap is a drop-in. Undelivered ⇒ delivered_at null. */
 export interface MessageRow {
+  outbound_state?: 'pending' | 'sent' | 'failed';
+  delivery_error?: string;
   message_id: string;
   from_agent: string;
   to_agent: string;
@@ -58,6 +61,8 @@ export interface ThreadSummary {
 
 /** A single message in a peer's history (mine = sent by the viewer). */
 export interface HistoryMessage {
+  outbound_state?: 'pending' | 'sent' | 'failed';
+  delivery_error?: string;
   id: string;
   from_agent: string;
   mine: boolean;
@@ -106,6 +111,48 @@ export class HubHistory {
     const tmp = `${this.file}.tmp`;
     writeFileSync(tmp, JSON.stringify(this.data, null, 2));
     renameSync(tmp, this.file);
+  }
+
+  /** Import one bounded sync page with a single atomic file replacement. Stage
+   *  changes separately so a failed write leaves both memory and disk retryable.
+   *  Existing content remains immutable; only explicit identity repairs apply. */
+  importSyncPage(page: {
+    messages: Array<{ row: MessageRow; repair: { from_agent?: string; to_agent?: string } }>;
+    calls: CallRow[];
+    frames: FrameRow[];
+  }): void {
+    if (!page.messages.length && !page.calls.length && !page.frames.length) return;
+    const next: HistoryData = {
+      messages: { ...this.data.messages },
+      calls: { ...this.data.calls },
+      call_frames: { ...this.data.call_frames },
+    };
+    let changed = false;
+    for (const { row, repair } of page.messages) {
+      const old = next.messages[row.message_id];
+      if (!old) {
+        next.messages[row.message_id] = structuredClone(row);
+        changed = true;
+      } else {
+        const merged = { ...mergeReceipts(old, row), from_agent: repair.from_agent ?? old.from_agent, to_agent: repair.to_agent ?? old.to_agent };
+        if (JSON.stringify(merged) !== JSON.stringify(old)) { next.messages[row.message_id] = merged; changed = true; }
+      }
+    }
+    for (const row of page.calls) {
+      const old = next.calls[row.call_id];
+      const merged = old ? mergeCall(old, row) : structuredClone(row);
+      if (JSON.stringify(merged) !== JSON.stringify(old)) { next.calls[row.call_id] = merged; changed = true; }
+    }
+    for (const row of page.frames) {
+      if (next.call_frames[row.frame_id]) continue;
+      next.call_frames[row.frame_id] = structuredClone(row);
+      changed = true;
+    }
+    if (!changed) return;
+    const previous = this.data;
+    this.data = next;
+    try { this.save(); }
+    catch (err) { this.data = previous; throw err; }
   }
 
   // ── messages ────────────────────────────────────────────────────────────
@@ -184,6 +231,16 @@ export class HubHistory {
     }
     if (n > 0) this.save();
     return n;
+  }
+
+  messageReceipt(id: string): MessageRow | undefined { return this.data.messages[id]; }
+
+  markOutbound(id: string, state: 'pending' | 'sent' | 'failed', error?: string): void {
+    const row = this.data.messages[id];
+    if (!row) return;
+    if (row.outbound_state === state && row.delivery_error === error) return;
+    this.data.messages[id] = { ...row, outbound_state: state, delivery_error: error };
+    try { this.save(); } catch (err) { this.data.messages[id] = row; throw err; }
   }
 
   /** Mark a message delivered (acked) — drives the sender's ✓✓ tick. */
@@ -286,18 +343,22 @@ export class HubHistory {
   }
 
   /** Full message history with one peer, newest-first-paged, returned ascending. */
-  messagesWithPeer(viewerId: string, peerId: string, beforeMs: number | null, limit = 50): HistoryMessage[] {
+  messagesWithPeer(viewerId: string, peerId: string, beforeMs: number | null, limit = 50, cursor?: string | null): HistoryMessage[] {
+    const boundary = parseTimelineCursor(cursor);
     const rows = this.messagesDesc()
       .filter(
         (r) =>
           ((r.from_agent === viewerId && r.to_agent === peerId) ||
             (r.from_agent === peerId && r.to_agent === viewerId)) &&
-          (beforeMs == null || r.created_ms < beforeMs),
+          (boundary ? r.created_ms < boundary.ts || (r.created_ms === boundary.ts && 'm:' + r.message_id < boundary.key) : beforeMs == null || r.created_ms < beforeMs),
       )
+      .sort((a, b) => b.created_ms - a.created_ms || (a.message_id < b.message_id ? 1 : -1))
       .slice(0, limit);
     return rows
       .map<HistoryMessage>((r) => ({
         id: r.message_id,
+        outbound_state: r.outbound_state,
+        delivery_error: r.delivery_error,
         from_agent: r.from_agent,
         mine: r.from_agent === viewerId,
         body: r.body,
@@ -498,20 +559,21 @@ export class HubHistory {
   callsFor(viewerId: string, limit = 50): CallRow[] {
     return Object.values(this.data.calls)
       .filter((c) => c.caller === viewerId || c.callee === viewerId)
-      .sort((a, b) => b.started_ms - a.started_ms)
+      .sort((a, b) => b.started_ms - a.started_ms || (a.call_id < b.call_id ? 1 : -1))
       .slice(0, limit);
   }
 
   /** Call sessions with one peer, newest-first-paged. */
-  callsWithPeer(viewerId: string, peerId: string, beforeMs: number | null = null, limit = 50): CallRow[] {
+  callsWithPeer(viewerId: string, peerId: string, beforeMs: number | null = null, limit = 50, cursor?: string | null): CallRow[] {
+    const boundary = parseTimelineCursor(cursor);
     return Object.values(this.data.calls)
       .filter(
         (c) =>
           ((c.caller === viewerId && c.callee === peerId) ||
             (c.caller === peerId && c.callee === viewerId)) &&
-          (beforeMs == null || c.started_ms < beforeMs),
+          (boundary ? c.started_ms < boundary.ts || (c.started_ms === boundary.ts && 'c:' + c.call_id < boundary.key) : beforeMs == null || c.started_ms < beforeMs),
       )
-      .sort((a, b) => b.started_ms - a.started_ms)
+      .sort((a, b) => b.started_ms - a.started_ms || (a.call_id < b.call_id ? 1 : -1))
       .slice(0, limit);
   }
 

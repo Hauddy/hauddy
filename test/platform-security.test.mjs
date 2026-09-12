@@ -30,9 +30,13 @@ async function fixture(t) {
   const kv = new Map();
   const hub = Object.create(HubDO.prototype);
   hub.db = db;
-  hub.env = { RATE_LIMIT: "off" };
+  const blobs = new Set();
+  hub.env = { RATE_LIMIT: "off", FILES: { delete: async (key) => { blobs.delete(key); } } };
+  hub.files = { sweep: async () => {} };
   hub.ctx = { getWebSockets: () => [], storage: {
     get: async (key) => kv.get(key), put: async (key, value) => kv.set(key, value),
+    delete: async (key) => kv.delete(key), setAlarm: async () => {},
+    list: async ({ prefix, limit, startAfter }) => new Map([...kv].filter(([k]) => k.startsWith(prefix) && (!startAfter || k > startAfter)).sort(([a], [b]) => a.localeCompare(b)).slice(0, limit)),
     transactionSync(fn) {
       sqlite.exec("BEGIN");
       try { const result = fn(); sqlite.exec("COMMIT"); return result; }
@@ -55,7 +59,7 @@ async function fixture(t) {
   const pull = async (key = a.key) => (await request("/console/sync/pull?since=0", undefined, key)).json();
   const seedMessage = (m) => db.insertMessage({ v: "0.1", id: m.message_id, type: "sms", from: m.from_agent, to: m.to_agent,
     ts: m.created_at, payload: { body: m.body }, sig: null }, { fromNick: null, toNick: null, accountScope: null });
-  return { sqlite, db, a, b, request, pull, seedMessage };
+  return { sqlite, db, a, b, request, pull, seedMessage, hub, kv, blobs };
 }
 const message = (id, from, to) => ({ message_id: id, from_agent: from, to_agent: to, body: `body-${id}`,
   attachments: [{ file_id: "fixture-file", name: "note.txt", mime: "text/plain", size: 1 }],
@@ -68,6 +72,19 @@ const expectStatus = async (promise, expected) => {
   assert.equal(res.status, expected, JSON.stringify(body));
   return body;
 };
+
+test('platform retries with the same message ID enqueue only once and cannot cross identities', async (t) => {
+  const { a, b, db, request, sqlite, hub } = await fixture(t);
+  const deliver = t.mock.method(hub, 'deliverTo');
+  const send = { to: a.agent, body: 'retain this message', message_id: 'retry-stable' };
+  assert.equal((await expectStatus(request('/console/sms', send), 200)).status, 'queued');
+  assert.equal((await expectStatus(request('/console/sms', send), 200)).status, 'queued');
+  assert.equal(sqlite.prepare('SELECT COUNT(*) AS n FROM messages WHERE message_id = ?').get(send.message_id).n, 1);
+  assert.equal(deliver.mock.callCount(), 1, 'retry does not redeliver to the recipient');
+  await expectStatus(request('/console/sms', { ...send, to: b.agent }, b.key), 400);
+  assert.equal(db.messageReceipt(send.message_id).from_agent, a.human);
+  assert.equal(sqlite.prepare('SELECT body FROM messages WHERE message_id = ?').get(send.message_id).body, send.body);
+});
 
 test("platform registration is owner/key bound and cannot claim unowned identities", async (t) => {
   const { db, a, b, request } = await fixture(t);
@@ -207,4 +224,218 @@ test("sidecar forwards only receipts for its exposed recipients", async (t) => {
   }));
   await sync.syncOnce();
   assert.deepEqual(receipts, [["mine"]]);
+});
+
+const deleteRequest = (hub, key) => hub.fetch(new Request("http://fixture.test/accounts/me", {
+  method: "DELETE", headers: key ? { authorization: `Bearer ${key}` } : {},
+}));
+
+async function deletionFixture(t) {
+  const f = await fixture(t);
+  const { sqlite, db, a, b, seedMessage, kv, blobs } = f;
+  const run = (query, ...args) => sqlite.prepare(query).run(...args);
+  const conn = db.createConnector(a.id, { handle: "alice-connector", scope: ["send", "read"], label: "fixture" });
+  assert.equal(conn.ok, true);
+  run("INSERT INTO oauth_clients VALUES ('owned-client', 'owned', '[]', 'secret', ?, 'now')", conn.agent_id);
+  run("INSERT INTO oauth_clients VALUES ('public-client', 'shared', '[]', NULL, NULL, 'now')");
+  db.bindNickname(a.agent, "alice-bot", a.id);
+  run("INSERT INTO reservations VALUES ('reserved', ?, 'now')", a.id);
+  run("INSERT INTO agent_grants VALUES (?, ?, 'now')", a.agent, b.id);
+  run("INSERT INTO agent_grants VALUES (?, ?, 'now')", b.agent, a.id);
+  run("INSERT INTO agent_books VALUES (?, 'alice-bot', 'now')", b.agent);
+  run("INSERT INTO agent_books VALUES (?, 'keep-book', 'now')", b.agent);
+  run("INSERT INTO agent_books VALUES (?, 'bob', 'now')", a.agent);
+  run("INSERT INTO contacts VALUES ('ab', ?, ?, 'linked', ?, 'now')", a.agent, b.agent, a.agent);
+  run("INSERT INTO friendships VALUES ('ab', ?, ?, 'linked', ?, 'allow_all', 'now')", a.id, b.id, a.id);
+  run("INSERT INTO console_sessions VALUES (?, 1)", a.human);
+  seedMessage(message("owned-message", a.agent, b.agent));
+  seedMessage(message("keep-message", b.human, b.agent));
+  const c = call("owned-call", a.agent, b.agent);
+  db.upsertCallInvite({ ...c, caller_nick: null, callee_nick: null });
+  db.insertCallFrame({ ...c.frames[0], call_id: c.call_id, attachments: null });
+  db.ingestMessages(a.id, [message("own-mirror", a.agent, b.agent)]);
+  db.ingestMessages(b.id, [message("keep-mirror", b.agent, a.agent)]);
+  for (const [id, account, owner] of [["own-file", a.id, a.agent], ["legacy-file", null, a.agent], ["keep-file", b.id, a.agent]]) {
+    db.insertAttachment({ file_id: id, account_id: account, owner, name: id, mime: "text/plain", size: 1, to_ref: null, created_ms: 1, expires_ms: Date.now() + 100000 });
+    blobs.add(`files/${id}`);
+  }
+  kv.set(`notifseen:${a.human}`, 1);
+  kv.set(`ccall:${a.human}`, { callId: c.call_id });
+  kv.set(`notifseen:${b.human}`, 2);
+  // More than a page ensures deleted keys don't break cleanup pagination.
+  for (let i = 0; i < 130; i++) kv.set(`oauthcode:${String(i).padStart(3, "0")}`, { token: conn.token });
+  kv.set("oauthcode:keep", { token: "unrelated-token" });
+  return { ...f, conn };
+}
+
+test("account deletion removes owned data, credentials, files and sessions without touching unrelated records", async (t) => {
+  const { hub, sqlite, db, a, b, kv, blobs, conn } = await deletionFixture(t);
+  let closed = false;
+  let att = { agentId: a.agent };
+  hub.ctx.getWebSockets = () => [{ deserializeAttachment: () => att, serializeAttachment: (next) => { att = next; }, close: () => { closed = true; } }];
+  await expectStatus(deleteRequest(hub, null), 401);
+  assert.ok(db.getAccount(a.id));
+  await expectStatus(deleteRequest(hub, a.key), 200);
+  assert.equal(db.getAccount(a.id), undefined);
+  assert.ok(db.getAccount(b.id));
+  assert.equal(db.authenticateAccount(a.key), null);
+  assert.equal(db.authenticateConnector(conn.token), null);
+  assert.equal(closed, true);
+  assert.equal(att.agentId, null);
+  for (const table of ["reservations", "agent_grants", "contacts", "friendships", "console_sessions", "connector_tokens", "calls", "call_frames", "account_cleanup"]) {
+    assert.equal(sqlite.prepare(`SELECT COUNT(*) AS n FROM ${table}`).get().n, 0, table);
+  }
+  assert.deepEqual(sqlite.prepare("SELECT client_id FROM oauth_clients").all().map((r) => r.client_id), ["public-client"]);
+  assert.deepEqual(sqlite.prepare("SELECT handle FROM agent_books").all().map((r) => r.handle), ["keep-book"]);
+  assert.deepEqual(sqlite.prepare("SELECT message_id FROM messages").all().map((r) => r.message_id), ["keep-message"]);
+  assert.deepEqual(sqlite.prepare("SELECT record_id FROM sync_history").all().map((r) => r.record_id), ["keep-mirror"]);
+  assert.deepEqual([...blobs], ["files/keep-file"]);
+  assert.deepEqual([...kv.keys()], [`notifseen:${b.human}`, "oauthcode:keep"]);
+  await expectStatus(deleteRequest(hub, a.key), 401);
+});
+
+test("account deletion rolls back SQL and its cleanup job on failure", async (t) => {
+  const { hub, sqlite, db, a, kv, blobs } = await deletionFixture(t);
+  const before = sqlite.prepare("SELECT COUNT(*) AS n FROM agents").get().n;
+  sqlite.exec("CREATE TRIGGER fail_delete BEFORE DELETE ON accounts BEGIN SELECT RAISE(ABORT, 'fixture failure'); END");
+  await expectStatus(deleteRequest(hub, a.key), 400);
+  assert.ok(db.getAccount(a.id));
+  assert.equal(sqlite.prepare("SELECT COUNT(*) AS n FROM agents").get().n, before);
+  assert.equal(db.pendingAccountCleanup().length, 0);
+  assert.equal(blobs.size, 3);
+  assert.equal(kv.size, 134);
+  assert.ok(db.getAttachment("own-file"));
+});
+
+test("account cleanup survives R2 failure and retries after a database restart", async (t) => {
+  const { hub, db, a, kv, blobs } = await deletionFixture(t);
+  const remove = hub.env.FILES.delete;
+  hub.env.FILES.delete = async () => { throw new Error("R2 unavailable"); };
+  await expectStatus(deleteRequest(hub, a.key), 200);
+  assert.equal(db.getAccount(a.id), undefined);
+  assert.equal(db.getAttachment("own-file"), undefined, "file unavailable immediately");
+  assert.equal(db.pendingAccountCleanup().length, 1);
+  assert.equal(blobs.size, 3);
+  let retryAt = null;
+  hub.ctx.storage.setAlarm = async (at) => { retryAt = at; };
+  await hub.alarm();
+  assert.ok(retryAt > Date.now(), "persistent failure schedules another attempt");
+  assert.equal(db.pendingAccountCleanup().length, 1);
+  db.init();
+  hub.env.FILES.delete = remove;
+  await hub.alarm();
+  assert.deepEqual([...blobs], ["files/keep-file"]);
+  assert.equal(kv.size, 2);
+  assert.equal(db.pendingAccountCleanup().length, 0);
+  await hub.alarm(); // idempotent replay
+});
+
+test('revision sync drains all pages across restart, discovers backdated rows, and converges mutable history', async (t) => {
+  const { hub, db, a, b, seedMessage } = await fixture(t);
+  const { HubHistory } = await import('../packages/hub/dist/history.js');
+  const { SyncEngine } = await import('../packages/sidecar/dist/sync.js');
+  const dir = mkdtempSync(resolve(output, 'revisions-'));
+  const history = new HubHistory(dir);
+  for (let i = 0; i < 501; i++) seedMessage(message(`msg${i}`, b.agent, a.agent));
+  for (let i = 0; i < 201; i++) db.upsertCallInvite({ ...call(`call${i}`, a.agent, b.agent), caller_nick: null, callee_nick: null });
+  let pulls = 0;
+  let failSecond = true;
+  t.mock.method(globalThis, 'fetch', async (url, options) => {
+    if (String(url).includes('/sync/pull') && ++pulls === 2 && failSecond) return Response.json({ error: 'offline' }, { status: 503 });
+    return hub.fetch(new Request(url, options));
+  });
+  const ctx = async () => ({ endpoint: 'http://fixture.test', apiKey: a.key, localHumanId: 'lh', platformHumanId: a.human,
+    localToPlatform: new Map([['local', a.agent], ['lh', a.human]]), platformToLocal: new Map([[a.agent, 'local'], [a.human, 'lh']]),
+    platformIdToNickname: new Map(), nicknameToPlatformId: new Map() });
+  await new SyncEngine(history, dir, ctx).syncOnce();
+  assert.equal(history.messagesSince(new Set(['local']), 0).length, 500);
+  failSecond = false;
+  await new SyncEngine(history, dir, ctx).syncOnce();
+  assert.equal(history.messagesSince(new Set(['local']), 0).length, 501);
+  assert.equal(history.callsSince(new Set(['local']), 0).length, 201);
+  const oldCursor = db.syncPage(a.id, 0, 10000).next_cursor;
+  seedMessage({ ...message('backdated', b.agent, a.agent), created_ms: 1, created_at: '1970-01-01T00:00:00.001Z' });
+  assert.ok(db.syncPage(a.id, oldCursor).messages.some((m) => m.message_id === 'backdated'));
+  db.markAgentRead(['msg0'], [a.agent]);
+  db.markCallAnswered('call0', 10);
+  db.insertCallFrame({ frame_id: 'late-frame', call_id: 'call0', from_agent: a.agent, body: 'later', attachments: null, created_ms: 11 });
+  db.closeCall('call0', 12, 'hangup');
+  await new SyncEngine(history, dir, ctx).syncOnce();
+  assert.ok(history.messageReceipt('msg0').agent_read_at);
+  assert.equal(history.getCall('call0').state, 'ended');
+  assert.equal(history.callFrames('call0')[0].body, 'later');
+  history.upsertCallInvite({ call_id: 'local-call', caller: 'local', callee: 'only-local', caller_nick: null, callee_nick: null, started_ms: 1 });
+  await new SyncEngine(history, dir, ctx).syncOnce();
+  history.markCallAnswered('local-call', 2);
+  history.insertCallFrame({ frame_id: 'local-frame', call_id: 'local-call', from_agent: 'local', body: 'new', attachments: null, created_ms: 3 });
+  history.closeCall('local-call', 4, 'hangup');
+  await new SyncEngine(history, dir, ctx).syncOnce();
+  const synced = db.syncPage(a.id, 0, 10000).calls.find((c) => c.call_id === 'local-call');
+  assert.equal(synced.state, 'ended');
+  assert.equal(synced.frames[0].body, 'new');
+  assert.equal(db.getCall('local-call'), undefined);
+});
+
+test('unified timeline pagination preserves equal-timestamp calls and messages', async (t) => {
+  const { db, a, b, seedMessage, request } = await fixture(t);
+  for (let i = 0; i < 61; i++) {
+    seedMessage(message(`msg${i}`, a.human, b.agent));
+    db.upsertCallInvite({ ...call(`call${i}`, a.human, b.agent), caller_nick: null, callee_nick: null });
+  }
+  let cursor = null;
+  const ids = [];
+  do {
+    const page = await expectStatus(request(`/console/thread/${b.agent}?limit=17${cursor ? '&cursor=' + encodeURIComponent(cursor) : ''}`), 200);
+    assert.ok(page.items.length <= 17);
+    ids.push(...page.items.map((i) => i.id ?? i.call_id));
+    cursor = page.next_cursor;
+  } while (cursor);
+  assert.equal(ids.length, 122);
+  assert.equal(new Set(ids).size, 122);
+});
+
+test('revision pull does not leak a foreign live record via a colliding private ID', async (t) => {
+  const { db, a, b, seedMessage } = await fixture(t);
+  db.ingestMessages(a.id, [message('collision', a.agent, 'local')]);
+  seedMessage(message('collision', b.agent, b.human));
+  assert.deepEqual(db.syncPage(a.id, 0).messages, []);
+});
+
+test('SDK initializes against the authenticated platform MCP implementation', async (t) => {
+  const { hub, a } = await fixture(t);
+  const { HauddyClient } = await import('../packages/sdk/dist/index.js');
+  t.mock.method(globalThis, 'fetch', (url, opts) => hub.fetch(new Request(url, opts)));
+  const sdk = new HauddyClient({ hub: 'http://fixture.test/mcp', bearerToken: a.key });
+  await sdk.connect();
+  const tools = await sdk.client.listTools();
+  assert.ok(tools.tools.length > 0);
+  await sdk.close();
+});
+
+test('desktop settings proxy uses daemon credentials, handles errors and clears account state on deletion', async (t) => {
+  const { hub, a, db } = await fixture(t);
+  const os = (await import('node:os')).default;
+  const home = mkdtempSync(resolve(output, 'desktop-home-'));
+  t.mock.method(os, 'homedir', () => home);
+  const { saveAccount, loadAccount } = await import('../packages/sidecar/dist/account.js');
+  const { Daemon } = await import('../packages/sidecar/dist/daemon.js');
+  saveAccount({ endpoint: 'ws://settings.test', api_key: a.key });
+  const daemon = new Daemon();
+  t.mock.method(globalThis, 'fetch', (url, opts) => {
+    assert.equal(new URL(url).hostname, 'settings.test');
+    assert.equal(opts.headers.authorization, `Bearer ${a.key}`);
+    return hub.fetch(new Request(url, opts));
+  });
+  const account = await daemon.accountSettings('get');
+  assert.equal(account.email, 'alice@example.test');
+  assert.equal(account.api_key, undefined);
+  assert.equal((await daemon.accountSettings('profile', { bio: 'updated bio' })).ok, true);
+  assert.equal((await daemon.accountSettings('get')).human.description, 'updated bio');
+  await assert.rejects(daemon.accountSettings('password', { current: 'wrong', next: 'new-password' }));
+  assert.equal((await daemon.accountSettings('password', { current: 'fixture-password', next: 'new-password' })).ok, true);
+  assert.equal((await daemon.accountSettings('autoAccept', { auto_accept: true })).auto_accept, true);
+  assert.equal((await daemon.accountSettings('delete')).ok, true);
+  assert.equal(db.getAccount(a.id), undefined);
+  assert.equal(loadAccount(), null);
+  await assert.rejects(daemon.accountSettings('get'), /Connect your account/);
 });

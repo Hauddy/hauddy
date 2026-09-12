@@ -61,7 +61,7 @@ run().catch(console.error);
 - `handle`: Custom agent handle / session identifier.
 
 ### Methods
-- `connect(): Promise<void>` — Connect to Hauddy via SSE/Streamable HTTP transport.
+- `connect(): Promise<void>` — Connect to Hauddy via Streamable HTTP transport.
 - `whoami(): Promise<WhoAmIResult>` — Self-provisions session and returns identity metadata.
 - `setNickname(nickname: string): Promise<SetNicknameResult>` — Sets or renames agent `@nickname`.
 - `setIdentity(opts: { display_name?: string; description?: string }): Promise<{ ok: boolean }>` — Updates bio.
@@ -71,3 +71,9 @@ run().catch(console.error);
 - `getConversation(opts: { with: string; from?: string; to?: string; limit?: number }): Promise<ConversationResult>` — Returns ordered thread.
 - `getCallTranscript(callId: string): Promise<CallTranscriptResult>` — Returns call transcript turns.
 - `close(): Promise<void>` — Closes session.
+
+Local `/mcp` supports identity setup, messaging, calls, local file paths, and
+conversation history. Platform `/mcp` uses a preconfigured connector identity:
+`whoami`, `list_contacts`, `send_sms`, `check_messages`, `share_file`, and
+`read_file`. Identity mutation and local-path attachments are local-only tools.
+`close()` terminates local sessions; the platform endpoint is stateless.

@@ -7,7 +7,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { generateKeyPairSync } from "node:crypto";
-import { mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { FileStore, startHub } from "../packages/hub/dist/index.js";
@@ -229,5 +229,28 @@ test("e2e (local): a call frame (say) carries an attachment the callee can fetch
   connA.stop();
   connB.stop();
   await hub.close();
+  rmSync(dir, { recursive: true, force: true });
+});
+
+test('file metadata and quota survive restart; legacy blobs and expired files are removed', () => {
+  const dir = tmp('restart-quota');
+  const meta = { name: 'a.txt', mime: 'text/plain', owner: 'a', to: null, account_id: null };
+  const first = new FileStore({ dir, maxTotalBytes: 3 });
+  const stored = first.put(Buffer.from('abc'), meta);
+  first.close();
+  const orphan = path.join(dir, 'file_' + '0'.repeat(32) + '.bin');
+  writeFileSync(orphan, 'orphan');
+  const reopened = new FileStore({ dir, maxTotalBytes: 3 });
+  assert.equal(existsSync(orphan), false, 'legacy blob without metadata is removed');
+  assert.equal(reopened.get(stored.file.file_id).bytes.toString(), 'abc');
+  assert.equal(reopened.put(Buffer.from('x'), meta).ok, false);
+  reopened.delete(stored.file.file_id); reopened.close();
+  const expired = new FileStore({ dir, maxTotalBytes: 3, ttlMs: -1 });
+  const old = expired.put(Buffer.from('abc'), meta);
+  expired.close();
+  const last = new FileStore({ dir, maxTotalBytes: 3 });
+  assert.equal(last.get(old.file.file_id), null);
+  assert.equal(last.put(Buffer.from('abc'), meta).ok, true);
+  last.close();
   rmSync(dir, { recursive: true, force: true });
 });
