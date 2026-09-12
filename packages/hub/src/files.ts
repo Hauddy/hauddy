@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, statSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 /** Metadata the hub keeps for one stored attachment. */
@@ -30,8 +30,7 @@ export interface FileStoreOptions {
 
 /**
  * A hub's temp store for message attachments. Bytes live on disk under
- * `<dataDir>/files/<id>.bin`; metadata is in memory (temp storage — a restart
- * drops in-flight transfers, which is fine for a 24h TTL store). Reference-based:
+ * `<dataDir>/files/<id>.bin`; metadata is persisted alongside each blob and reconciled on restart. Reference-based:
  * the message envelope only carries a small {@link FileMeta}-derived reference,
  * so WS frames and the durable inbox stay small. Enforces a per-file cap and a
  * whole-store quota, and sweeps expired files.
@@ -51,6 +50,25 @@ export class FileStore {
     this.maxTotalBytes = opts.maxTotalBytes ?? 500 * 1024 * 1024;
     this.ttlMs = opts.ttlMs ?? 24 * 60 * 60 * 1000;
     mkdirSync(this.dir, { recursive: true });
+    // Recover valid metadata; remove legacy/orphan blobs and interrupted writes.
+    for (const name of readdirSync(this.dir)) {
+      if (!/^file_[a-f0-9]{32}\.json$/.test(name)) continue;
+      const id = name.slice(0, -5);
+      try {
+        const m = JSON.parse(readFileSync(path.join(this.dir, name), 'utf8')) as FileMeta;
+        const size = statSync(this.pathFor(id)).size;
+        if (m.file_id !== id || size !== m.size || !Number.isFinite(m.expires_at) || m.expires_at <= Date.now()) throw new Error('expired or invalid');
+        this.meta.set(id, m); this.total += size;
+      } catch { rmSync(path.join(this.dir, name), { force: true }); rmSync(this.pathFor(id), { force: true }); }
+    }
+    for (const name of readdirSync(this.dir)) {
+      if (/^file_[a-f0-9]{32}\.bin$/.test(name) && !this.meta.has(name.slice(0, -4))) rmSync(path.join(this.dir, name), { force: true });
+      if (/^file_[a-f0-9]{32}\.json\.tmp$/.test(name)) rmSync(path.join(this.dir, name), { force: true });
+    }
+    for (const m of [...this.meta.values()].sort((a, b) => a.expires_at - b.expires_at)) {
+      if (this.total <= this.maxTotalBytes) break;
+      this.delete(m.file_id);
+    }
     this.sweeper = setInterval(() => this.sweep(), 5 * 60 * 1000);
     this.sweeper.unref?.();
   }
@@ -79,6 +97,11 @@ export class FileStore {
       ...meta,
     };
     writeFileSync(this.pathFor(file_id), bytes);
+    try {
+      const metaPath = path.join(this.dir, file_id + '.json');
+      writeFileSync(metaPath + '.tmp', JSON.stringify(file));
+      renameSync(metaPath + '.tmp', metaPath);
+    } catch (err) { rmSync(this.pathFor(file_id), { force: true }); throw err; }
     this.meta.set(file_id, file);
     this.total += bytes.length;
     return { ok: true, file };
@@ -102,16 +125,11 @@ export class FileStore {
   }
 
   delete(file_id: string): void {
+    if (!/^file_[a-f0-9]{32}$/.test(file_id)) return;
+    rmSync(this.pathFor(file_id), { force: true });
+    rmSync(path.join(this.dir, file_id + '.json'), { force: true });
     const meta = this.meta.get(file_id);
-    if (meta) {
-      this.total -= meta.size;
-      this.meta.delete(file_id);
-    }
-    try {
-      rmSync(this.pathFor(file_id), { force: true });
-    } catch {
-      /* already gone */
-    }
+    if (meta) { this.total -= meta.size; this.meta.delete(file_id); }
   }
 
   /** Remove every expired file. Cheap; called on an interval and before each put. */

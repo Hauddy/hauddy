@@ -122,6 +122,10 @@ export async function startLocalApi(opts: LocalApiOptions): Promise<LocalApiHand
         }
       }
 
+      if (method === 'GET' && p === '/api/account/settings') return json(res, 200, await daemon.accountSettings('get'));
+      const accountAction = p.match(/^\/api\/account\/(profile|password|autoAccept|delete)$/);
+      if (method === 'POST' && accountAction) return json(res, 200, await daemon.accountSettings(accountAction[1]!, await readBody(req)));
+
       // ---- platform link ("go online": connect + expose) ----
       if (method === "GET" && p === "/api/platform") return json(res, 200, daemon.getPlatform());
       if (method === "POST" && p === "/api/platform/connect") {
@@ -196,7 +200,7 @@ export async function startLocalApi(opts: LocalApiOptions): Promise<LocalApiHand
       if (method === "POST" && p === "/api/human/sms") {
         const body = await readBody(req);
         const attachments = Array.isArray(body.attachments) ? (body.attachments as Attachment[]) : undefined;
-        return json(res, 200, await daemon.humanSms(String(body.to ?? ""), String(body.body ?? ""), attachments));
+        return json(res, 200, await daemon.humanSms(String(body.to ?? ""), String(body.body ?? ""), attachments, typeof body.message_id === "string" ? body.message_id : undefined));
       }
       // Stage a file the human is about to send. Bytes in the body; name/mime/to
       // as query params (so the browser needs no custom request headers → no CORS
@@ -216,6 +220,8 @@ export async function startLocalApi(opts: LocalApiOptions): Promise<LocalApiHand
         const beforeRaw = url.searchParams.get("before");
         return json(res, 200, await daemon.humanThread(decodeURIComponent(humanThread[1]!), {
           viewAs: url.searchParams.get("as"),
+          cursor: url.searchParams.get('cursor'),
+          limit: Number(url.searchParams.get('limit')) || undefined,
           before: beforeRaw && Number.isFinite(Number(beforeRaw)) ? Number(beforeRaw) : undefined,
         }));
       }

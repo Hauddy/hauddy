@@ -52,9 +52,10 @@ function httpBase(endpoint: string): string {
   return endpoint.replace(/^ws/, "http");
 }
 
-async function request<T>(endpoint: string, method: string, path: string, body?: unknown, apiKey?: string): Promise<T> {
+async function request<T>(endpoint: string, method: string, path: string, body?: unknown, apiKey?: string, signal?: AbortSignal): Promise<T> {
   const res = await fetch(httpBase(endpoint) + path, {
     method,
+    signal: signal ?? AbortSignal.timeout(5000),
     headers: {
       ...(body !== undefined ? { "content-type": "application/json" } : {}),
       ...(apiKey ? { authorization: `Bearer ${apiKey}` } : {}),
@@ -132,6 +133,11 @@ export function registerAgent(
 
 export function listAgents(endpoint: string): Promise<{ agents: AgentView[] }> {
   return request(endpoint, "GET", "/agents");
+}
+
+/** Persist read markers on the local hub before reporting receipt success. */
+export function markAgentRead(endpoint: string, messageIds: string[]): Promise<{ ok: boolean; marked: number }> {
+  return request(endpoint, "POST", "/console/sms/agent-read", { message_ids: messageIds }, undefined, AbortSignal.timeout(5_000));
 }
 
 /** Bind/rename an agent's nickname (unique within the hub). */

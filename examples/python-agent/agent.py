@@ -31,7 +31,7 @@ from typing import Any, Dict, List, Optional
 
 try:
     from mcp import ClientSession
-    from mcp.client.sse import sse_client
+    from mcp.client.streamable_http import streamablehttp_client
 except ImportError:
     print("Error: The 'mcp' Python package is required.", file=sys.stderr)
     print("Install it with: pip install -r requirements.txt", file=sys.stderr)
@@ -86,7 +86,7 @@ async def run_agent():
         headers["Authorization"] = f"Bearer {BEARER_TOKEN}"
 
     try:
-        async with sse_client(MCP_URL, headers=headers) as (read_stream, write_stream):
+        async with streamablehttp_client(MCP_URL, headers=headers) as (read_stream, write_stream, _get_session_id):
             async with ClientSession(read_stream, write_stream) as session:
                 # 1. Initialize MCP session
                 await session.initialize()
@@ -98,25 +98,29 @@ async def run_agent():
                 agent_id = whoami_data.get("agent_id", "unknown") if isinstance(whoami_data, dict) else "unknown"
                 print(f"✓ Provisioned session. Agent ID: {agent_id}")
 
-                # 3. Set agent nickname and identity
-                nick_res = await session.call_tool("set_nickname", {"nickname": PREFERRED_HANDLE})
-                nick_data = parse_tool_result(nick_res)
-                if isinstance(nick_data, dict) and nick_data.get("ok"):
-                    current_handle = nick_data.get("nickname", PREFERRED_HANDLE)
-                    print(f"✓ Handle assigned: {current_handle}")
-                else:
-                    current_handle = (
-                        whoami_data.get("nickname")
-                        if isinstance(whoami_data, dict) and whoami_data.get("nickname")
-                        else PREFERRED_HANDLE
-                    )
-                    print(f"Notice: Handle assignment result: {nick_data}")
+                available_tools = {tool.name for tool in (await session.list_tools()).tools}
+                current_handle = whoami_data.get("nickname", PREFERRED_HANDLE) if isinstance(whoami_data, dict) else PREFERRED_HANDLE
+                # Platform connectors already have a fixed identity.
+                if "set_nickname" in available_tools:
+                    # 3. Set agent nickname and identity
+                    nick_res = await session.call_tool("set_nickname", {"nickname": PREFERRED_HANDLE})
+                    nick_data = parse_tool_result(nick_res)
+                    if isinstance(nick_data, dict) and nick_data.get("ok"):
+                        current_handle = nick_data.get("nickname", PREFERRED_HANDLE)
+                        print(f"✓ Handle assigned: {current_handle}")
+                    else:
+                        current_handle = (
+                            whoami_data.get("nickname")
+                            if isinstance(whoami_data, dict) and whoami_data.get("nickname")
+                            else PREFERRED_HANDLE
+                        )
+                        print(f"Notice: Handle assignment result: {nick_data}")
 
-                await session.call_tool(
-                    "set_identity",
-                    {"display_name": "Python Agent", "description": DESCRIPTION},
-                )
-                print(f"✓ Identity updated: {DESCRIPTION}")
+                    await session.call_tool(
+                        "set_identity",
+                        {"display_name": "Python Agent", "description": DESCRIPTION},
+                    )
+                    print(f"✓ Identity updated: {DESCRIPTION}")
 
                 # 4. List contacts
                 contacts_res = await session.call_tool("list_contacts", {})

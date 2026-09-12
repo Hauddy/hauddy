@@ -1,3 +1,5 @@
+import { parseTimelineCursor } from "@hauddy/protocol";
+import { mergeReceipts, mergeCall } from "@hauddy/protocol";
 import {
   formatNickname,
   mintAccountId,
@@ -317,21 +319,49 @@ export class Db {
     return this.first<AccountRow>("SELECT * FROM accounts WHERE account_id = ?", accountId);
   }
 
+  /** Caller must wrap in storage.transactionSync. External cleanup is queued in
+   *  the same commit, so failures never orphan blobs or resurrect credentials. */
   deleteAccount(accountId: string): boolean {
-    const acc = this.getAccount(accountId);
-    if (!acc) return false;
-    const nicks = this.rows<{ handle: string }>(`SELECT handle FROM profile_nicknames WHERE account_id = ?`, accountId);
-    for (const n of nicks) {
-      this.sql.exec(`DELETE FROM profile_nicknames WHERE handle = ?`, n.handle);
-      this.sql.exec(`DELETE FROM nickname_registry WHERE handle = ?`, n.handle);
+    if (!this.getAccount(accountId)) return false;
+    const agentIds = this.accountAgents(accountId).map((a) => a.agent_id);
+    const tokens = this.rows<{ token: string }>("SELECT token FROM connector_tokens WHERE account_id = ?", accountId).map((r) => r.token);
+    // account_id is authoritative. owner is a client-provided hint, so only use
+    // it for legacy attachments lacking account provenance.
+    const fileIds = this.rows<{ file_id: string }>(`SELECT file_id FROM attachments
+      WHERE account_id = ? OR (account_id IS NULL AND owner IN (SELECT agent_id FROM agents WHERE account_id = ?))`, accountId, accountId).map((r) => r.file_id);
+    this.sql.exec("INSERT INTO account_cleanup (account_id, data) VALUES (?, ?)", accountId, JSON.stringify({ agentIds, tokens, fileIds }));
+    for (const fileId of fileIds) this.deleteAttachment(fileId);
+    for (const agentId of agentIds) {
+      this.sql.exec("DELETE FROM call_frames WHERE call_id IN (SELECT call_id FROM calls WHERE caller = ? OR callee = ?)", agentId, agentId);
+      this.sql.exec("DELETE FROM calls WHERE caller = ? OR callee = ?", agentId, agentId);
+      this.sql.exec("DELETE FROM messages WHERE from_agent = ? OR to_agent = ?", agentId, agentId);
+      this.sql.exec("DELETE FROM contacts WHERE agent_a = ? OR agent_b = ?", agentId, agentId);
+      this.sql.exec("DELETE FROM console_sessions WHERE human_id = ?", agentId);
+      // Remove references before releasing handles, so a later claimant isn't
+      // automatically inserted into another agent's curated book.
+      this.sql.exec("DELETE FROM agent_books WHERE handle IN (SELECT nickname FROM nicknames WHERE agent_id = ?)", agentId);
+      this.sql.exec("DELETE FROM agent_grants WHERE agent_id = ?", agentId);
+      this.removeAgent(agentId);
     }
-    this.sql.exec(`DELETE FROM friend_requests WHERE requester_id = ? OR addressee_id = ?`, accountId, accountId);
-    this.sql.exec(`DELETE FROM friendships WHERE account_a = ? OR account_b = ?`, accountId, accountId);
-    this.sql.exec(`DELETE FROM oauth_clients WHERE connector_agent_id IN (SELECT agent_id FROM connectors WHERE account_id = ?)`, accountId);
-    this.sql.exec(`DELETE FROM connectors WHERE account_id = ?`, accountId);
-    this.sql.exec(`DELETE FROM agent_exposures WHERE account_id = ?`, accountId);
-    this.sql.exec(`DELETE FROM accounts WHERE account_id = ?`, accountId);
+    this.sql.exec("DELETE FROM messages WHERE account_scope = ?", accountId);
+    this.sql.exec("DELETE FROM agent_grants WHERE account_id = ?", accountId);
+    this.sql.exec("DELETE FROM reservations WHERE account_id = ?", accountId);
+    this.sql.exec("DELETE FROM nicknames WHERE account_id = ?", accountId);
+    this.sql.exec("DELETE FROM connector_tokens WHERE account_id = ?", accountId);
+    this.sql.exec("DELETE FROM sync_history WHERE account_id = ?", accountId);
+    this.sql.exec("DELETE FROM friendships WHERE account_a = ? OR account_b = ?", accountId, accountId);
+    this.sql.exec("DELETE FROM sync_changes WHERE source = ?", accountId);
+    this.sql.exec("DELETE FROM accounts WHERE account_id = ?", accountId);
     return true;
+  }
+
+  pendingAccountCleanup(): Array<{ accountId: string; agentIds: string[]; tokens: string[]; fileIds: string[] }> {
+    return this.rows<{ account_id: string; data: string }>("SELECT * FROM account_cleanup")
+      .map((r) => ({ accountId: r.account_id, ...JSON.parse(r.data) }));
+  }
+
+  finishAccountCleanup(accountId: string): void {
+    this.sql.exec("DELETE FROM account_cleanup WHERE account_id = ?", accountId);
   }
 
   async verifyLogin(login: string, password: string): Promise<string | null> {
@@ -1432,18 +1462,18 @@ export class Db {
   }
 
   /** Full message history with one peer, newest-first-paged, returned ascending. */
-  messagesWithPeer(humanId: string, peerId: string, beforeMs: number | null, limit = 50): HistoryMessage[] {
+  messagesWithPeer(humanId: string, peerId: string, beforeMs: number | null, limit = 50, cursor?: string | null): HistoryMessage[] {
+    const boundary = parseTimelineCursor(cursor);
     const hasBefore = beforeMs != null;
     const rows = this.rows<Record<string, Bind>>(
       `SELECT message_id, from_agent, to_agent, body, attachments, created_ms, created_at, delivered_at, read_at, agent_read_at
          FROM ${this.historySource("message")}
         WHERE ((from_agent = ? AND to_agent = ?) OR (from_agent = ? AND to_agent = ?))
-          ${hasBefore ? "AND created_ms < ?" : ""}
-        ORDER BY created_ms DESC LIMIT ?`,
+          ${boundary ? "AND (created_ms < ? OR (created_ms = ? AND ('m:' || message_id) < ?))" : hasBefore ? "AND created_ms < ?" : ""}
+        ORDER BY created_ms DESC, message_id DESC LIMIT ?`,
       this.getAgent(humanId)?.account_id ?? null,
-      ...(hasBefore
-        ? [humanId, peerId, peerId, humanId, beforeMs as number, limit]
-        : [humanId, peerId, peerId, humanId, limit]),
+      humanId, peerId, peerId, humanId,
+      ...(boundary ? [boundary.ts, boundary.ts, boundary.key] : hasBefore ? [beforeMs!] : []), limit,
     );
     return rows
       .map((r) => ({
@@ -1513,17 +1543,17 @@ export class Db {
   }
 
   /** Call sessions with one peer, newest-first-paged. */
-  callsWithPeer(humanId: string, peerId: string, beforeMs: number | null = null, limit = 50): CallRow[] {
+  callsWithPeer(humanId: string, peerId: string, beforeMs: number | null = null, limit = 50, cursor?: string | null): CallRow[] {
+    const boundary = parseTimelineCursor(cursor);
     const hasBefore = beforeMs != null;
     return this.rows<CallRow>(
       `SELECT * FROM ${this.historySource("call")}
          WHERE ((caller = ? AND callee = ?) OR (caller = ? AND callee = ?))
-           ${hasBefore ? "AND started_ms < ?" : ""}
-         ORDER BY started_ms DESC LIMIT ?`,
+           ${boundary ? "AND (started_ms < ? OR (started_ms = ? AND ('c:' || call_id) < ?))" : hasBefore ? "AND started_ms < ?" : ""}
+         ORDER BY started_ms DESC, call_id DESC LIMIT ?`,
       this.getAgent(humanId)?.account_id ?? null,
-      ...(hasBefore
-        ? [humanId, peerId, peerId, humanId, beforeMs, limit]
-        : [humanId, peerId, peerId, humanId, limit]),
+      humanId, peerId, peerId, humanId,
+      ...(boundary ? [boundary.ts, boundary.ts, boundary.key] : hasBefore ? [beforeMs!] : []), limit,
     );
   }
 
@@ -1546,6 +1576,10 @@ export class Db {
         sinceMs,
       )?.n ?? 0,
     );
+  }
+
+  messageReceipt(id: string): { from_agent: string; to_agent: string; delivered_at: string | null } | undefined {
+    return this.first("SELECT from_agent, to_agent, delivered_at FROM messages WHERE message_id = ?", id);
   }
 
   // ── private sync mirror ────────────────────────────────────────────────
@@ -1576,8 +1610,11 @@ export class Db {
     const rows = parseMessages(input);
     for (const row of rows) this.requireMirrorParty(accountId, row.from_agent, row.to_agent);
     for (const row of rows) {
-      this.sql.exec("INSERT OR IGNORE INTO sync_history (account_id, kind, record_id, data) VALUES (?, 'message', ?, ?)",
-        accountId, row.message_id, JSON.stringify({ ...row, account_scope: accountId }));
+      const prior = this.first<{ data: string }>("SELECT data FROM sync_history WHERE account_id = ? AND kind = 'message' AND record_id = ?", accountId, row.message_id);
+      const old = prior ? JSON.parse(prior.data) : null;
+      if (old && (old.from_agent !== row.from_agent || old.to_agent !== row.to_agent)) throw new AuthorizationError("message participants cannot change");
+      const data = JSON.stringify(old ? mergeReceipts(old, row) : { ...row, account_scope: accountId });
+      if (data !== prior?.data) this.sql.exec("INSERT INTO sync_history (account_id, kind, record_id, data) VALUES (?, 'message', ?, ?) ON CONFLICT(account_id, kind, record_id) DO UPDATE SET data = excluded.data", accountId, row.message_id, data);
     }
     return rows.length;
   }
@@ -1593,10 +1630,37 @@ export class Db {
       }
     }
     for (const c of calls) {
-      this.sql.exec("INSERT OR IGNORE INTO sync_history (account_id, kind, record_id, data) VALUES (?, 'call', ?, ?)",
-        accountId, c.call_id, JSON.stringify(c));
+      const prior = this.first<{ data: string }>("SELECT data FROM sync_history WHERE account_id = ? AND kind = 'call' AND record_id = ?", accountId, c.call_id);
+      const old = prior ? JSON.parse(prior.data) as SyncCall : null;
+      if (old && (old.caller !== c.caller || old.callee !== c.callee)) throw new AuthorizationError("call participants cannot change");
+      const frames = new Map((old?.frames ?? []).map((f) => [f.frame_id, f]));
+      for (const f of c.frames ?? []) if (!frames.has(f.frame_id)) frames.set(f.frame_id, f);
+      const data = JSON.stringify({ ...(old ? mergeCall(old, c) : c), frames: [...frames.values()] });
+      if (data !== prior?.data) this.sql.exec("INSERT INTO sync_history (account_id, kind, record_id, data) VALUES (?, 'call', ?, ?) ON CONFLICT(account_id, kind, record_id) DO UPDATE SET data = excluded.data", accountId, c.call_id, data);
     }
     return calls.length;
+  }
+
+  syncPage(accountId: string, after: number, limit = 500) {
+    const changes = this.rows<{ seq: number; source: string; kind: string; record_id: string }>(`
+      SELECT ch.* FROM sync_changes ch WHERE seq > ? AND (
+        (source = ? AND EXISTS (SELECT 1 FROM sync_history h WHERE h.account_id = ch.source AND h.kind = ch.kind AND h.record_id = ch.record_id))
+        OR (source = '' AND kind = 'message' AND EXISTS (SELECT 1 FROM messages m JOIN agents a ON a.agent_id IN (m.from_agent,m.to_agent) WHERE m.message_id = ch.record_id AND a.account_id = ?))
+        OR (source = '' AND kind = 'call' AND EXISTS (SELECT 1 FROM calls c JOIN agents a ON a.agent_id IN (c.caller,c.callee) WHERE c.call_id = ch.record_id AND a.account_id = ?))
+      ) ORDER BY seq LIMIT ?`, after, accountId, accountId, accountId, limit + 1);
+    const owned = new Set(this.accountAgents(accountId).map((a) => a.agent_id));
+    const messages: SyncMessage[] = [];
+    const calls: Array<CallRow & { frames: unknown[] }> = [];
+    for (const ch of changes.slice(0, limit)) {
+      if (ch.kind === 'message') {
+        const row = this.first<SyncMessage>(`SELECT * FROM ${this.historySource("message")} WHERE message_id = ?`, accountId, ch.record_id);
+        if (row && (owned.has(row.from_agent) || owned.has(row.to_agent))) messages.push({ ...row, attachments: typeof row.attachments === 'string' ? safeJson(row.attachments) : row.attachments });
+      } else {
+        const row = this.first<CallRow>(`SELECT * FROM ${this.historySource("call")} WHERE call_id = ?`, accountId, ch.record_id);
+        if (row && (owned.has(row.caller) || owned.has(row.callee))) calls.push({ ...row, frames: this.historyCallFrames(row.call_id, accountId) });
+      }
+    }
+    return { messages, calls, next_cursor: changes[Math.min(changes.length, limit) - 1]?.seq ?? after, has_more: changes.length > limit };
   }
 
   /** Messages touching any of `agentIds`, created after `sinceMs`, oldest-first

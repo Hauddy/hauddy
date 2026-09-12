@@ -1,5 +1,5 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
+import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import type { Attachment } from "@hauddy/protocol";
 
 export interface HauddyClientOptions {
@@ -108,7 +108,7 @@ export interface CallTranscriptResult {
  */
 export class HauddyClient {
   private client: Client;
-  private transport: SSEClientTransport | null = null;
+  private transport: StreamableHTTPClientTransport | null = null;
   private endpoint: string;
   private bearerToken?: string;
 
@@ -128,7 +128,7 @@ export class HauddyClient {
   }
 
   /**
-   * Connect to the Hauddy MCP server endpoint via SSE/Streamable HTTP transport.
+   * Connect to the Hauddy MCP server endpoint via Streamable HTTP transport.
    */
   async connect(): Promise<void> {
     const headers: Record<string, string> = {};
@@ -136,7 +136,7 @@ export class HauddyClient {
       headers["Authorization"] = `Bearer ${this.bearerToken}`;
     }
 
-    this.transport = new SSEClientTransport(new URL(this.endpoint), {
+    this.transport = new StreamableHTTPClientTransport(new URL(this.endpoint), {
       requestInit: { headers }
     });
 
@@ -148,8 +148,8 @@ export class HauddyClient {
    */
   async close(): Promise<void> {
     if (this.transport) {
-      await this.transport.close();
-      this.transport = null;
+      try { await this.transport.terminateSession(); }
+      finally { await this.client.close(); this.transport = null; }
     }
   }
 

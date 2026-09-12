@@ -1,3 +1,5 @@
+import { timelinePage } from "@hauddy/protocol";
+import { Outbox } from "./outbox.js";
 import crypto from "node:crypto";
 import { readFileSync } from "node:fs";
 import http from "node:http";
@@ -64,7 +66,7 @@ export interface HubOptions {
    * forwards it up the sender's upstream bridge connection to the platform.
    * `fromAgentId` is the local sender; `envelope.to` is the global `@nickname`.
    */
-  forwardRemote?: (fromAgentId: string, envelope: Envelope) => void;
+  forwardRemote?: (fromAgentId: string, envelope: Envelope) => Promise<{ status: string }>;
   /**
    * Per-agent contact-book override (local hub only). The app curates a book for
    * each agent; when it returns a non-empty list of bare handles, that agent's
@@ -188,6 +190,11 @@ function clock(ms: number): string {
 export async function startHub(options: HubOptions = {}): Promise<HubHandle> {
   const store = new HubStore(options.dataDir ?? "data");
   const history = new HubHistory(options.dataDir ?? "data");
+  const outbox = options.forwardRemote ? new Outbox(options.dataDir ?? 'data', options.forwardRemote, (row) => {
+    history.markOutbound(row.envelope.id, row.state, row.error);
+  }) : null;
+  const outboundTimer = setInterval(() => { void outbox?.flush().catch(() => {}); }, 2000);
+  outboundTimer.unref();
   const files = new FileStore({ dir: path.join(options.dataDir ?? "data", "files") });
   const autoLink = options.autoLink ?? false;
   const allowlistFile = options.allowlistFile ?? path.join(options.dataDir ?? "data", "allowlist.txt");
@@ -482,12 +489,22 @@ export async function startHub(options: HubOptions = {}): Promise<HubHandle> {
     const toId = store.resolveAgentId(toRef);
     if (!toId) {
       if (resolveRemote(toRef) && options.forwardRemote) {
-        options.forwardRemote(fromAgentId, { ...envelope, from: fromAgentId });
-        return { ok: true, status: "queued" };
+        const asserted = { ...envelope, from: fromAgentId, to: resolveRemote(toRef)! };
+        persistHistory({ ...asserted, to: toRef }, toRef);
+        const entry = outbox!.enqueue(asserted);
+        history.markOutbound(envelope.id, entry.state, entry.error);
+        if (entry.state === 'failed') return { ok: false, code: 'E_UNSUPPORTED', message: entry.error ?? 'remote send failed' };
+        void outbox!.flush().catch(() => {});
+        return { ok: true, status: 'queued' };
       }
       return { ok: false, code: "E_UNKNOWN_AGENT", message: `unknown agent ${toRef}` };
     }
     if (!areLinked(fromAgentId, toId)) return { ok: false, code: "E_NOT_LINKED", message: `not linked to ${toRef}` };
+    const prior = history.messageReceipt(envelope.id);
+    if (prior) {
+      if (prior.from_agent !== fromAgentId || prior.to_agent !== toId) return { ok: false, code: 'E_IDENTITY_MISMATCH', message: 'message ID already used' };
+      return { ok: true, status: prior.delivered_at ? 'delivered' : 'queued' };
+    }
     const toBare = normalizeNickname(toRef);
     const asserted: Envelope = { ...envelope, from: fromAgentId, to: toId };
     // When the human owner messages one of its own agents, tag the (opaque)
@@ -1057,8 +1074,9 @@ export async function startHub(options: HubOptions = {}): Promise<HubHandle> {
           const beforeRaw = url.searchParams.get("before");
           const before = beforeRaw && Number.isFinite(Number(beforeRaw)) ? Number(beforeRaw) : null;
           const limit = Math.min(Math.max(Number(url.searchParams.get("limit")) || 50, 1), 200);
-          const messages = history.messagesWithPeer(viewerId, peerId, before, limit);
-          const calls = history.callsWithPeer(viewerId, peerId, before, limit);
+          const cursor = url.searchParams.get('cursor');
+          const messages = history.messagesWithPeer(viewerId, peerId, before, limit + 1, cursor);
+          const calls = history.callsWithPeer(viewerId, peerId, before, limit + 1, cursor);
           const callItems = calls.map((c) => {
             const incoming = c.callee === viewerId;
             return {
@@ -1077,14 +1095,10 @@ export async function startHub(options: HubOptions = {}): Promise<HubHandle> {
             kind: "message" as const,
             ...m,
           }));
-          const items = [...messageItems, ...callItems].sort((a, b) => {
-            const tsA = a.kind === "message" ? a.ts : a.started_ms;
-            const tsB = b.kind === "message" ? b.ts : b.started_ms;
-            return tsA - tsB;
-          });
+          const page = timelinePage([...messageItems, ...callItems], limit);
           if (viewerId === humanId) history.markThreadRead(viewerId, peerId); // browsing an agent is read-only
           const peer_nick = speakingNickname(peerId) ?? (ref.startsWith("@") ? ref : `@${ref}`);
-          return json(200, { peer_id: peerId, peer_nick, messages, items });
+          return json(200, { peer_id: peerId, peer_nick, messages: page.items.filter((x) => x.kind === 'message'), ...page });
         }
         if (req.method === "GET" && path === "/console/calls") {
           const viewerId = resolveConsoleViewer();
@@ -1176,7 +1190,9 @@ export async function startHub(options: HubOptions = {}): Promise<HubHandle> {
         if (req.method === "POST" && path === "/console/sms") {
           const body = await readBody(req);
           const atts = Array.isArray(body.attachments) && body.attachments.length ? { attachments: body.attachments } : {};
-          const res = routeFromAgent(humanId, mkEnvelope(humanId, String(body.to ?? ""), { body: String(body.body ?? ""), ...atts }));
+          const envelope = mkEnvelope(humanId, String(body.to ?? ""), { body: String(body.body ?? ""), ...atts });
+          if (typeof body.message_id === 'string' && /^[A-Za-z0-9_-]{1,128}$/.test(body.message_id)) envelope.id = body.message_id;
+          const res = routeFromAgent(humanId, envelope);
           return res.ok ? json(200, { status: res.status }) : json(400, { error: res.code, message: res.message });
         }
         // Calls: place/pickup/say/poll/hangup — the hub holds the human's side.
@@ -1418,6 +1434,7 @@ export async function startHub(options: HubOptions = {}): Promise<HubHandle> {
     close: () =>
       new Promise<void>((resolve) => {
         clearInterval(heartbeat);
+        clearInterval(outboundTimer);
         files.close();
         for (const ws of clients.keys()) ws.terminate();
         wss.close(() => server.close(() => resolve()));

@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { MessageSubmission } from '../message-send';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { api, useApiState, type Attachment, type ThreadCallFrame } from '../api';
+import { api, useApiState, type Attachment, type ThreadCallFrame, type ThreadItem } from '../api';
 import type { Presence } from '../api/types';
 import Combobox from '../components/Combobox';
 import { PresenceDot } from '../components/Presence';
@@ -9,7 +10,7 @@ import ErrorState from '../components/ErrorState';
 import { SkeletonList } from '../components/LoadingSkeleton';
 
 /** Sender-side delivery state → ✓ (sent) / ✓✓ (delivered) / ✓✓ accent (read). */
-type MsgStatus = 'sent' | 'delivered' | 'read';
+type MsgStatus = 'pending' | 'failed' | 'sent' | 'delivered' | 'read';
 
 export interface TimelineMessage {
   kind: 'message';
@@ -19,6 +20,7 @@ export interface TimelineMessage {
   mine: boolean;
   attachments?: Attachment[] | null;
   status?: MsgStatus;
+  error?: string;
   ts: number;
 }
 
@@ -36,7 +38,18 @@ export interface TimelineCall {
 
 export type TimelineItem = TimelineMessage | TimelineCall;
 
-const uid = () => `local-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+function toTimeline(items: ThreadItem[], peer: string): TimelineItem[] {
+  return items.map((item) => item.kind === 'message' ? {
+    kind: 'message', id: item.id, from: peer, body: item.body ?? '', mine: item.mine,
+    attachments: item.attachments, ts: item.ts, error: item.delivery_error,
+    status: item.mine ? (item.outbound_state === 'failed' ? 'failed' : item.outbound_state === 'pending' ? 'pending' : item.agent_read_at ? 'read' : item.delivered_at ? 'delivered' : 'sent') : undefined,
+  } : { kind: 'call', id: item.call_id, direction: item.direction, state: item.state,
+    started_ms: item.started_ms, answered_ms: item.answered_ms, ended_ms: item.ended_ms,
+    end_reason: item.end_reason, frames: item.frames ?? [] });
+}
+const mergeTimeline = (old: TimelineItem[], fresh: TimelineItem[]) => [...new Map([...old, ...fresh].map((item) => [item.id, item])).values()]
+  .sort((a, b) => (a.kind === 'message' ? a.ts : a.started_ms) - (b.kind === 'message' ? b.ts : b.started_ms) || a.id.localeCompare(b.id));
+
 
 function fmtSize(n: number): string {
   if (n < 1024) return `${n} B`;
@@ -81,6 +94,7 @@ function fmtDuration(answeredMs: number, endedMs: number): string {
 
 /** ✓ sent · ✓✓ delivered · ✓✓ (accent) read — on your own outbound lines. */
 function MsgTick({ status }: { status: MsgStatus }) {
+  if (status === 'pending' || status === 'failed') return <span>{status === 'pending' ? 'Sending…' : 'Failed'}</span>;
   return (
     <span className={`msg-tick${status === 'read' ? ' read' : ''}`} title={status} aria-label={status}>
       {status === 'sent' ? '✓' : '✓✓'}
@@ -367,6 +381,17 @@ export default function Messages() {
   const [items, setItems] = useState<TimelineItem[]>([]);
   const [draft, setDraft] = useState('');
   const [files, setFiles] = useState<File[]>([]);
+  const submissions = useRef(new Map<string, MessageSubmission>());
+  const threadKey = `${viewAs ?? ''}|${selectedId ?? selected ?? ''}`;
+  const currentThread = useRef(threadKey);
+  currentThread.current = threadKey;
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [loadingOlder, setLoadingOlder] = useState(false);
+  const [historyError, setHistoryError] = useState<string | null>(null);
+  const [openRevision, setOpenRevision] = useState(0);
+  const prepending = useRef(false);
+  const submissionItem = (op: MessageSubmission): TimelineMessage => ({ kind: 'message', id: op.id, from: 'you', body: op.body,
+    mine: true, attachments: op.attachments, status: op.status, error: op.error, ts: op.ts });
 
   // ── call state (lifted from the old CallPanel, now session-wide) ──────────
   const [callActive, setCallActive] = useState(false);
@@ -427,7 +452,8 @@ export default function Messages() {
 
   // Stay pinned to the newest line when already at the bottom; otherwise flag
   // that new lines arrived below the fold (drives the "new messages" pill).
-  useEffect(() => {
+  useLayoutEffect(() => {
+    if (prepending.current) { prevLen.current = items.length; return; }
     if (items.length > prevLen.current) {
       if (atBottom) requestAnimationFrame(scrollToBottom);
       else setHasNew(true);
@@ -436,77 +462,46 @@ export default function Messages() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items]);
 
-  // Load persisted history when the open conversation (or identity) changes.
+  // Reopening a thread always fetches fresh receipts; local failed submissions
+  // remain recoverable when navigating away while a send is in flight.
   useEffect(() => {
     peerIdRef.current = null;
-    if (!selected) {
-      setItems([]);
-      return;
-    }
+    setNextCursor(null); setLoadingOlder(false); setHistoryError(null);
+    if (!selected) { setItems([]); return; }
     let live = true;
-    setItems([]);
-    setAtBottom(true);
-    setHasNew(false);
-    api
-      .consoleThread(selectedId ?? selected, { as: viewAs ?? undefined })
-      .then((res) => {
-        if (!live) return;
-        peerIdRef.current = res.peer_id;
-        const timeline: TimelineItem[] = [];
+    const local = [...submissions.current.values()].filter((op) => op.thread === threadKey).map(submissionItem);
+    setItems(local); setAtBottom(true); setHasNew(false);
+    api.consoleThread(selectedId ?? selected, { as: viewAs ?? undefined }).then((res) => {
+      if (!live) return;
+      peerIdRef.current = res.peer_id;
+      const timeline = toTimeline(res.items ?? res.messages.map((m) => ({ ...m, kind: 'message' as const })), selected);
+      for (const item of timeline) seen.current.add(item.id);
+      setItems(mergeTimeline([...submissions.current.values()].filter((op) => op.thread === threadKey).map(submissionItem), timeline)); setNextCursor(res.next_cursor ?? null);
+      requestAnimationFrame(scrollToBottom);
+    }).catch((err) => { if (live) setHistoryError(String(err)); });
+    return () => { live = false; };
+  }, [selected, selectedId, viewAs, openRevision]);
 
-        if (res.items && res.items.length > 0) {
-          for (const item of res.items) {
-            if (item.kind === 'message') {
-              seen.current.add(item.id);
-              timeline.push({
-                kind: 'message',
-                id: item.id,
-                from: selected ?? res.peer_nick,
-                body: item.body ?? '',
-                mine: item.mine,
-                attachments: item.attachments,
-                status: item.mine ? (item.agent_read_at ? 'read' : item.delivered_at ? 'delivered' : 'sent') : undefined,
-                ts: item.ts,
-              });
-            } else if (item.kind === 'call') {
-              seen.current.add(item.call_id);
-              timeline.push({
-                kind: 'call',
-                id: item.call_id,
-                direction: item.direction,
-                state: item.state,
-                started_ms: item.started_ms,
-                answered_ms: item.answered_ms,
-                ended_ms: item.ended_ms,
-                end_reason: item.end_reason,
-                frames: item.frames ?? [],
-              });
-            }
-          }
-        } else {
-          for (const m of res.messages) {
-            seen.current.add(m.id);
-            timeline.push({
-              kind: 'message',
-              id: m.id,
-              from: selected ?? res.peer_nick,
-              body: m.body ?? '',
-              mine: m.mine,
-              attachments: m.attachments,
-              status: m.mine ? (m.agent_read_at ? 'read' : m.delivered_at ? 'delivered' : 'sent') : undefined,
-              ts: m.ts,
-            });
-          }
-        }
-
-        setItems(timeline);
-        requestAnimationFrame(scrollToBottom);
-      })
-      .catch(() => live && setItems([]));
-    return () => {
-      live = false;
-    };
-  }, [selected, selectedId, viewAs]);
+  const loadOlder = async () => {
+    if (!selected || !nextCursor || loadingOlder) return;
+    const key = threadKey;
+    setLoadingOlder(true); setHistoryError(null);
+    const element = threadRef.current;
+    const height = element?.scrollHeight ?? 0;
+    const top = element?.scrollTop ?? 0;
+    try {
+      const res = await api.consoleThread(selectedId ?? selected, { as: viewAs ?? undefined, cursor: nextCursor });
+      if (currentThread.current !== key) return;
+      prepending.current = true;
+      setItems((old) => mergeTimeline(toTimeline(res.items ?? [], selected), old));
+      setNextCursor(res.next_cursor ?? null);
+      requestAnimationFrame(() => {
+        if (element && currentThread.current === key) element.scrollTop = top + element.scrollHeight - height;
+        prepending.current = false;
+      });
+    } catch (err) { if (currentThread.current === key) setHistoryError(String(err)); }
+    finally { if (currentThread.current === key) setLoadingOlder(false); }
+  };
 
   // Live tail (YOUR inbox): drain /console/inbox and append messages from the
   // OPEN peer. Match on the peer's agent_id — the inbox `from` is an id, not an
@@ -545,73 +540,18 @@ export default function Messages() {
     };
   }, [selected, isAgentView]);
 
-  // Live tail (AGENT inbox is read-only — no /console/inbox drains for it): re-poll
-  // the open thread's history and append anything new. Only while browsing an agent.
+  // Refresh metadata as well as new rows for both human and agent inboxes.
   useEffect(() => {
-    if (!isAgentView || !selected) return;
+    if (!selected) return;
     let live = true;
     const tick = async () => {
-      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
+      if (document.visibilityState === 'hidden') return;
       const res = await api.consoleThread(selectedId ?? selected, { as: viewAs ?? undefined }).catch(() => null);
-      if (!live || !res) return;
-      const fresh: TimelineItem[] = [];
-
-      if (res.items && res.items.length > 0) {
-        for (const item of res.items) {
-          if (item.kind === 'message') {
-            if (seen.current.has(item.id)) continue;
-            seen.current.add(item.id);
-            fresh.push({
-              kind: 'message',
-              id: item.id,
-              from: selected ?? res.peer_nick,
-              body: item.body ?? '',
-              mine: item.mine,
-              attachments: item.attachments,
-              status: item.mine ? (item.agent_read_at ? 'read' : item.delivered_at ? 'delivered' : 'sent') : undefined,
-              ts: item.ts,
-            });
-          } else if (item.kind === 'call') {
-            if (seen.current.has(item.call_id)) continue;
-            seen.current.add(item.call_id);
-            fresh.push({
-              kind: 'call',
-              id: item.call_id,
-              direction: item.direction,
-              state: item.state,
-              started_ms: item.started_ms,
-              answered_ms: item.answered_ms,
-              ended_ms: item.ended_ms,
-              end_reason: item.end_reason,
-              frames: item.frames ?? [],
-            });
-          }
-        }
-      } else {
-        for (const m of res.messages) {
-          if (seen.current.has(m.id)) continue;
-          seen.current.add(m.id);
-          fresh.push({
-            kind: 'message',
-            id: m.id,
-            from: selected ?? res.peer_nick,
-            body: m.body ?? '',
-            mine: m.mine,
-            attachments: m.attachments,
-            status: m.mine ? (m.agent_read_at ? 'read' : m.delivered_at ? 'delivered' : 'sent') : undefined,
-            ts: m.ts,
-          });
-        }
-      }
-
-      if (fresh.length) setItems((p) => [...p, ...fresh]);
+      if (live && res) setItems((old) => mergeTimeline(old, toTimeline(res.items ?? res.messages.map((m) => ({ ...m, kind: 'message' as const })), selected)));
     };
-    const t = setInterval(tick, 4000);
-    return () => {
-      live = false;
-      clearInterval(t);
-    };
-  }, [selected, selectedId, isAgentView, viewAs]);
+    const timer = setInterval(tick, 4000);
+    return () => { live = false; clearInterval(timer); };
+  }, [selected, selectedId, viewAs]);
 
   // Call polling — runs whenever the console is open (not agent-view). 1s tick
   // during an active call; 4s when idle so incoming invites surface quickly.
@@ -644,63 +584,24 @@ export default function Messages() {
   // handle can fail to resolve back (a deleted connector or an unexposed peer
   // isn't bound), whereas the id is exactly what the thread was grouped under.
   const openThread = (peer: string, id?: string | null) => {
+    setOpenRevision((v) => v + 1);
     setSelected(peer || null);
     setSelectedId(id ?? null);
     setComposing(false);
   };
 
+  const retrySend = async (op: MessageSubmission) => {
+    await op.send(api, () => {
+      if (currentThread.current === op.thread) setItems((old) => mergeTimeline(old, [submissionItem(op)]));
+    });
+  };
   const send = async () => {
     const body = draft.trim();
-    if ((!body && files.length === 0) || !selected) return;
-    setDraft('');
-    const pending = files;
-    setFiles([]);
-    const staged: Attachment[] = [];
-    for (const f of pending) {
-      try {
-        staged.push(await api.uploadConsoleFile(f, selected));
-      } catch (e) {
-        setItems((p) => [
-          ...p,
-          {
-            kind: 'message',
-            id: uid(),
-            from: 'system',
-            body: `couldn't attach ${f.name}: ${e instanceof Error ? e.message : e}`,
-            mine: false,
-            ts: Date.now(),
-          },
-        ]);
-      }
-    }
-    const msgId = uid();
-    setItems((p) => [
-      ...p,
-      {
-        kind: 'message',
-        id: msgId,
-        from: 'you',
-        body,
-        mine: true,
-        attachments: staged.length ? staged : undefined,
-        status: 'sent',
-        ts: Date.now(),
-      },
-    ]);
-    const res = await api.consoleSms(selected, body, staged.length ? staged : undefined);
-    if (res.error) {
-      setItems((p) => [
-        ...p,
-        {
-          kind: 'message',
-          id: uid(),
-          from: 'system',
-          body: `couldn't send: ${res.error}`,
-          mine: false,
-          ts: Date.now(),
-        },
-      ]);
-    }
+    if ((!body && !files.length) || !selected) return;
+    const op = new MessageSubmission(threadKey, selectedId ?? selected, body, [...files]);
+    submissions.current.set(op.id, op);
+    setDraft(''); setFiles([]);
+    await retrySend(op);
   };
 
   const placeCall = async () => {
@@ -881,6 +782,9 @@ export default function Messages() {
                 )}
               </div>
               <div className="chat-thread" aria-label="Conversation" ref={threadRef} onScroll={onThreadScroll}>
+                {nextCursor && <button type="button" className="btn" disabled={loadingOlder} onClick={() => void loadOlder()}>{loadingOlder ? 'Loading…' : 'Load older messages'}</button>}
+                {historyError && <p role="alert">{historyError}</p>}
+
                 {items.length === 0 && !(callActive && callTarget === selected) ? (
                   <EmptyState
                     icon="message"
@@ -902,6 +806,8 @@ export default function Messages() {
                           <span className="msg-meta">
                             <span className="msg-time">{fmtMsgTime(item.ts)}</span>
                             {item.mine && item.status && <MsgTick status={item.status} />}
+                            {item.error && <span role="alert">{item.error}</span>}
+                            {item.status === 'failed' && submissions.current.has(item.id) && <button type="button" onClick={() => void retrySend(submissions.current.get(item.id)!)}>Retry</button>}
                           </span>
                         </span>
                       </div>

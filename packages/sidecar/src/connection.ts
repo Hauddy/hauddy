@@ -236,6 +236,13 @@ export class HubConnection extends EventEmitter {
         return;
       }
       case "error": {
+        if (frame.ref) {
+          const pending = this.pendingReceipts.get(frame.ref);
+          if (pending) {
+            clearTimeout(pending.timer); this.pendingReceipts.delete(frame.ref);
+            pending.reject(Object.assign(new Error(`${frame.code}: ${frame.message}`), { permanent: ['E_NOT_LINKED', 'E_UNKNOWN_AGENT', 'E_IDENTITY_MISMATCH', 'E_UNSUPPORTED'].includes(frame.code) }));
+          }
+        }
         this.emit("protocol_error", frame);
         return;
       }
@@ -300,19 +307,14 @@ export class HubConnection extends EventEmitter {
    * it, `to` kept as the target reference (a global `@nickname` the platform
    * resolves). Carries both plain SMS bodies and `payload.call` frames.
    */
-  relay(to: string, payload: Record<string, unknown>): void {
-    if (!this.ready || !this.ws) return;
-    const envelope: Envelope = {
-      v: PROTOCOL_VERSION,
-      id: mintMessageId(),
-      type: "sms",
-      from: this.opts.agentId,
-      to,
-      ts: nowIso(),
-      payload,
-      sig: null,
-    };
-    this.sendRaw({ type: "send", envelope });
+  relay(to: string, payload: Record<string, unknown>, id = mintMessageId(), ts = nowIso()): Promise<SmsReceipt> {
+    if (!this.ready || !this.ws) return Promise.reject(new Error('bridge disconnected'));
+    const envelope: Envelope = { v: PROTOCOL_VERSION, id, type: 'sms', from: this.opts.agentId, to, ts, payload, sig: null };
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => { this.pendingReceipts.delete(id); reject(new Error('upstream receipt timeout')); }, 15_000);
+      this.pendingReceipts.set(id, { resolve, reject, timer });
+      this.sendRaw({ type: 'send', envelope });
+    });
   }
 
   /** Send a call frame — rides on an sms envelope, distinguished by payload.call.

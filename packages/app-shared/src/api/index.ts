@@ -336,6 +336,8 @@ export interface ThreadSummary {
   unread: number;
 }
 export interface ThreadMessage {
+  outbound_state?: 'pending' | 'sent' | 'failed';
+  delivery_error?: string;
   id: string;
   from_agent: string;
   mine: boolean;
@@ -771,8 +773,8 @@ export const api = {
   },
 
   // ---- human console (message/call agents as the person, spec §"human") ----
-  consoleSms(to: string, body: string, attachments?: Attachment[]): Promise<{ status?: string; error?: string }> {
-    return post('/console/sms', { to, body, ...(attachments && attachments.length ? { attachments } : {}) });
+  consoleSms(to: string, body: string, attachments?: Attachment[], messageId?: string): Promise<{ status?: string; error?: string }> {
+    return post('/console/sms', { to, body, message_id: messageId, ...(attachments && attachments.length ? { attachments } : {}) });
   },
   consoleInbox(): Promise<{ messages: ConsoleMessage[] }> {
     return get<{ messages: ConsoleMessage[] }>('/console/inbox');
@@ -790,7 +792,9 @@ export const api = {
     const res = await fetch(`${BASE}/files?${qs.toString()}`, { method: 'POST', headers: authHeaders(), body: file });
     if (res.status === 401) clearKey();
     if (!res.ok) throw new Error(((await res.json().catch(() => ({}))) as { error?: string })?.error ?? `upload HTTP ${res.status}`);
-    return (await res.json()) as Attachment;
+    const uploaded = await res.json() as { file_id?: unknown; size?: unknown };
+    if (typeof uploaded.file_id !== 'string' || typeof uploaded.size !== 'number' || uploaded.size !== file.size) throw new Error('Invalid attachment response');
+    return { file_id: uploaded.file_id, size: uploaded.size, name: file.name, mime: file.type || 'application/octet-stream' };
   },
   /** Fetch a received attachment (Bearer) and save it — a plain <a download> can't
    *  carry the auth header, so we pull the blob and trigger the download. */
@@ -830,10 +834,11 @@ export const api = {
   },
   consoleThread(
     peer: string,
-    opts?: { before?: number; limit?: number; as?: string | null },
-  ): Promise<{ peer_id: string; peer_nick: string; messages: ThreadMessage[]; items?: ThreadItem[] }> {
+    opts?: { before?: number; limit?: number; as?: string | null; cursor?: string },
+  ): Promise<{ peer_id: string; peer_nick: string; messages: ThreadMessage[]; items?: ThreadItem[]; next_cursor?: string | null }> {
     const qs = new URLSearchParams();
     if (opts?.before) qs.set('before', String(opts.before));
+    if (opts?.cursor) qs.set('cursor', opts.cursor);
     if (opts?.limit) qs.set('limit', String(opts.limit));
     if (opts?.as) qs.set('as', opts.as);
     const q = qs.toString();

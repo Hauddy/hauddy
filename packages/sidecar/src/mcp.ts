@@ -7,7 +7,7 @@ import { z } from "zod";
 import { hauddyHome } from "./account.js";
 import type { ActivityLog } from "./activity.js";
 import type { HubConnection } from "./connection.js";
-import { downloadFile, getCallTranscript, getConversation, getPresence, listAgents, listContacts, setNickname, updateProfile, uploadFile } from "./hub-api.js";
+import { downloadFile, getCallTranscript, getConversation, getPresence, listAgents, listContacts, markAgentRead, setNickname, updateProfile, uploadFile } from "./hub-api.js";
 import { CallValidation, callSetupGuide, wakeChannelFor } from "./wake.js";
 
 /** Minimal extension→MIME guess for outbound attachments (best-effort; the hub
@@ -90,6 +90,10 @@ export function createMcpServer(provision: Provision, validation: CallValidation
     // (spec § Waking sessions). Harmless to harnesses that ignore it.
     { capabilities: { experimental: { "claude/channel": {} } } },
   );
+
+  // Retain failed markers for the next poll, including a poll with no new SMS.
+  // Key by endpoint + identity because provision() can change between calls.
+  const pendingReads = new Map<string, Set<string>>();
 
   const me = async (p: Provisioned) => (await listAgents(p.endpoint).catch(() => ({ agents: [] }))).agents.find((a) => a.agent_id === p.agentId) ?? null;
 
@@ -350,12 +354,21 @@ export function createMcpServer(provision: Provision, validation: CallValidation
       // Notify the local hub that the agent read these messages so agent_read_at
       // is stamped (for the sender's read receipt tick).
       const inboundIds = messages.filter((m) => m.to === p.agentId && m.type === "sms").map((m) => m.id);
-      if (inboundIds.length) {
-        fetch(`${p.endpoint}/console/sms/agent-read`, {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ message_ids: inboundIds }),
-        }).catch(() => {});
+      const readKey = `${p.endpoint}\n${p.agentId}`;
+      const pending = pendingReads.get(readKey) ?? new Set<string>();
+      for (const id of inboundIds) pending.add(id);
+      let readReceiptError: string | undefined;
+      if (pending.size) {
+        pendingReads.set(readKey, pending);
+        const batch = [...pending];
+        try {
+          await markAgentRead(p.endpoint, batch);
+          for (const id of batch) pending.delete(id);
+          if (!pending.size) pendingReads.delete(readKey);
+        } catch (err) {
+          readReceiptError = `Read receipts pending; check_messages will retry: ${err instanceof Error ? err.message : String(err)}`;
+          p.activity?.push("error", readReceiptError);
+        }
       }
       // HTTP-MCP ring polling fallback: if a call arrived but the out-of-band
       // notification didn't wake the session (no persistent SSE GET stream), surface
@@ -364,6 +377,7 @@ export function createMcpServer(provision: Provision, validation: CallValidation
       const invite = p.connection.pendingInvite();
       return asText({
         messages,
+        ...(readReceiptError ? { read_receipt_error: readReceiptError } : {}),
         ...(invite
           ? {
               pending_call: {

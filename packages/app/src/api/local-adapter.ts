@@ -39,6 +39,17 @@ const asQuery = (as?: string | null): string => (as ? `?as=${encodeURIComponent(
  *  poll frames carry a `hub` tag → remember it per call so pickup can route. */
 const inviteHubs = new Map<string, 'local' | 'platform'>();
 
+let cachedNetwork: Awaited<ReturnType<typeof httpApi.listNetworkAgents>> = [];
+let networkRefresh: Promise<unknown> | null = null;
+let cachedFriends: FriendsView = { auto_accept: false, linked: [], incoming: [], outgoing: [] };
+let friendsRefresh: Promise<unknown> | null = null;
+async function accountAction<T>(action: string, body?: unknown): Promise<T> {
+  const res = await fetch(`${BASE}/api/account/${action}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body ?? {}) });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error ?? `account HTTP ${res.status}`);
+  return data;
+}
+
 const localApi: Partial<Api> = {
   // ---- directory / presence ----
   // The account's agents for the shared Messages screen: local-hub agents PLUS
@@ -48,10 +59,9 @@ const localApi: Partial<Api> = {
   // agent_id, so `consoleThreads(as=<connectorId>)` resolves. Web's own listAgents
   // already includes connectors; this brings the desktop to parity.
   async listAgents(): Promise<Agent[]> {
-    const [agents, network] = await Promise.all([
-      httpApi.listAgents(),
-      httpApi.listNetworkAgents().catch(() => []),
-    ]);
+    const agents = await httpApi.listAgents();
+    if (!networkRefresh) networkRefresh = httpApi.listNetworkAgents().then((r) => { cachedNetwork = r; }).catch(() => {}).finally(() => { networkRefresh = null; });
+    const network = cachedNetwork;
     const local: Agent[] = agents.map((a) => ({
       id: a.agentId,
       nickname: a.nicknames[0] ?? '',
@@ -98,10 +108,11 @@ const localApi: Partial<Api> = {
 
   // ---- dashboard (assembled locally — daemon for threads/notifications, platform for the rest) ----
   async consoleDashboard(opts?: { as?: string | null }): Promise<DashboardResult> {
+    if (!friendsRefresh) friendsRefresh = httpApi.listFriends().then((r) => { if (r) cachedFriends = r; }).catch(() => {}).finally(() => { friendsRefresh = null; });
     const [threadsRes, notifications, friends, agents, platform_agents] = await Promise.all([
       daemonGet<{ threads: ThreadSummary[] }>(`/api/human/threads${asQuery(opts?.as)}`),
       daemonGet<Notifications>('/api/human/notifications'),
-      httpApi.listFriends().then((r): FriendsView => r ?? { auto_accept: false, linked: [], incoming: [], outgoing: [], linked_agents: [] }).catch((): FriendsView => ({ auto_accept: false, linked: [], incoming: [], outgoing: [], linked_agents: [] })),
+      Promise.resolve(cachedFriends),
       localApi.listAgents!(),
       localApi.listPlatformAgents!(),
     ]);
@@ -114,10 +125,11 @@ const localApi: Partial<Api> = {
   },
   consoleThread(
     peer: string,
-    opts?: { before?: number; limit?: number; as?: string | null },
-  ): Promise<{ peer_id: string; peer_nick: string; messages: ThreadMessage[]; items?: ThreadItem[] }> {
+    opts?: { before?: number; limit?: number; as?: string | null; cursor?: string },
+  ): Promise<{ peer_id: string; peer_nick: string; messages: ThreadMessage[]; items?: ThreadItem[]; next_cursor?: string | null }> {
     const qs = new URLSearchParams();
     if (opts?.before) qs.set('before', String(opts.before));
+    if (opts?.cursor) qs.set('cursor', opts.cursor);
     if (opts?.limit) qs.set('limit', String(opts.limit));
     if (opts?.as) qs.set('as', opts.as);
     const q = qs.toString();
@@ -145,11 +157,40 @@ const localApi: Partial<Api> = {
   consoleInbox(): Promise<{ messages: ConsoleMessage[] }> {
     return daemonGet<{ messages: ConsoleMessage[] }>('/api/human/inbox');
   },
-  consoleSms(to: string, body: string, attachments?: Attachment[]) {
-    return httpApi.humanSms(to, body, attachments);
+  consoleSms(to: string, body: string, attachments?: Attachment[], messageId?: string) {
+    return httpApi.humanSms(to, body, attachments, messageId);
+  },
+
+  // ---- account settings: credentials remain in the daemon ----
+  async getSession() {
+    const a = await daemonGet<{ email: string; username?: string }>('/api/account/settings');
+    return { email: a.email, name: a.username ?? a.email.split('@')[0] };
+  },
+  async getIdentity() {
+    const a = await daemonGet<{ human?: { nickname?: string; description?: string } }>('/api/account/settings');
+    return { handle: a.human?.nickname ?? null, bio: a.human?.description ?? '' };
+  },
+  async updateProfile(patch) {
+    try { return await accountAction('profile', patch); }
+    catch (err) { return { ok: false, error: err instanceof Error ? err.message : String(err) }; }
+  },
+  async changePassword(current, next) {
+    try { return await accountAction('password', { current, next }); }
+    catch (err) { return { ok: false, error: err instanceof Error ? err.message : String(err) }; }
+  },
+  setAutoAccept: (on) => accountAction('autoAccept', { auto_accept: on }),
+  async deleteAccount() {
+    const result = await accountAction<{ ok: boolean }>('delete');
+    cachedNetwork = []; cachedFriends = { auto_accept: false, linked: [], incoming: [], outgoing: [] };
+    return result;
   },
 
   // ---- files ----
+  async getConsoleFileUrl(fileId: string): Promise<string> {
+    const res = await fetch(httpApi.humanFileUrl(fileId));
+    if (!res.ok) throw new Error(`file HTTP ${res.status}`);
+    return URL.createObjectURL(await res.blob());
+  },
   uploadConsoleFile(file: File, to: string): Promise<Attachment> {
     return httpApi.uploadHumanFile(file, to);
   },

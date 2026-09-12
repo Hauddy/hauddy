@@ -349,47 +349,26 @@ export class Daemon {
   }
 
   /** An exposed agent wants to reach a remote `@nickname` — relay it upstream. */
-  private forwardRemote(fromAgentId: string, envelope: Envelope): void {
+  private async forwardRemote(fromAgentId: string, envelope: Envelope): Promise<{ status: string }> {
     const conn = this.bridge?.connectionFor(fromAgentId);
-    if (!conn) {
-      this.activity.push("relay.drop", `${fromAgentId} not bridged (expose it to reach the network)`);
-      return;
-    }
-    // Attachments are async (re-host the bytes on the platform first), so the
-    // relay itself is fire-and-forget — the sender already got its "queued".
-    void this.relayWithFiles(conn, fromAgentId, envelope);
-  }
-
-  /** Relay a remote-bound envelope. Any attachment bytes live in *this* machine's
-   *  local file store; the recipient's machine can't reach that, so we re-upload
-   *  each to the platform store and rewrite the file ids before relaying. */
-  private async relayWithFiles(conn: HubConnection, fromAgentId: string, envelope: Envelope): Promise<void> {
+    if (!conn?.isReady()) throw new Error('bridge unavailable; queued for reconnect');
     let payload = envelope.payload as Record<string, unknown>;
     const atts = payload.attachments as Attachment[] | undefined;
-    if (Array.isArray(atts) && atts.length > 0 && this.hubHandle) {
+    if (atts?.length) {
       const cfg = loadAccount();
-      if (cfg?.api_key) {
-        const moved: Attachment[] = [];
-        for (const a of atts) {
-          const local = this.hubHandle.files.get(a.file_id);
-          if (!local) continue; // expired/gone — drop this one, keep the message
-          try {
-            const up = await hub.uploadFile(
-              cfg.endpoint,
-              local.bytes,
-              { name: a.name, mime: a.mime || local.meta.mime || "application/octet-stream", owner: fromAgentId, to: envelope.to },
-              cfg.api_key,
-            );
-            moved.push({ ...a, file_id: up.file_id });
-          } catch (err) {
-            this.activity.push("relay.file.err", `${a.name}: ${err instanceof Error ? err.message : String(err)}`);
-          }
-        }
-        payload = { ...payload, attachments: moved };
+      if (!cfg?.api_key || !this.hubHandle) throw new Error('account unavailable');
+      const moved: Attachment[] = [];
+      for (const a of atts) {
+        const local = this.hubHandle.files.get(a.file_id);
+        if (!local) throw Object.assign(new Error(`attachment ${a.name} expired or missing`), { permanent: true });
+        const up = await hub.uploadFile(cfg.endpoint, local.bytes, { name: a.name, mime: a.mime || local.meta.mime, owner: fromAgentId, to: envelope.to }, cfg.api_key);
+        moved.push({ ...a, file_id: up.file_id });
       }
+      payload = { ...payload, attachments: moved };
     }
-    conn.relay(envelope.to, payload);
-    this.activity.push("relay.out", `${fromAgentId} → ${envelope.to}${atts?.length ? ` (+${atts.length} file)` : ""}`);
+    const receipt = await conn.relay(envelope.to, payload, envelope.id, envelope.ts);
+    this.activity.push('relay.out', `${fromAgentId} → ${envelope.to}`);
+    return receipt;
   }
 
   /** A platform envelope arrived for a local agent — inject it into the local
@@ -858,8 +837,33 @@ export class Daemon {
   /** Drop the local platform link (the account stays on the platform). */
   async disconnectPlatform(): Promise<void> {
     clearAccount();
+    this.cachedFriendRequests = 0;
     this.activity.push("platform.disconnect", "");
     await this.refreshBridges();
+  }
+
+  /** Fixed allowlist: renderer never receives the master key or selects a URL. */
+  async accountSettings(action: string, body?: unknown): Promise<unknown> {
+    const cfg = loadAccount();
+    if (!cfg?.api_key) throw new Error('Connect your account in Platform settings first');
+    const routes: Record<string, [string, string]> = {
+      get: ['GET', '/accounts/me'], profile: ['POST', '/accounts/profile'],
+      password: ['POST', '/accounts/password'], autoAccept: ['POST', '/accounts/settings'],
+      delete: ['DELETE', '/accounts/me'],
+    };
+    const route = routes[action];
+    if (!route) throw new Error('unknown account action');
+    const response = await fetch(cfg.endpoint.replace(/^ws/, 'http') + route[1], {
+      method: route[0], signal: AbortSignal.timeout(10_000),
+      headers: { authorization: `Bearer ${cfg.api_key}`, 'content-type': 'application/json' },
+      ...(route[0] === 'POST' ? { body: JSON.stringify(body ?? {}) } : {}),
+    });
+    const result = await response.json() as Record<string, unknown>;
+    if (!response.ok) throw new Error(String(result.error ?? `account HTTP ${response.status}`));
+    if (action === 'delete') await this.disconnectPlatform();
+    if (action === 'profile') return { ok: true };
+    if (action === 'get') return { email: result.email, username: result.username, human: result.human };
+    return result;
   }
 
   async rotatePlatformKey(): Promise<PlatformActionResult> {
@@ -1074,10 +1078,15 @@ export class Daemon {
   // ---- friends (profile↔profile links on the platform) -------------------
 
   /** This account's friendships (linked + pending), or null if not connected. */
+  private cachedFriendRequests = 0;
+  private pendingFriends: Promise<hub.FriendsView | null> | null = null;
   async listFriends(): Promise<hub.FriendsView | null> {
     const cfg = loadAccount();
     if (!cfg?.api_key) return null;
-    return hub.listFriends(cfg.endpoint, cfg.api_key).catch(() => null);
+    if (!this.pendingFriends) this.pendingFriends = hub.listFriends(cfg.endpoint, cfg.api_key)
+      .then((r) => { this.cachedFriendRequests = r.incoming.length; return r; })
+      .catch(() => null).finally(() => { this.pendingFriends = null; });
+    return this.pendingFriends;
   }
 
   /** Send a connect request to a `@handle`'s profile (may auto-link on their end). */
@@ -1144,6 +1153,7 @@ export class Daemon {
     const base = cfg.endpoint.replace(/^ws/, "http");
     const res = await fetch(`${base}/console${suffix}`, {
       method,
+      signal: AbortSignal.timeout(2000),
       headers: { authorization: `Bearer ${cfg.api_key}`, ...(body !== undefined ? { "content-type": "application/json" } : {}) },
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
@@ -1167,8 +1177,8 @@ export class Daemon {
     return { nickname: (local?.nickname as string) ?? "@you", network: !!loadAccount()?.api_key };
   }
 
-  async humanSms(to: string, body: string, attachments?: Attachment[]): Promise<Record<string, unknown>> {
-    const payload = { to, body, ...(attachments && attachments.length ? { attachments } : {}) };
+  async humanSms(to: string, body: string, attachments?: Attachment[], messageId?: string): Promise<Record<string, unknown>> {
+    const payload = { to, body, message_id: messageId, ...(attachments && attachments.length ? { attachments } : {}) };
     const res = this.targetIsRemote(to)
       ? await this.platformConsole("POST", "/sms", payload)
       : await this.localConsole("POST", "/sms", payload);
@@ -1273,10 +1283,12 @@ export class Daemon {
     return this.localConsole("GET", `/threads${q}`).catch(() => ({ threads: [] }));
   }
 
-  async humanThread(peer: string, opts?: { viewAs?: string | null; before?: number }): Promise<Record<string, unknown>> {
+  async humanThread(peer: string, opts?: { viewAs?: string | null; before?: number; cursor?: string | null; limit?: number }): Promise<Record<string, unknown>> {
     const params = new URLSearchParams();
     if (opts?.viewAs) params.set("view_as", opts.viewAs);
     if (opts?.before != null) params.set("before", String(opts.before));
+    if (opts?.cursor) params.set('cursor', opts.cursor);
+    if (opts?.limit) params.set('limit', String(opts.limit));
     const q = params.toString();
     return this.localConsole("GET", `/thread/${encodeURIComponent(peer)}${q ? `?${q}` : ""}`).catch(() => ({
       peer_id: peer,
@@ -1300,12 +1312,8 @@ export class Daemon {
       unread_messages?: number;
       missed_calls?: number;
     };
-    let friend_requests = 0;
-    try {
-      friend_requests = (await this.listFriends())?.incoming.length ?? 0;
-    } catch {
-      /* platform down → 0 */
-    }
+    const friend_requests = this.cachedFriendRequests;
+    void this.listFriends();
     return {
       friend_requests,
       unread_messages: local.unread_messages ?? 0,

@@ -177,6 +177,13 @@ CREATE TABLE IF NOT EXISTS attachments (
 );
 CREATE INDEX IF NOT EXISTS idx_attach_expires ON attachments(expires_ms);
 
+-- Durable external cleanup after account deletion. No foreign key: jobs must
+-- survive deletion of their account until R2 and DO session cleanup succeeds.
+CREATE TABLE IF NOT EXISTS account_cleanup (
+  account_id TEXT PRIMARY KEY,
+  data TEXT NOT NULL
+);
+
 -- ── INVITES: the email allowlist as a table (replaces allowlist.txt) ───
 CREATE TABLE IF NOT EXISTS invites (
   email      TEXT PRIMARY KEY,
@@ -241,4 +248,31 @@ CREATE TABLE IF NOT EXISTS oauth_clients (
   connector_agent_id  TEXT REFERENCES agents(agent_id) ON DELETE CASCADE,
   created_at          TEXT NOT NULL
 );
+
+-- Latest revision per record. Replacement allocates a monotonic sequence even
+-- for imported rows whose event timestamp predates the last sync.
+CREATE TABLE IF NOT EXISTS sync_changes (
+ seq INTEGER PRIMARY KEY AUTOINCREMENT,
+ source TEXT NOT NULL,
+ kind TEXT NOT NULL,
+ record_id TEXT NOT NULL,
+ UNIQUE(source, kind, record_id)
+);
+CREATE TRIGGER IF NOT EXISTS sync_messages_insert AFTER INSERT ON messages
+ BEGIN DELETE FROM sync_changes WHERE source = '' AND kind = 'message' AND record_id = NEW.message_id; INSERT INTO sync_changes(source, kind, record_id) VALUES ('', 'message', NEW.message_id); END;
+CREATE TRIGGER IF NOT EXISTS sync_messages_update AFTER UPDATE ON messages
+ BEGIN DELETE FROM sync_changes WHERE source = '' AND kind = 'message' AND record_id = NEW.message_id; INSERT INTO sync_changes(source, kind, record_id) VALUES ('', 'message', NEW.message_id); END;
+INSERT OR IGNORE INTO sync_changes(source, kind, record_id) SELECT '', 'message', message_id FROM messages;
+CREATE TRIGGER IF NOT EXISTS sync_calls_insert AFTER INSERT ON calls
+ BEGIN DELETE FROM sync_changes WHERE source = '' AND kind = 'call' AND record_id = NEW.call_id; INSERT INTO sync_changes(source, kind, record_id) VALUES ('', 'call', NEW.call_id); END;
+CREATE TRIGGER IF NOT EXISTS sync_calls_update AFTER UPDATE ON calls
+ BEGIN DELETE FROM sync_changes WHERE source = '' AND kind = 'call' AND record_id = NEW.call_id; INSERT INTO sync_changes(source, kind, record_id) VALUES ('', 'call', NEW.call_id); END;
+INSERT OR IGNORE INTO sync_changes(source, kind, record_id) SELECT '', 'call', call_id FROM calls;
+CREATE TRIGGER IF NOT EXISTS sync_sync_history_insert AFTER INSERT ON sync_history
+ BEGIN DELETE FROM sync_changes WHERE source = NEW.account_id AND kind = NEW.kind AND record_id = NEW.record_id; INSERT INTO sync_changes(source, kind, record_id) VALUES (NEW.account_id, NEW.kind, NEW.record_id); END;
+CREATE TRIGGER IF NOT EXISTS sync_sync_history_update AFTER UPDATE ON sync_history
+ BEGIN DELETE FROM sync_changes WHERE source = NEW.account_id AND kind = NEW.kind AND record_id = NEW.record_id; INSERT INTO sync_changes(source, kind, record_id) VALUES (NEW.account_id, NEW.kind, NEW.record_id); END;
+INSERT OR IGNORE INTO sync_changes(source, kind, record_id) SELECT account_id, kind, record_id FROM sync_history;
+CREATE TRIGGER IF NOT EXISTS sync_frame_insert AFTER INSERT ON call_frames
+ BEGIN DELETE FROM sync_changes WHERE source = '' AND kind = 'call' AND record_id = NEW.call_id; INSERT INTO sync_changes(source, kind, record_id) VALUES ('', 'call', NEW.call_id); END;
 `;
