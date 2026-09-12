@@ -202,8 +202,7 @@ jobs:
       - name: Deploy web dashboard
         working-directory: packages/web
         run: |
-          npx wrangler pages project create hauddy-web --production-branch main 2>/dev/null || true
-          npx wrangler pages deploy dist --branch main
+          npx wrangler pages deploy dist --project-name hauddy-app --branch main
 
       # Build and deploy the landing site (hauddy.com)
       - name: Build landing site

@@ -32,7 +32,7 @@ jobs:
         run: npm run build -w @hauddy/landing
       - name: Deploy web dashboard
         working-directory: packages/web
-        run: npx wrangler pages deploy dist --branch main
+        run: npx wrangler pages deploy dist --project-name hauddy-app --branch main
       - name: Deploy landing site
         working-directory: packages/landing
         run: npx wrangler pages deploy dist --branch main
