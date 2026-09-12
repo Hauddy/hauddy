@@ -1,0 +1,38 @@
+name: Deploy Sites
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-sites
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy production websites
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Build web dashboard
+        run: npm run build -w @hauddy/web
+      - name: Build landing site
+        run: npm run build -w @hauddy/landing
+      - name: Deploy web dashboard
+        working-directory: packages/web
+        run: npx wrangler pages deploy dist --branch main
+      - name: Deploy landing site
+        working-directory: packages/landing
+        run: npx wrangler pages deploy dist --branch main

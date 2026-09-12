@@ -203,7 +203,7 @@ jobs:
         working-directory: packages/web
         run: |
           npx wrangler pages project create hauddy-web --production-branch main 2>/dev/null || true
-          npx wrangler pages deploy dist
+          npx wrangler pages deploy dist --branch main
 
       # Build and deploy the landing site (hauddy.com)
       - name: Build landing site
@@ -213,7 +213,7 @@ jobs:
         working-directory: packages/landing
         run: |
           npx wrangler pages project create hauddy-landing --production-branch main 2>/dev/null || true
-          npx wrangler pages deploy dist
+          npx wrangler pages deploy dist --branch main
 
       # Create GitHub Release
       - name: Create GitHub Release
