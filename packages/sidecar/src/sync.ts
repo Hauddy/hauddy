@@ -46,8 +46,8 @@ const toAttArray = (v: unknown): import("@hauddy/protocol").Attachment[] | null 
  *    identity (the human, or an exposed agent) — the OR rule. The mapped party
  *    becomes its platform id; an unexposed local peer is kept verbatim as a
  *    read-only "external" peer (visible in the owner's web inbox, not routable).
- *    Persist-only on the platform, INSERT OR IGNORE by id — so a locally-edited
- *    (tampered) row can never overwrite the SSOT copy.
+ *    Stored privately for this account, INSERT OR IGNORE by id. Imports never
+ *    write live routing records or become visible in another account's history.
  *  - PULL DOWN account-scoped history from the platform into the local store, so
  *    the local hub is self-sufficient (offline-capable) and agents can later read
  *    the full conversation context.
@@ -217,7 +217,8 @@ export class SyncEngine {
   }
 
   private async pushAgentReads(ctx: SyncContext): Promise<void> {
-    const ids = this.history.agentReadSince(this.cursors.agentReadMs);
+    const recipients = new Set([...ctx.localToPlatform.keys(), ...ctx.localToPlatform.values()]);
+    const ids = this.history.agentReadSince(this.cursors.agentReadMs, recipients);
     if (!ids.length) return;
     const res = await this.post(ctx, "/messages/agent-read", { message_ids: ids });
     if (res.ok) {

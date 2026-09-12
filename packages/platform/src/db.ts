@@ -10,6 +10,7 @@ import {
 } from "@hauddy/protocol";
 import { hashPassword, randomHex, verifyPassword } from "./crypto.js";
 import { SCHEMA } from "./schema.js";
+import { parseCalls, parseMessages } from "./sync-validation.js";
 
 // ── row shapes (raw SQLite → typed) ───────────────────────────────────────
 export interface AccountRow {
@@ -118,6 +119,12 @@ export interface SyncMessage {
   agent_read_at: string | null;
   account_scope: string | null;
 }
+
+export interface SyncCall extends CallRow {
+  frames?: Array<{ frame_id: string; from_agent: string; body: string | null; attachments: unknown; created_ms: number }>;
+}
+
+export class AuthorizationError extends Error {}
 
 export type NicknameOutcome =
   | { ok: true; nickname: string }
@@ -648,7 +655,9 @@ export class Db {
   }
 
   // ── agents ──────────────────────────────────────────────────────────────
-  /** Idempotent by grant_scope_id: re-registering updates the existing record. */
+  /** Only the existing owner may re-register, with the enrolled key unchanged.
+   *  Unowned identities cannot be claimed through this endpoint: linking them
+   *  would require a separate proof-of-possession flow. */
   registerAgent(input: {
     account_id?: string | null;
     grant_scope_id: string;
@@ -663,9 +672,11 @@ export class Db {
       input.grant_scope_id,
     );
     if (existing) {
+      if (!input.account_id || existing.account_id !== input.account_id || existing.public_key !== input.public_key) {
+        throw new AuthorizationError("registration does not match the enrolled owner and key");
+      }
       const sets: string[] = [];
       const binds: Bind[] = [];
-      if (input.account_id !== undefined) (sets.push("account_id = ?"), binds.push(input.account_id));
       if (input.local_id !== undefined) (sets.push("local_id = ?"), binds.push(input.local_id));
       if (input.display_name !== undefined) (sets.push("display_name = ?"), binds.push(input.display_name));
       if (input.description !== undefined) (sets.push("description = ?"), binds.push(input.description));
@@ -1283,11 +1294,21 @@ export class Db {
     );
   }
 
-  callFrames(callId: string): Array<{ seq: number; from_agent: string; body: string | null; attachments: unknown; created_ms: number }> {
+  callFrames(callId: string, mirrorAccountId: string | null = null): Array<{ seq: number; from_agent: string; body: string | null; attachments: unknown; created_ms: number }> {
+    return this.historyCallFrames(callId, mirrorAccountId);
+  }
+
+  private historyCallFrames(callId: string, mirrorAccountId: string | null) {
+    if (!this.getCall(callId)) {
+      const row = this.first<{ data: string }>("SELECT data FROM sync_history WHERE account_id = ? AND kind = 'call' AND record_id = ?", mirrorAccountId, callId);
+      const c = row ? JSON.parse(row.data) as SyncCall : null;
+      return (c?.frames ?? []).map((f, seq) => ({ ...f, seq }));
+    }
     return this.rows<Record<string, Bind>>(
-      "SELECT seq, from_agent, body, attachments, created_ms FROM call_frames WHERE call_id = ? ORDER BY seq",
+      "SELECT frame_id, seq, from_agent, body, attachments, created_ms FROM call_frames WHERE call_id = ? ORDER BY seq",
       callId,
     ).map((r) => ({
+      frame_id: String(r.frame_id),
       seq: Number(r.seq),
       from_agent: String(r.from_agent),
       body: r.body == null ? null : String(r.body),
@@ -1334,7 +1355,8 @@ export class Db {
   threadsFor(humanId: string): ThreadSummary[] {
     const rows = this.rows<Record<string, Bind>>(
       `SELECT from_agent, to_agent, from_nick, to_nick, body, attachments, created_ms, read_at
-         FROM messages WHERE from_agent = ? OR to_agent = ? ORDER BY created_ms DESC`,
+         FROM ${this.historySource("message")} WHERE from_agent = ? OR to_agent = ? ORDER BY created_ms DESC`,
+      this.getAgent(humanId)?.account_id ?? null,
       humanId,
       humanId,
     );
@@ -1367,7 +1389,8 @@ export class Db {
     // Merge latest call per peer
     const callRows = this.rows<Record<string, Bind>>(
       `SELECT caller, callee, caller_nick, callee_nick, state, started_ms, answered_ms, ended_ms
-         FROM calls WHERE caller = ? OR callee = ? ORDER BY started_ms DESC`,
+         FROM ${this.historySource("call")} WHERE caller = ? OR callee = ? ORDER BY started_ms DESC`,
+      this.getAgent(humanId)?.account_id ?? null,
       humanId,
       humanId,
     );
@@ -1413,10 +1436,11 @@ export class Db {
     const hasBefore = beforeMs != null;
     const rows = this.rows<Record<string, Bind>>(
       `SELECT message_id, from_agent, to_agent, body, attachments, created_ms, created_at, delivered_at, read_at, agent_read_at
-         FROM messages
+         FROM ${this.historySource("message")}
         WHERE ((from_agent = ? AND to_agent = ?) OR (from_agent = ? AND to_agent = ?))
           ${hasBefore ? "AND created_ms < ?" : ""}
         ORDER BY created_ms DESC LIMIT ?`,
+      this.getAgent(humanId)?.account_id ?? null,
       ...(hasBefore
         ? [humanId, peerId, peerId, humanId, beforeMs as number, limit]
         : [humanId, peerId, peerId, humanId, limit]),
@@ -1445,25 +1469,43 @@ export class Db {
       humanId,
       peerId,
     );
+    this.sql.exec(`UPDATE sync_history SET data = json_set(data, '$.read_at', ?)
+      WHERE account_id = ? AND kind = 'message' AND json_extract(data, '$.to_agent') = ?
+        AND json_extract(data, '$.from_agent') = ? AND json_extract(data, '$.read_at') IS NULL`,
+      nowIso(), this.getAgent(humanId)?.account_id ?? null, humanId, peerId);
   }
 
-  /** Mark specific messages as agent-read (agent called check_messages). */
-  markAgentRead(messageIds: string[]): void {
-    if (!messageIds.length) return;
-    const now = nowIso();
-    for (const id of messageIds) {
-      this.sql.exec(
-        "UPDATE messages SET agent_read_at = ? WHERE message_id = ? AND agent_read_at IS NULL",
-        now,
-        id,
-      );
+  /** Stamp only owned recipients. Unknown IDs are harmless no-ops (a local
+   *  receipt can arrive before its history import); reject foreign IDs as a batch. */
+  markAgentRead(messageIds: string[], recipientIds: string[], mirrorAccountId: string | null = null): number {
+    const recipients = new Set(recipientIds);
+    const records = [...new Set(messageIds)].map((id) => ({
+      id,
+      live: this.first<{ to_agent: string }>("SELECT to_agent FROM messages WHERE message_id = ?", id),
+      mirror: this.first<{ to_agent: string }>(
+        "SELECT json_extract(data, '$.to_agent') AS to_agent FROM sync_history WHERE account_id = ? AND kind = 'message' AND record_id = ?",
+        mirrorAccountId, id),
+    }));
+    for (const r of records) {
+      if ((r.live && !recipients.has(r.live.to_agent)) || (r.mirror && !recipients.has(r.mirror.to_agent))) {
+        throw new AuthorizationError("read receipts require ownership of the recipient");
+      }
     }
+    const now = nowIso();
+    for (const r of records) {
+      if (r.live) this.sql.exec("UPDATE messages SET agent_read_at = ? WHERE message_id = ? AND agent_read_at IS NULL", now, r.id);
+      if (r.mirror) this.sql.exec(`UPDATE sync_history SET data = json_set(data, '$.agent_read_at', ?)
+        WHERE account_id = ? AND kind = 'message' AND record_id = ? AND json_extract(data, '$.agent_read_at') IS NULL`,
+        now, mirrorAccountId, r.id);
+    }
+    return records.filter((r) => r.live || r.mirror).length;
   }
 
   /** The human's call sessions, newest first (SMS≠Call — from the `calls` table). */
   callsFor(humanId: string, limit = 50): CallRow[] {
     return this.rows<CallRow>(
-      "SELECT * FROM calls WHERE caller = ? OR callee = ? ORDER BY started_ms DESC LIMIT ?",
+      `SELECT * FROM ${this.historySource("call")} WHERE caller = ? OR callee = ? ORDER BY started_ms DESC LIMIT ?`,
+      this.getAgent(humanId)?.account_id ?? null,
       humanId,
       humanId,
       limit,
@@ -1474,10 +1516,11 @@ export class Db {
   callsWithPeer(humanId: string, peerId: string, beforeMs: number | null = null, limit = 50): CallRow[] {
     const hasBefore = beforeMs != null;
     return this.rows<CallRow>(
-      `SELECT * FROM calls
+      `SELECT * FROM ${this.historySource("call")}
          WHERE ((caller = ? AND callee = ?) OR (caller = ? AND callee = ?))
            ${hasBefore ? "AND started_ms < ?" : ""}
          ORDER BY started_ms DESC LIMIT ?`,
+      this.getAgent(humanId)?.account_id ?? null,
       ...(hasBefore
         ? [humanId, peerId, peerId, humanId, beforeMs, limit]
         : [humanId, peerId, peerId, humanId, limit]),
@@ -1487,7 +1530,7 @@ export class Db {
   /** Unread inbound messages across all threads (badge count). */
   unreadMessageCount(humanId: string): number {
     return Number(
-      this.first<{ n: number }>("SELECT COUNT(*) AS n FROM messages WHERE to_agent = ? AND read_at IS NULL", humanId)?.n ??
+      this.first<{ n: number }>(`SELECT COUNT(*) AS n FROM ${this.historySource("message")} WHERE to_agent = ? AND read_at IS NULL`, this.getAgent(humanId)?.account_id ?? null, humanId)?.n ??
         0,
     );
   }
@@ -1497,70 +1540,73 @@ export class Db {
   missedCallCount(humanId: string, sinceMs = 0): number {
     return Number(
       this.first<{ n: number }>(
-        "SELECT COUNT(*) AS n FROM calls WHERE callee = ? AND state = 'missed' AND started_ms > ?",
+        `SELECT COUNT(*) AS n FROM ${this.historySource("call")} WHERE callee = ? AND state = 'missed' AND started_ms > ?`,
+        this.getAgent(humanId)?.account_id ?? null,
         humanId,
         sinceMs,
       )?.n ?? 0,
     );
   }
 
-  // ── sync mirror (local hub ⇄ platform; platform is SSOT) ────────────────
-  // The daemon pushes local-origin messages/calls up (persist-only, NO delivery)
-  // and pulls account-scoped history down. Every write is INSERT OR IGNORE by id,
-  // so a re-pushed — possibly locally-edited — row can never overwrite the SSOT
-  // copy. That is the whole anti-tamper guarantee (the user can edit local JSON
-  // freely; the platform simply ignores a known id).
-
-  /** Ingest a pushed message row verbatim (no routing/delivery). */
-  ingestMessage(row: SyncMessage): void {
-    const attachments =
-      row.attachments == null ? null : typeof row.attachments === "string" ? row.attachments : JSON.stringify(row.attachments);
-    this.sql.exec(
-      `INSERT OR IGNORE INTO messages
-         (message_id, from_agent, to_agent, from_nick, to_nick, body, attachments, created_at, created_ms, delivered_at, read_at, agent_read_at, account_scope)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      row.message_id,
-      row.from_agent,
-      row.to_agent,
-      row.from_nick,
-      row.to_nick,
-      row.body,
-      attachments,
-      row.created_at,
-      row.created_ms,
-      row.delivered_at ?? null,
-      row.read_at ?? null,
-      row.agent_read_at ?? null,
-      row.account_scope ?? null,
-    );
+  // ── private sync mirror ────────────────────────────────────────────────
+  // Imported history is untrusted. It never writes the live routing tables and
+  // is visible only to its importing account. Live records win on ID collisions.
+  private historySource(kind: "message" | "call"): string {
+    const table = kind === "message" ? "messages" : "calls";
+    const id = kind === "message" ? "message_id" : "call_id";
+    const columns = kind === "message"
+      ? "message_id,from_agent,to_agent,from_nick,to_nick,body,attachments,created_at,created_ms,delivered_at,read_at,agent_read_at,account_scope"
+      : "call_id,caller,callee,caller_nick,callee_nick,state,started_ms,answered_ms,ended_ms,end_reason";
+    const projected = columns.split(",").map((c) => `json_extract(data, '$.${c}') AS ${c}`).join(",");
+    return `(SELECT ${columns} FROM ${table} UNION ALL
+      SELECT ${projected} FROM sync_history
+      WHERE account_id = ? AND kind = '${kind}'
+        AND NOT EXISTS (SELECT 1 FROM ${table} WHERE ${id} = record_id))`;
   }
 
-  /** Ingest a pushed call session verbatim (persist-only). */
-  ingestCall(row: CallRow): void {
-    this.sql.exec(
-      `INSERT OR IGNORE INTO calls
-         (call_id, caller, callee, caller_nick, callee_nick, state, started_ms, answered_ms, ended_ms, end_reason)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      row.call_id,
-      row.caller,
-      row.callee,
-      row.caller_nick,
-      row.callee_nick,
-      row.state,
-      row.started_ms,
-      row.answered_ms,
-      row.ended_ms,
-      row.end_reason,
-    );
+  private requireMirrorParty(accountId: string, ...parties: string[]): void {
+    if (!parties.some((id) => this.getAgent(id)?.account_id === accountId)) {
+      throw new AuthorizationError("sync record must involve an identity you own");
+    }
+  }
+
+  /** Validate the complete batch before the first write. The handler also wraps
+   *  this synchronous operation in a storage transaction for database failures. */
+  ingestMessages(accountId: string, input: unknown): number {
+    const rows = parseMessages(input);
+    for (const row of rows) this.requireMirrorParty(accountId, row.from_agent, row.to_agent);
+    for (const row of rows) {
+      this.sql.exec("INSERT OR IGNORE INTO sync_history (account_id, kind, record_id, data) VALUES (?, 'message', ?, ?)",
+        accountId, row.message_id, JSON.stringify({ ...row, account_scope: accountId }));
+    }
+    return rows.length;
+  }
+
+  ingestCalls(accountId: string, input: unknown): number {
+    const calls = parseCalls(input);
+    for (const c of calls) {
+      this.requireMirrorParty(accountId, c.caller, c.callee);
+      for (const f of c.frames ?? []) {
+        if (f.from_agent !== c.caller && f.from_agent !== c.callee) {
+          throw new AuthorizationError("frame sender must be a call participant");
+        }
+      }
+    }
+    for (const c of calls) {
+      this.sql.exec("INSERT OR IGNORE INTO sync_history (account_id, kind, record_id, data) VALUES (?, 'call', ?, ?)",
+        accountId, c.call_id, JSON.stringify(c));
+    }
+    return calls.length;
   }
 
   /** Messages touching any of `agentIds`, created after `sinceMs`, oldest-first
    *  (the pull-down cursor page). */
-  messagesForScope(agentIds: string[], sinceMs: number, limit = 500): SyncMessage[] {
+  messagesForScope(agentIds: string[], sinceMs: number, limit = 500, mirrorAccountId: string | null = null): SyncMessage[] {
     if (agentIds.length === 0) return [];
     const ph = agentIds.map(() => "?").join(",");
     return this.rows<Record<string, Bind>>(
-      `SELECT * FROM messages WHERE created_ms > ? AND (from_agent IN (${ph}) OR to_agent IN (${ph})) ORDER BY created_ms LIMIT ?`,
+      `SELECT * FROM ${this.historySource("message")} WHERE created_ms > ? AND (from_agent IN (${ph}) OR to_agent IN (${ph})) ORDER BY created_ms LIMIT ?`,
+      mirrorAccountId,
       sinceMs,
       ...agentIds,
       ...agentIds,
@@ -1587,11 +1633,13 @@ export class Db {
     agentIds: string[],
     sinceMs: number,
     limit = 200,
+    mirrorAccountId: string | null = null,
   ): Array<CallRow & { frames: Array<{ frame_id: string; seq: number; from_agent: string; body: string | null; attachments: unknown; created_ms: number }> }> {
     if (agentIds.length === 0) return [];
     const ph = agentIds.map(() => "?").join(",");
     const calls = this.rows<CallRow>(
-      `SELECT * FROM calls WHERE started_ms > ? AND (caller IN (${ph}) OR callee IN (${ph})) ORDER BY started_ms LIMIT ?`,
+      `SELECT * FROM ${this.historySource("call")} WHERE started_ms > ? AND (caller IN (${ph}) OR callee IN (${ph})) ORDER BY started_ms LIMIT ?`,
+      mirrorAccountId,
       sinceMs,
       ...agentIds,
       ...agentIds,
@@ -1601,17 +1649,7 @@ export class Db {
     // local origin copy — synthesising an id would duplicate locally-sent frames.
     return calls.map((c) => ({
       ...c,
-      frames: this.rows<Record<string, Bind>>(
-        "SELECT frame_id, seq, from_agent, body, attachments, created_ms FROM call_frames WHERE call_id = ? ORDER BY seq",
-        c.call_id,
-      ).map((r) => ({
-        frame_id: String(r.frame_id),
-        seq: Number(r.seq),
-        from_agent: String(r.from_agent),
-        body: r.body == null ? null : String(r.body),
-        attachments: r.attachments == null ? null : safeJson(String(r.attachments)),
-        created_ms: Number(r.created_ms),
-      })),
+      frames: this.historyCallFrames(c.call_id, mirrorAccountId),
     }));
   }
 

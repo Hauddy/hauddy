@@ -153,6 +153,16 @@ CREATE TABLE IF NOT EXISTS call_frames (
 );
 CREATE INDEX IF NOT EXISTS idx_callframes_call ON call_frames(call_id, seq);
 
+-- Untrusted local history is private to its importing account. Separate keys
+-- prevent imports from reserving live message/call IDs or entering delivery.
+CREATE TABLE IF NOT EXISTS sync_history (
+  account_id TEXT NOT NULL REFERENCES accounts(account_id) ON DELETE CASCADE,
+  kind TEXT NOT NULL CHECK (kind IN ('message', 'call')),
+  record_id TEXT NOT NULL,
+  data TEXT NOT NULL,
+  PRIMARY KEY (account_id, kind, record_id)
+);
+
 -- ── ATTACHMENTS: R2-backed file metadata (bytes at R2 files/<file_id>) ──
 CREATE TABLE IF NOT EXISTS attachments (
   file_id     TEXT PRIMARY KEY,

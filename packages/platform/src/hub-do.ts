@@ -27,7 +27,7 @@ function semverLt(a: string, b: string): boolean {
   return aPat < bPat;
 }
 import type { Env } from "./env.js";
-import { Db, CONNECTOR_SCOPES, type AttachmentRow, type CallRow, type SyncMessage } from "./db.js";
+import { Db, AuthorizationError, CONNECTOR_SCOPES, type AttachmentRow } from "./db.js";
 import { FileStoreR2 } from "./files-r2.js";
 import { b64urlToBytes, randomHex, randomNonceB64url, verifyEd25519 } from "./crypto.js";
 import {
@@ -652,6 +652,7 @@ export class HubDO {
 
       return this.json(404, { error: "not found" });
     } catch (err) {
+      if (err instanceof AuthorizationError) return this.json(403, { error: err.message });
       return this.json(400, { error: err instanceof Error ? err.message : String(err) });
     }
   }
@@ -727,13 +728,14 @@ export class HubDO {
   }
 
   private async register(request: Request): Promise<Response> {
-    const accountId = this.requireAccount(request); // null ⇒ local agent
+    const accountId = this.requireAccount(request);
+    if (!accountId) return this.unauthorized();
     const body = await this.readBody(request);
     if (typeof body.grant_scope_id !== "string" || typeof body.public_key !== "string") {
       return this.json(400, { error: "grant_scope_id and public_key are required" });
     }
     const agent = this.db.registerAgent({
-      account_id: accountId ?? undefined,
+      account_id: accountId,
       grant_scope_id: body.grant_scope_id,
       public_key: body.public_key,
       local_id: typeof body.local_id === "string" ? body.local_id : undefined,
@@ -880,7 +882,7 @@ export class HubDO {
       .filter((m) => m.to_agent === auth.agentId && m.agent_read_at == null)
       .map((m) => m.message_id);
     if (unread.length) {
-      this.db.markAgentRead(unread);
+      this.db.markAgentRead(unread, [auth.agentId]);
       const now = new Date().toISOString();
       for (const m of messages) {
         if (unread.includes(m.message_id)) m.agent_read_at = now;
@@ -1358,8 +1360,9 @@ export class HubDO {
 
   private async console(request: Request, url: URL): Promise<Response> {
     const human = this.consoleHuman(request);
-    if (!human) return this.json(400, { error: "no human console (account key required)" });
+    if (!human) return this.unauthorized();
     const humanId = human.agent_id;
+    const accountId = this.requireAccount(request)!;
     const path = url.pathname;
     const method = request.method;
 
@@ -1412,7 +1415,7 @@ export class HubDO {
           answered_ms: c.answered_ms != null ? Number(c.answered_ms) : null,
           ended_ms: c.ended_ms != null ? Number(c.ended_ms) : null,
           end_reason: c.end_reason ?? null,
-          frames: this.db.callFrames(c.call_id),
+          frames: this.db.callFrames(c.call_id, accountId),
         };
       });
       const messageItems = messages.map((m) => ({
@@ -1448,7 +1451,7 @@ export class HubDO {
           ended_ms: c.ended_ms,
           end_reason: c.end_reason,
         };
-        return withFrames ? { ...base, frames: this.db.callFrames(c.call_id) } : base;
+        return withFrames ? { ...base, frames: this.db.callFrames(c.call_id, accountId) } : base;
       });
       return this.json(200, { calls });
     }
@@ -1473,9 +1476,12 @@ export class HubDO {
     if (method === "POST" && path === "/console/messages/agent-read") {
       // Local hub calls this after an agent drains check_messages locally.
       const body = await this.readBody(request);
-      const ids = Array.isArray(body.message_ids) ? (body.message_ids as string[]).filter((x) => typeof x === "string") : [];
-      if (ids.length) this.db.markAgentRead(ids);
-      return this.json(200, { ok: true, marked: ids.length });
+      if (!Array.isArray(body.message_ids) || !body.message_ids.every((id) => typeof id === "string" && id.length > 0)) {
+        return this.json(400, { error: "message_ids must be an array of nonempty strings" });
+      }
+      const recipients = this.db.accountAgents(accountId).map((a) => a.agent_id);
+      const marked = this.ctx.storage.transactionSync(() => this.db.markAgentRead(body.message_ids as string[], recipients, accountId));
+      return this.json(200, { ok: true, marked });
     }
     if (method === "POST" && path === "/console/sms") {
       const body = await this.readBody(request);
@@ -1517,41 +1523,15 @@ export class HubDO {
       }
       return this.json(200, { ok: true });
     }
-    // ---- sync mirror (local hub ⇄ platform; platform = SSOT) ----
-    // Push = persist-only ingest (NO delivery), pull = account-scoped history.
-    // All ingest is INSERT OR IGNORE by id → a locally-edited row can never
-    // overwrite the SSOT copy, so a tampered ~/.hauddy/history.json is inert here.
+    // Private history imports never enter live routing or another account's log.
     if (method === "POST" && path === "/console/sync/messages") {
       const body = await this.readBody(request);
-      const rows = Array.isArray(body.messages) ? (body.messages as SyncMessage[]) : [];
-      let ingested = 0;
-      for (const r of rows) {
-        if (!r || typeof r.message_id !== "string") continue;
-        this.db.ingestMessage(r);
-        ingested += 1;
-      }
+      const ingested = this.ctx.storage.transactionSync(() => this.db.ingestMessages(accountId, body.messages));
       return this.json(200, { ok: true, ingested });
     }
     if (method === "POST" && path === "/console/sync/calls") {
       const body = await this.readBody(request);
-      const calls = Array.isArray(body.calls) ? (body.calls as Array<CallRow & { frames?: Array<Record<string, unknown>> }>) : [];
-      let ingested = 0;
-      for (const c of calls) {
-        if (!c || typeof c.call_id !== "string") continue;
-        this.db.ingestCall(c);
-        for (const f of Array.isArray(c.frames) ? c.frames : []) {
-          if (typeof f.frame_id !== "string") continue;
-          this.db.insertCallFrame({
-            frame_id: String(f.frame_id),
-            call_id: c.call_id,
-            from_agent: String(f.from_agent ?? ""),
-            body: f.body == null ? null : String(f.body),
-            attachments: f.attachments == null ? null : typeof f.attachments === "string" ? (f.attachments as string) : JSON.stringify(f.attachments),
-            created_ms: Number(f.created_ms ?? 0),
-          });
-        }
-        ingested += 1;
-      }
+      const ingested = this.ctx.storage.transactionSync(() => this.db.ingestCalls(accountId, body.calls));
       return this.json(200, { ok: true, ingested });
     }
     if (method === "GET" && path === "/console/sync/pull") {
@@ -1561,8 +1541,8 @@ export class HubDO {
       const since = sinceRaw && Number.isFinite(Number(sinceRaw)) ? Number(sinceRaw) : 0;
       const agentIds = this.db.accountAgents(accountId).map((a) => a.agent_id);
       return this.json(200, {
-        messages: this.db.messagesForScope(agentIds, since),
-        calls: this.db.callsForScope(agentIds, since),
+        messages: this.db.messagesForScope(agentIds, since, 500, accountId),
+        calls: this.db.callsForScope(agentIds, since, 200, accountId),
         now: Date.now(),
       });
     }

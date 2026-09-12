@@ -526,11 +526,12 @@ export class HubHistory {
 
   // ── bulk reads for the sync engine (cursor-paged, ascending) ────────────
 
-  /** Message IDs where agent_read_at was set after `sinceMs` (for sync push). */
-  agentReadSince(sinceMs: number): string[] {
+  /** Read markers for owned recipients only; remote receipts pulled into local
+   *  history must not be reasserted as this account's reads. */
+  agentReadSince(sinceMs: number, recipientIds: Set<string>): string[] {
     return Object.values(this.data.messages)
       .filter((m) => {
-        if (!m.agent_read_at) return false;
+        if (!m.agent_read_at || !recipientIds.has(m.to_agent)) return false;
         const ms = Date.parse(m.agent_read_at);
         return Number.isFinite(ms) && ms > sinceMs;
       })
