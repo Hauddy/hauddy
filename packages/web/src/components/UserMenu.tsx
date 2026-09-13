@@ -8,6 +8,7 @@ import { clearKey } from '@hauddy/app-shared';
 export default function UserMenu({ email, name }: { email?: string; name?: string }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -16,7 +17,10 @@ export default function UserMenu({ email, name }: { email?: string; name?: strin
       if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false);
     };
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
+      if (e.key === 'Escape') {
+        setOpen(false);
+        triggerRef.current?.focus();
+      }
     };
     document.addEventListener('mousedown', onDoc);
     document.addEventListener('keydown', onKey);
@@ -27,12 +31,15 @@ export default function UserMenu({ email, name }: { email?: string; name?: strin
   }, [open]);
 
   const initial = (name ?? email ?? '?').trim().charAt(0).toUpperCase() || '?';
+  const label = email ? `Account menu, ${email}` : 'Account menu';
 
   return (
     <div className="user-menu" ref={rootRef}>
       <button
+        ref={triggerRef}
         type="button"
         className="user-menu-trigger"
+        aria-label={label}
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
