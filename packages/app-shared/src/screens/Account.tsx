@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api, apiBase, clearKey, revealKey, useApiData, useApiState, type ConnectorInfo, type ConnectorOAuth } from '../api';
 import ConnectorSnippets from '../components/ConnectorSnippets';
 import CopyChip from '../components/CopyChip';
@@ -12,9 +12,19 @@ export interface AccountProps {
   version?: string;
 }
 
-export default function Account({ showDownload = true, version = '0.1.0' }: AccountProps) {
+export default function Account({ showDownload = true, version }: AccountProps) {
   const session = useApiData(() => api.getSession());
   const key = useApiData(() => api.getAccountKey());
+  const [latestVersion, setLatestVersion] = useState<string | null>(version ?? null);
+
+  useEffect(() => {
+    if (version) return;
+    const base = apiBase().replace(/^ws/, 'http');
+    fetch(`${base}/api/version`)
+      .then((r) => r.json() as Promise<{ latest?: string }>)
+      .then(({ latest }) => { if (latest) setLatestVersion(latest); })
+      .catch(() => {});
+  }, [version]);
 
   const [rotated, setRotated] = useState(false);
   const [armed, setArmed] = useState(false);
@@ -61,7 +71,7 @@ export default function Account({ showDownload = true, version = '0.1.0' }: Acco
       <h2 className="section-title">API key</h2>
       <p className="book-explainer">
         This is the key that links your account to the Hauddy app. Copy it, then in the app go to{' '}
-        <strong>Platform → Set up API key</strong> and paste it. Rotating replaces it (re-paste into the app);
+        <strong>Account → Set up API key</strong> and paste it. Rotating replaces it (re-paste into the app);
         revoking disconnects every app and signs you out here.
       </p>
       <div className="card conn-card">
@@ -96,13 +106,21 @@ export default function Account({ showDownload = true, version = '0.1.0' }: Acco
             </p>
             <div className="download-platforms">
               <a href="https://api.hauddy.com/download/mac" className="btn btn-primary" download="hauddy.dmg">
-                Download for Mac
+                macOS (Apple Silicon)
               </a>
-              <span className="btn btn-ghost download-soon" title="Coming soon">Windows</span>
-              <span className="btn btn-ghost download-soon" title="Coming soon">Linux</span>
+              <a href="https://api.hauddy.com/download/windows" className="btn btn-ghost" download="hauddy-setup.exe">
+                Windows (x64)
+              </a>
+              <a href="https://api.hauddy.com/download/linux-deb" className="btn btn-ghost" download="hauddy.deb">
+                Linux (.deb)
+              </a>
+              <a href="https://api.hauddy.com/download/linux-appimage" className="btn btn-ghost" download="hauddy.AppImage">
+                Linux (AppImage)
+              </a>
             </div>
             <p className="download-note">
-              Apple Silicon · v0.1.0 · unsigned — right-click → Open on first launch.{' '}
+              {latestVersion ? `v${latestVersion} · ` : ''}
+              macOS: right-click → Open on first launch (unsigned) ·{' '}
               <a href="https://github.com/hauddy/hauddy/releases" className="download-releases-link" target="_blank" rel="noreferrer">
                 All releases ↗
               </a>
@@ -110,7 +128,7 @@ export default function Account({ showDownload = true, version = '0.1.0' }: Acco
           </div>
         </>
       ) : (
-        <p className="download-note account-version">version {version}</p>
+        <p className="download-note account-version">version {latestVersion ?? version}</p>
       )}
 
       <p className="account-legal">
