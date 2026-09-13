@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { api, apiBase, clearKey, revealKey, useApiData, useApiState, type ConnectorInfo, type ConnectorOAuth } from '../api';
 import ConnectorSnippets from '../components/ConnectorSnippets';
 import CopyChip from '../components/CopyChip';
@@ -18,6 +18,9 @@ export default function Account({ showDownload = true, version = '0.1.0' }: Acco
 
   const [rotated, setRotated] = useState(false);
   const [armed, setArmed] = useState(false);
+  const [revoking, setRevoking] = useState(false);
+  const [revokeFailed, setRevokeFailed] = useState(false);
+  const revokingRef = useRef(false);
   const [shown, setShown] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -40,13 +43,30 @@ export default function Account({ showDownload = true, version = '0.1.0' }: Acco
     setTimeout(() => setRotated(false), 1600);
   };
 
+  const confirmRevoke = async () => {
+    if (revokingRef.current) return;
+    revokingRef.current = true;
+    setRevoking(true);
+    setRevokeFailed(false);
+    try {
+      await api.revokeKey(); // confirmed revocation clears the key → login
+    } catch {
+      setRevokeFailed(true);
+    } finally {
+      revokingRef.current = false;
+      setRevoking(false);
+      setArmed(false);
+    }
+  };
+
   const revoke = () => {
+    if (revokingRef.current) return;
     if (!armed) {
       setArmed(true);
       setTimeout(() => setArmed(false), 3500);
       return;
     }
-    void api.revokeKey(); // clears the key → guard sends you back to login
+    void confirmRevoke();
   };
 
   return (
@@ -67,23 +87,31 @@ export default function Account({ showDownload = true, version = '0.1.0' }: Acco
       <div className="card conn-card">
         <code className="key-chip">{shown ?? key?.masked ?? '…'}</code>
         <div className="conn-actions">
-          <button type="button" className="btn btn-primary" onClick={revealCopy}>
+          <button type="button" className="btn btn-primary" onClick={revealCopy} disabled={revoking}>
             {copied ? 'Copied ✓' : shown ? 'Copy key' : 'Reveal & copy key'}
           </button>
-          <button type="button" className="btn btn-ghost" onClick={rotate}>
+          <button type="button" className="btn btn-ghost" onClick={rotate} disabled={revoking}>
             {rotated ? 'Rotated ✓' : 'Rotate'}
           </button>
-          <button type="button" className="btn btn-danger-ghost" onClick={revoke}>
-            {armed ? 'Confirm revoke?' : 'Revoke'}
+          <button type="button" className="btn btn-danger-ghost" onClick={revoke} disabled={revoking}>
+            {revoking ? 'Revoking…' : armed ? 'Confirm revoke?' : 'Revoke'}
           </button>
         </div>
       </div>
+      {revoking && <p role="status">Waiting for the server to confirm revocation…</p>}
+      {revokeFailed && (
+        <div className="notice bad" role="alert">
+          <p>Revocation could not be confirmed. Your API key may still be active. Check your connection and retry.</p>
+          <button type="button" className="btn btn-ghost" onClick={() => void confirmRevoke()}>Retry revocation</button>
+        </div>
+      )}
 
       <Connectors />
 
       <h2 className="section-title">Session</h2>
-      <button type="button" className="btn btn-ghost" onClick={() => clearKey()}>
-        Sign out
+      <p className="book-explainer">Signing out here does not revoke your API key or disconnect other apps.</p>
+      <button type="button" className="btn btn-ghost" onClick={() => clearKey()} disabled={revoking}>
+        Sign out of this browser
       </button>
 
       {showDownload ? (
