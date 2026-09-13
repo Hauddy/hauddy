@@ -174,20 +174,67 @@ jobs:
           path: dist-artifacts
           merge-multiple: true
 
-      # Upload the DMG to R2 under two keys:
-      #   downloads/mac-arm64-latest.dmg  — stable "latest" pointer (served by /download/mac)
-      #   downloads/hauddy-{v}-arm64.dmg  — immutable versioned archive
-      - name: Upload DMG to R2
+      # Upload all platform builds to R2.
+      # Each gets a stable "latest" pointer (served by /download/<platform>) and an
+      # immutable versioned archive. Linux/Windows names are found by glob since
+      # electron-builder's exact output name varies slightly across versions.
+      - name: Upload release artifacts to R2
         working-directory: packages/platform
         run: |
+          # macOS
           npx wrangler r2 object put hauddy-releases/downloads/mac-arm64-latest.dmg \
             --file "$GITHUB_WORKSPACE/dist-artifacts/$DMG" \
-            --content-type application/octet-stream \
-            --remote
+            --content-type application/octet-stream --remote
           npx wrangler r2 object put "hauddy-releases/downloads/Hauddy-${VERSION}-arm64.dmg" \
             --file "$GITHUB_WORKSPACE/dist-artifacts/$DMG" \
-            --content-type application/octet-stream \
-            --remote
+            --content-type application/octet-stream --remote
+
+          # Linux .deb
+          DEB=$(find "$GITHUB_WORKSPACE/dist-artifacts" -name "*.deb" | head -1)
+          npx wrangler r2 object put hauddy-releases/downloads/linux-amd64-latest.deb \
+            --file "$DEB" --content-type application/octet-stream --remote
+          npx wrangler r2 object put "hauddy-releases/downloads/$(basename "$DEB")" \
+            --file "$DEB" --content-type application/octet-stream --remote
+
+          # Linux AppImage
+          APPIMAGE=$(find "$GITHUB_WORKSPACE/dist-artifacts" -name "*.AppImage" | head -1)
+          npx wrangler r2 object put hauddy-releases/downloads/linux-x86_64-latest.AppImage \
+            --file "$APPIMAGE" --content-type application/octet-stream --remote
+          npx wrangler r2 object put "hauddy-releases/downloads/$(basename "$APPIMAGE")" \
+            --file "$APPIMAGE" --content-type application/octet-stream --remote
+
+          # Windows
+          EXE=$(find "$GITHUB_WORKSPACE/dist-artifacts" -name "*.exe" | head -1)
+          npx wrangler r2 object put hauddy-releases/downloads/windows-x64-latest.exe \
+            --file "$EXE" --content-type application/octet-stream --remote
+          npx wrangler r2 object put "hauddy-releases/downloads/$(basename "$EXE")" \
+            --file "$EXE" --content-type application/octet-stream --remote
+
+      # Publish assets before /api/version and the dashboard advertise this version.
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Hauddy v${{ env.VERSION }}
+          body: |
+            ## Download
+
+            | Platform | File | Direct link |
+            |---|---|---|
+            | macOS (Apple Silicon) | `Hauddy-${{ env.VERSION }}-arm64.dmg` | https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/Hauddy-${{ env.VERSION }}-arm64.dmg |
+            | Windows (x64) | `Hauddy.Setup.${{ env.VERSION }}.exe` | https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/Hauddy.Setup.${{ env.VERSION }}.exe |
+            | Linux (Debian/Ubuntu) | `hauddy_${{ env.VERSION }}_amd64.deb` | https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/hauddy_${{ env.VERSION }}_amd64.deb |
+            | Linux (Universal) | `hauddy_${{ env.VERSION }}_x86_64.AppImage` | https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/hauddy_${{ env.VERSION }}_x86_64.AppImage |
+
+            macOS: unsigned — right-click → Open on first launch.
+
+            ---
+            See [CHANGELOG](https://github.com/hauddy/hauddy/blob/main/CHANGELOG.md) for what's new.
+          files: |
+            dist-artifacts/*.dmg
+            dist-artifacts/*.deb
+            dist-artifacts/*.AppImage
+            dist-artifacts/*.exe
+          fail_on_unmatched_files: true
 
       # Deploy the platform Worker. Passes LATEST_CLIENT_VERSION so /api/version
       # and the auth_rejected frame can report the newest available download.
@@ -213,29 +260,3 @@ jobs:
         run: |
           npx wrangler pages project create hauddy-landing --production-branch main 2>/dev/null || true
           npx wrangler pages deploy dist --branch main
-
-      # Create GitHub Release
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          name: Hauddy v${{ env.VERSION }}
-          body: |
-            ## Download
-
-            | Platform | File |
-            |---|---|
-            | macOS (Apple Silicon) | `Hauddy-${{ env.VERSION }}-arm64.dmg` |
-            | Linux (Debian/Ubuntu) | `hauddy_${{ env.VERSION }}_amd64.deb` |
-            | Linux (Universal) | `hauddy-${{ env.VERSION }}.AppImage` |
-            | Windows (x64) | `hauddy-Setup-${{ env.VERSION }}.exe` |
-
-            Or use the direct link: **https://api.hauddy.com/download/mac**
-
-            ---
-            See [CHANGELOG](https://github.com/hauddy/hauddy/blob/main/CHANGELOG.md) for what's new.
-          files: |
-            dist-artifacts/*.dmg
-            dist-artifacts/*.deb
-            dist-artifacts/*.AppImage
-            dist-artifacts/*.exe
-          fail_on_unmatched_files: true

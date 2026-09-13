@@ -49,14 +49,21 @@ export default {
       );
     }
 
-    // Public app download — served directly from R2, no auth required.
-    if (url.pathname === "/download/mac") {
-      const obj = await env.RELEASES.get("downloads/mac-arm64-latest.dmg");
+    // Public app downloads — served directly from R2, no auth required.
+    const downloads: Record<string, { key: string; filename: string }> = {
+      "/download/mac":            { key: "downloads/mac-arm64-latest.dmg",        filename: "hauddy.dmg"      },
+      "/download/windows":        { key: "downloads/windows-x64-latest.exe",       filename: "hauddy-setup.exe"},
+      "/download/linux-deb":      { key: "downloads/linux-amd64-latest.deb",       filename: "hauddy.deb"      },
+      "/download/linux-appimage": { key: "downloads/linux-x86_64-latest.AppImage", filename: "hauddy.AppImage" },
+    };
+    const dl = downloads[url.pathname];
+    if (dl) {
+      const obj = await env.RELEASES.get(dl.key);
       if (!obj) return new Response("Not found", { status: 404 });
       return new Response(obj.body, {
         headers: {
           "content-type": "application/octet-stream",
-          "content-disposition": 'attachment; filename="hauddy.dmg"',
+          "content-disposition": `attachment; filename="${dl.filename}"`,
           "content-length": String(obj.size),
           "cache-control": "no-cache, no-store, must-revalidate",
           ...corsHeaders(env),

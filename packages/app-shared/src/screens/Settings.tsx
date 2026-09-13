@@ -1,6 +1,7 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api, clearKey, useApiData } from '../api';
+import { api, clearKey, useApiData, useApiState } from '../api';
+import ErrorState from '../components/ErrorState';
 
 /** Account settings: profile (username == your @handle + bio), password, and the
  *  friend auto-accept toggle (rehomed here from the Friends screen). Distinct from
@@ -8,7 +9,6 @@ import { api, clearKey, useApiData } from '../api';
 export default function Settings() {
   const session = useApiData(() => api.getSession());
   const identity = useApiData(() => api.getIdentity());
-  const friends = useApiData(() => api.listFriends());
 
   return (
     <>
@@ -21,7 +21,7 @@ export default function Settings() {
 
       <ProfileSection currentName={session?.name} currentBio={identity?.bio} handle={identity?.handle ?? null} />
       <PasswordSection />
-      <FriendsSection autoAccept={friends?.auto_accept} loaded={friends !== undefined} />
+      <FriendsSection />
       <DangerSection />
     </>
   );
@@ -287,20 +287,54 @@ function PasswordSection() {
   );
 }
 
-function FriendsSection({ autoAccept, loaded }: { autoAccept?: boolean; loaded: boolean }) {
-  // Optimistic local mirror so the toggle feels instant; the server stays the
-  // source of truth on the next refresh.
+function FriendsSection() {
+  // Ignore reads started before/during a save: only a subsequent read can
+  // reconcile its result. This also protects against a delayed polling response.
+  const revision = useRef(0);
+  const saving = useRef(false);
+  const { data, error: loadError, refetch } = useApiState(async () => {
+    const started = revision.current;
+    const friends = await api.listFriends();
+    return { value: friends.auto_accept, revision: started };
+  });
+  const [confirmed, setConfirmed] = useState<boolean | null>(null);
   const [on, setOn] = useState(false);
-  const [touched, setTouched] = useState(false);
+  const [pending, setPending] = useState(false);
+  const [failure, setFailure] = useState<{ value: boolean; error: string } | null>(null);
 
   useEffect(() => {
-    if (!touched && autoAccept !== undefined) setOn(autoAccept);
-  }, [autoAccept, touched]);
+    if (!data || saving.current || data.revision !== revision.current) return;
+    setConfirmed(data.value);
+    setOn(data.value);
+    setFailure((previous) => previous?.value === data.value ? null : previous);
+  }, [data]);
+
+  useEffect(() => {
+    window.addEventListener('online', refetch);
+    return () => window.removeEventListener('online', refetch);
+  }, [refetch]);
 
   const toggle = async (v: boolean) => {
-    setTouched(true);
+    if (saving.current || confirmed === null) return;
+    saving.current = true;
+    revision.current += 1;
+    setPending(true);
+    setFailure(null);
     setOn(v);
-    await api.setAutoAccept(v);
+    try {
+      const result = await api.setAutoAccept(v);
+      if (typeof result.auto_accept !== 'boolean') throw new Error('The server did not confirm the setting.');
+      setConfirmed(result.auto_accept);
+      setOn(result.auto_accept);
+    } catch (err) {
+      setOn(confirmed);
+      setFailure({ value: v, error: err instanceof Error ? err.message : 'Unable to save the setting.' });
+    } finally {
+      revision.current += 1;
+      saving.current = false;
+      setPending(false);
+      refetch();
+    }
   };
 
   return (
@@ -310,7 +344,7 @@ function FriendsSection({ autoAccept, loaded }: { autoAccept?: boolean; loaded: 
         <input
           type="checkbox"
           checked={on}
-          disabled={!loaded}
+          disabled={confirmed === null || pending}
           onChange={(e) => void toggle(e.target.checked)}
         />
         <span className="settings-toggle-text">
@@ -321,6 +355,14 @@ function FriendsSection({ autoAccept, loaded }: { autoAccept?: boolean; loaded: 
           </span>
         </span>
       </label>
+      {pending && <p role="status">Saving auto-accept…</p>}
+      {failure && (
+        <>
+          <p className="settings-hint">Showing the last confirmed setting.</p>
+          <ErrorState title="Auto-accept could not be saved" error={failure.error} onRetry={() => void toggle(failure.value)} compact />
+        </>
+      )}
+      {!failure && loadError && <ErrorState title="Unable to refresh auto-accept" error={loadError} onRetry={refetch} compact />}
     </section>
   );
 }

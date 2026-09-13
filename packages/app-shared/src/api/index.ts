@@ -454,8 +454,11 @@ export const api = {
   },
 
   async revokeKey(): Promise<void> {
-    await post('/accounts/revoke').catch(() => {});
-    clearKey();
+    const key = getKey();
+    const result = await post<{ ok?: boolean }>('/accounts/revoke');
+    if (result.ok !== true) throw new Error('The server did not confirm revocation.');
+    // A delayed response for an old session must not sign out a newer one.
+    if (getKey() === key) clearKey();
   },
 
   // ---- connector tokens (scoped bearer creds for /v1 + /mcp) --------------

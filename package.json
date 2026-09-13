@@ -28,6 +28,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260804.1",
     "@types/node": "^22.5.0",
+    "react-test-renderer": "18.3.1",
     "typescript": "~5.5.4",
     "wrangler": "^4.119.0"
   }

@@ -54,7 +54,7 @@ export default function Account() {
           {softUpdate && !softDismissed && !isDesktop() && (
             <div className="notice update-soft">
               Hauddy {softUpdate.latest} is available —{' '}
-              <a href="https://api.hauddy.com/download/mac" target="_blank" rel="noopener noreferrer">Download</a>
+              <a href="https://github.com/hauddy/hauddy/releases/latest" target="_blank" rel="noopener noreferrer">Download</a>
               <button type="button" className="btn-dismiss" onClick={() => setSoftDismissed(true)}>✕</button>
             </div>
           )}
@@ -231,7 +231,7 @@ function OutdatedBanner({
   currentVersion: string;
   rejection: NonNullable<PlatformInfo['rejection']>;
 }) {
-  const downloadUrl = 'https://api.hauddy.com/download/mac';
+  const downloadUrl = 'https://github.com/hauddy/hauddy/releases/latest';
   return (
     <div className="card conn-card outdated-banner">
       <div className="conn-status">

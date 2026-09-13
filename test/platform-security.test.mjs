@@ -73,6 +73,15 @@ const expectStatus = async (promise, expected) => {
   return body;
 };
 
+test('confirmed account-key revocation invalidates the old key without revoking another account', async (t) => {
+  const { a, b, request } = await fixture(t);
+  await expectStatus(request('/accounts/me', undefined, a.key), 200);
+  assert.deepEqual(await expectStatus(request('/accounts/revoke', {}, a.key), 200), { ok: true });
+  await expectStatus(request('/accounts/me', undefined, a.key), 401);
+  await expectStatus(request('/accounts/revoke', {}, a.key), 401);
+  await expectStatus(request('/accounts/me', undefined, b.key), 200);
+});
+
 test('platform retries with the same message ID enqueue only once and cannot cross identities', async (t) => {
   const { a, b, db, request, sqlite, hub } = await fixture(t);
   const deliver = t.mock.method(hub, 'deliverTo');
