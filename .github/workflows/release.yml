@@ -210,6 +210,32 @@ jobs:
           npx wrangler r2 object put "hauddy-releases/downloads/$(basename "$EXE")" \
             --file "$EXE" --content-type application/octet-stream --remote
 
+      # Publish assets before /api/version and the dashboard advertise this version.
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Hauddy v${{ env.VERSION }}
+          body: |
+            ## Download
+
+            | Platform | File | Direct link |
+            |---|---|---|
+            | macOS (Apple Silicon) | `Hauddy-${{ env.VERSION }}-arm64.dmg` | https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/Hauddy-${{ env.VERSION }}-arm64.dmg |
+            | Windows (x64) | `Hauddy.Setup.${{ env.VERSION }}.exe` | https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/Hauddy.Setup.${{ env.VERSION }}.exe |
+            | Linux (Debian/Ubuntu) | `hauddy_${{ env.VERSION }}_amd64.deb` | https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/hauddy_${{ env.VERSION }}_amd64.deb |
+            | Linux (Universal) | `hauddy_${{ env.VERSION }}_x86_64.AppImage` | https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/hauddy_${{ env.VERSION }}_x86_64.AppImage |
+
+            macOS: unsigned — right-click → Open on first launch.
+
+            ---
+            See [CHANGELOG](https://github.com/hauddy/hauddy/blob/main/CHANGELOG.md) for what's new.
+          files: |
+            dist-artifacts/*.dmg
+            dist-artifacts/*.deb
+            dist-artifacts/*.AppImage
+            dist-artifacts/*.exe
+          fail_on_unmatched_files: true
+
       # Deploy the platform Worker. Passes LATEST_CLIENT_VERSION so /api/version
       # and the auth_rejected frame can report the newest available download.
       - name: Deploy platform Worker
@@ -234,29 +260,3 @@ jobs:
         run: |
           npx wrangler pages project create hauddy-landing --production-branch main 2>/dev/null || true
           npx wrangler pages deploy dist --branch main
-
-      # Create GitHub Release
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          name: Hauddy v${{ env.VERSION }}
-          body: |
-            ## Download
-
-            | Platform | File | Direct link |
-            |---|---|---|
-            | macOS (Apple Silicon) | `Hauddy-${{ env.VERSION }}-arm64.dmg` | https://api.hauddy.com/download/mac |
-            | Windows (x64) | `Hauddy Setup ${{ env.VERSION }}.exe` | https://api.hauddy.com/download/windows |
-            | Linux (Debian/Ubuntu) | `hauddy_${{ env.VERSION }}_amd64.deb` | https://api.hauddy.com/download/linux-deb |
-            | Linux (Universal) | `hauddy_${{ env.VERSION }}_x86_64.AppImage` | https://api.hauddy.com/download/linux-appimage |
-
-            macOS: unsigned — right-click → Open on first launch.
-
-            ---
-            See [CHANGELOG](https://github.com/hauddy/hauddy/blob/main/CHANGELOG.md) for what's new.
-          files: |
-            dist-artifacts/*.dmg
-            dist-artifacts/*.deb
-            dist-artifacts/*.AppImage
-            dist-artifacts/*.exe
-          fail_on_unmatched_files: true

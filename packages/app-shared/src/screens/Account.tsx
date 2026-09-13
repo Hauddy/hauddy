@@ -18,13 +18,19 @@ export default function Account({ showDownload = true, version }: AccountProps) 
   const [latestVersion, setLatestVersion] = useState<string | null>(version ?? null);
 
   useEffect(() => {
-    if (version) return;
+    if (version || !showDownload) return;
     const base = apiBase().replace(/^ws/, 'http');
     fetch(`${base}/api/version`)
       .then((r) => r.json() as Promise<{ latest?: string }>)
       .then(({ latest }) => { if (latest) setLatestVersion(latest); })
       .catch(() => {});
-  }, [version]);
+  }, [version, showDownload]);
+
+  // These assets already exist on GitHub. A dashboard-only deployment must
+  // not depend on new Worker routes or R2 keys populated by a later release.
+  const releaseAsset = (filename: string) => latestVersion
+    ? `https://github.com/Hauddy/hauddy/releases/download/${encodeURIComponent(`v${latestVersion}`)}/${encodeURIComponent(filename)}`
+    : 'https://github.com/Hauddy/hauddy/releases/latest';
 
   const [rotated, setRotated] = useState(false);
   const [armed, setArmed] = useState(false);
@@ -136,13 +142,13 @@ export default function Account({ showDownload = true, version }: AccountProps) 
               <a href="https://api.hauddy.com/download/mac" className="btn btn-primary" download="hauddy.dmg">
                 macOS (Apple Silicon)
               </a>
-              <a href="https://api.hauddy.com/download/windows" className="btn btn-ghost" download="hauddy-setup.exe">
+              <a href={releaseAsset(`Hauddy.Setup.${latestVersion}.exe`)} className="btn btn-ghost">
                 Windows (x64)
               </a>
-              <a href="https://api.hauddy.com/download/linux-deb" className="btn btn-ghost" download="hauddy.deb">
+              <a href={releaseAsset(`hauddy_${latestVersion}_amd64.deb`)} className="btn btn-ghost">
                 Linux (.deb)
               </a>
-              <a href="https://api.hauddy.com/download/linux-appimage" className="btn btn-ghost" download="hauddy.AppImage">
+              <a href={releaseAsset(`hauddy_${latestVersion}_x86_64.AppImage`)} className="btn btn-ghost">
                 Linux (AppImage)
               </a>
             </div>
