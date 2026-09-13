@@ -1,4 +1,5 @@
 import { MessageSubmission } from '../message-send';
+import { useConversationDraft } from '../message-drafts';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { api, useApiState, type Attachment, type ThreadCallFrame, type ThreadItem } from '../api';
@@ -379,8 +380,7 @@ export default function Messages() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const [items, setItems] = useState<TimelineItem[]>([]);
-  const [draft, setDraft] = useState('');
-  const [files, setFiles] = useState<File[]>([]);
+  const { body: draft, files, recipientId, setBody: setDraft, setFiles, clear: clearDraft, resolveRecipient } = useConversationDraft(viewAs, selected, selectedId);
   const submissions = useRef(new Map<string, MessageSubmission>());
   const threadKey = `${viewAs ?? ''}|${selectedId ?? selected ?? ''}`;
   const currentThread = useRef(threadKey);
@@ -474,6 +474,7 @@ export default function Messages() {
     api.consoleThread(selectedId ?? selected, { as: viewAs ?? undefined }).then((res) => {
       if (!live) return;
       peerIdRef.current = res.peer_id;
+      resolveRecipient(selected, res.peer_id);
       const timeline = toTimeline(res.items ?? res.messages.map((m) => ({ ...m, kind: 'message' as const })), selected);
       for (const item of timeline) seen.current.add(item.id);
       setItems(mergeTimeline([...submissions.current.values()].filter((op) => op.thread === threadKey).map(submissionItem), timeline)); setNextCursor(res.next_cursor ?? null);
@@ -584,6 +585,7 @@ export default function Messages() {
   // handle can fail to resolve back (a deleted connector or an unexposed peer
   // isn't bound), whereas the id is exactly what the thread was grouped under.
   const openThread = (peer: string, id?: string | null) => {
+    if (id) resolveRecipient(peer, id);
     setOpenRevision((v) => v + 1);
     setSelected(peer || null);
     setSelectedId(id ?? null);
@@ -598,9 +600,9 @@ export default function Messages() {
   const send = async () => {
     const body = draft.trim();
     if ((!body && !files.length) || !selected) return;
-    const op = new MessageSubmission(threadKey, selectedId ?? selected, body, [...files]);
+    const op = new MessageSubmission(threadKey, recipientId ?? selected, body, [...files]);
     submissions.current.set(op.id, op);
-    setDraft(''); setFiles([]);
+    clearDraft();
     await retrySend(op);
   };
 
