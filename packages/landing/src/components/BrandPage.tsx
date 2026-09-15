@@ -1,7 +1,6 @@
-import Logo from './Logo';
 import { PRODUCT_PROMISE, PRODUCT_DESCRIPTION } from '../marketing';
 export default function BrandPage() {
-  return <main className="public-page"><header><a href="/"><Logo size={32} /> Hauddy</a><a href="/demo">Watch the demo</a></header>
+  return <main className="docs-content about-page">
     <h1>Brand and press kit</h1><p className="lede">{PRODUCT_PROMISE}</p>
     <p><a className="btn primary" href="/brand/hauddy-brand-v1.zip" download>Download kit v1 · ZIP</a></p>
     <h2>Describe Hauddy</h2><p><strong>Short:</strong> {PRODUCT_PROMISE}</p><p><strong>Medium:</strong> {PRODUCT_DESCRIPTION}</p>

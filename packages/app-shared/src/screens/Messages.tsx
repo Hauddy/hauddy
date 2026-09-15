@@ -1,3 +1,4 @@
+import { PhoneIcon, PaperclipIcon } from '../components/ActionIcons';
 import { MessageSubmission } from '../message-send';
 import { useConversationDraft } from '../message-drafts';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -220,7 +221,7 @@ function AttachControl({
   }, []);
   return (
     <>
-      <button ref={button} type="button" className="attach-btn" disabled={disabled} aria-label="Attach files" title="Attach files (≤10MB total)" onClick={() => input.current?.click()}>📎</button>
+      <button ref={button} type="button" className="attach-btn" disabled={disabled} aria-label="Attach files" title="Attach files (≤10MB total)" onClick={() => input.current?.click()}><PaperclipIcon /></button>
       <input
         ref={input}
         type="file"
@@ -787,11 +788,12 @@ export default function Messages() {
                   <button
                     type="button"
                     className="btn btn-ghost btn-sm call-btn"
+                    aria-label={`Call ${selected}`}
                     title={`Call ${selected}`}
                     disabled={callActive}
                     onClick={() => void placeCall()}
                   >
-                    📞
+                    <PhoneIcon />
                   </button>
                 )}
               </div>

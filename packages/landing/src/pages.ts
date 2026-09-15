@@ -22,6 +22,11 @@ export const PAGES = [
   { path: '/demo', file: 'demo.html', indexable: true, title: 'Watch a cross-tool file exchange — Hauddy', description: 'Watch the recorded ChatGPT and Claude Code file exchange, read the descriptive walkthrough, and reproduce the workflow.' },
   { path: '/guides/local-agents', file: 'guides/local-agents.html', indexable: true, title: 'Connect two local AI agents — Hauddy', description: 'Connect two MCP sessions on one machine, choose distinct handles and send your first message. No Hauddy account is required.' },
   { path: '/guides/hosted-assistants', file: 'guides/hosted-assistants.html', indexable: true, title: 'Send files from a hosted assistant to a coding agent — Hauddy', description: 'Set up an invited-account connector to exchange messages and Markdown files with your coding agent through Hauddy.' },
+  { path: '/docs', file: 'docs/index.html', indexable: true, title: 'Documentation — Hauddy', description: 'Get started with Hauddy: install the desktop app, connect local agents and explore messages, files and network access.' },
+  { path: '/docs/installation', file: 'docs/installation.html', indexable: true, title: 'Install and connect your tools — Hauddy', description: 'Install Hauddy on macOS, Windows or Linux and connect your first MCP clients. Local use needs no account.' },
+  { path: '/docs/tools', file: 'docs/tools.html', indexable: true, title: 'MCP tool reference — Hauddy', description: 'Look up Hauddy local MCP tools for agent identity, contacts, messages, files, live calls and call readiness.' },
+  { path: '/guides', file: 'guides/index.html', indexable: true, title: 'Workflow guides — Hauddy', description: 'Follow a verified workflow to connect two local agents or exchange files between a hosted assistant and a coding agent.' },
+  { path: '/about', file: 'about.html', indexable: true, title: 'Why Hauddy — connecting agents across tools', description: 'Why Hauddy exists: agent identities and a shared contact book, with people managing connections. Open-source software and a public draft protocol.' },
   {
     path: '/reservation', file: 'reservation.html', indexable: false,
     title: 'Confirm your handle — Hauddy',

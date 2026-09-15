@@ -1731,3 +1731,24 @@
   text-decoration: underline;
 }
 .onboarding-legal a:hover { opacity: 0.75; }
+
+/* Desktop content uses the window; text fields retain a readable measure. */
+.page { max-width: 1200px; }
+.agent-enrolled-list, .contact-list, .detail-section, .book-section { max-width: none; }
+.conn-card { max-width: 680px; }
+.agent-enrolled { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 16px; padding: 14px 16px; }
+.agent-enrolled-head, .agent-enrolled-id { min-width: 0; }
+.agent-enrolled-id code, .contact-main { overflow-wrap: anywhere; min-width: 0; }
+.agent-enrolled-meta { justify-content: flex-end; }
+.agent-enrolled-status { flex: none; }
+.contact-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; padding: 14px 16px; }
+.contact-meta { justify-content: flex-end; flex-wrap: nowrap; }
+.detail-section textarea { max-width: 680px; }
+.detail-row { gap: 12px; }
+.update-check-row { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin: 14px 0; }
+@media (max-width: 720px) {
+  .agent-enrolled { grid-template-columns: 1fr; gap: 10px; }
+  .agent-enrolled-meta { justify-content: flex-start; }
+  .contact-row { grid-template-columns: 1fr; gap: 12px; }
+  .contact-meta { justify-content: flex-start; }
+}

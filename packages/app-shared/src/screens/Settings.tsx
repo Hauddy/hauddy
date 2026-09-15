@@ -1,25 +1,30 @@
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api, clearKey, useApiData, useApiState } from '../api';
+import { api, clearKey, useApiState } from '../api';
 import ErrorState from '../components/ErrorState';
+import { SkeletonCard } from '../components/LoadingSkeleton';
 
 /** Account settings: profile (username == your @handle + bio), password, and the
  *  friend auto-accept toggle (rehomed here from the Friends screen). Distinct from
  *  the Account screen, which is about the API key + app download. */
 export default function Settings() {
-  const session = useApiData(() => api.getSession());
-  const identity = useApiData(() => api.getIdentity());
+  const { data: profile, loading, error, refetch } = useApiState(async () => {
+    const [session, identity] = await Promise.all([api.getSession(), api.getIdentity()]);
+    return { session, identity };
+  });
 
   return (
     <>
       <div className="page-head">
         <div>
           <h1 className="page-title">Settings</h1>
-          <p className="page-sub">{session?.email ?? '…'}</p>
+          <p className="page-sub">{profile?.session.email ?? 'Manage your profile and account preferences.'}</p>
         </div>
       </div>
 
-      <ProfileSection currentName={session?.name} currentBio={identity?.bio} handle={identity?.handle ?? null} />
+      {error && <ErrorState title={profile ? 'Could not refresh your profile' : 'Could not load your profile'} error={error} onRetry={refetch} />}
+      {!profile && loading && <div className="settings-section" role="status" aria-label="Loading profile"><SkeletonCard /></div>}
+      {profile && <ProfileSection currentName={profile.session.name} currentBio={profile.identity.bio} handle={profile.identity.handle} />}
       <PasswordSection />
       <FriendsSection />
       <DangerSection />

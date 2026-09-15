@@ -92,7 +92,7 @@ export default function Login() {
             {busy ? 'Please wait…' : mode === 'signin' ? 'Sign in' : 'Create account'}
           </button>
         </form>
-        {mode === 'signin' && <Link to="/reset-password">Forgot password?</Link>}
+        {mode === 'signin' && <Link className="login-recovery" to="/reset-password">Forgot password?</Link>}
         <div className="login-divider" role="separator"><span>or</span></div>
         <button
           type="button"

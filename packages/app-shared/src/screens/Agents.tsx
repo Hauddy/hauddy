@@ -23,8 +23,8 @@ export default function Agents() {
             visibility.
           </p>
         </div>
+        {overview?.agents.length !== 0 && <Link to="/setup" className="btn btn-primary">Set up an agent</Link>}
       </div>
-      <Link to="/setup" className="btn btn-primary">Set up an agent / resume setup</Link>
 
       {loading && !overview ? (
         <SkeletonList count={3} />

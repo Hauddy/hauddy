@@ -4,7 +4,7 @@ import { api, useApiData } from '../api';
 import type { ExposureRow, PlatformInfo } from '../api/types';
 import { PresenceDot } from '../components/Presence';
 import { isDesktop, downloadUpdate, installUpdate, onUpdateProgress, onUpdateReady, onUpdateError } from '../bridge';
-import { APP_VERSION, fetchVersion, semverLt, useVersionResult } from '../versionCheck';
+import { APP_VERSION, fetchVersion, semverLt, useVersionResult, type VersionResult } from '../versionCheck';
 
 /** Account: link this machine to your Hauddy account (paste the API key), then
  *  expose chosen agents onto the network under it. Everything here is opt-in —
@@ -16,7 +16,7 @@ export default function Account() {
   const versionResult = useVersionResult();
 
   useEffect(() => {
-    if (platform?.endpoint) fetchVersion(platform.endpoint);
+    fetchVersion(platform?.endpoint ?? undefined);
   }, [platform?.endpoint]);
 
   const softUpdate = versionResult?.latest && semverLt(APP_VERSION, versionResult.latest)
@@ -66,7 +66,7 @@ export default function Account() {
       )}
 
       {isDesktop() && (
-        <UpdateSection currentVersion={APP_VERSION} latestVersion={softUpdate?.latest ?? null} />
+        <UpdateSection currentVersion={APP_VERSION} latestVersion={softUpdate?.latest ?? null} check={versionResult} endpoint={platform?.endpoint ?? undefined} />
       )}
 
       <section className="detail-section">
@@ -85,7 +85,7 @@ export default function Account() {
 
 type UpdateState = 'idle' | 'downloading' | 'ready' | 'error';
 
-function UpdateSection({ currentVersion, latestVersion }: { currentVersion: string; latestVersion: string | null }) {
+export function UpdateSection({ currentVersion, latestVersion, check, endpoint }: { currentVersion: string; latestVersion: string | null; check: VersionResult | null; endpoint?: string }) {
   const [state, setState] = useState<UpdateState>('idle');
   const [percent, setPercent] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -113,6 +113,7 @@ function UpdateSection({ currentVersion, latestVersion }: { currentVersion: stri
         <span className="update-version-label">Current version</span>
         <span className="update-version-value">v{currentVersion}</span>
       </div>
+      {state === 'idle' && <div className="update-check-row"><span role="status">{check?.status === 'error' ? 'Could not check for updates.' : !check || check.status === 'checking' ? 'Checking for updates…' : latestVersion ? 'An update is available.' : 'Up to date'}</span><button type="button" className="btn btn-ghost btn-sm" disabled={check?.status === 'checking'} onClick={() => fetchVersion(endpoint, true)}>Check again</button></div>}
       {state === 'idle' && (
         latestVersion ? (
           <div className="update-available-row">
@@ -121,9 +122,7 @@ function UpdateSection({ currentVersion, latestVersion }: { currentVersion: stri
               Download &amp; install
             </button>
           </div>
-        ) : (
-          <p className="update-up-to-date">Up to date</p>
-        )
+        ) : null
       )}
       {state === 'downloading' && (
         <div className="update-progress-wrap">
@@ -292,7 +291,7 @@ function ExposureRowView({ row }: { row: ExposureRow }) {
     <div className="contact-row">
       <div className="contact-main">
         <span className="contact-nick">{row.nickname ?? row.localId}</span>
-        <span className="contact-desc"> — on the network as {row.platformNickname ?? '(nickname taken)'}</span>
+        {row.platformNickname !== row.nickname && <span className="contact-desc"> — on the network as {row.platformNickname ?? '(nickname taken)'}</span>}
         {error && <div className="notice link-conflict">{error}</div>}
       </div>
       <div className="contact-meta">
