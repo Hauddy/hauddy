@@ -50,7 +50,7 @@ function DangerSection() {
     <section className="settings-section settings-danger">
       <h2 className="section-title bad">Danger Zone</h2>
       <p className="book-explainer">
-        Deleting your account removes your handle reservations, connectors, and friendships permanently. This action cannot be undone.
+        Deleting your account permanently removes your platform account, its stored history and files, handle reservations, connectors, and friendships. You lose access to this account and its handles. History on your computer and private copies held by other participants remain. This action cannot be undone.
       </p>
 
       {!confirming ? (
@@ -60,7 +60,7 @@ function DangerSection() {
       ) : (
         <div className="danger-confirm-box">
           <p className="danger-warning">
-            Are you sure you want to permanently delete your account and all associated data?
+            Delete your platform account, its stored history and files, handles, connectors, and friendships? History on your computer and other participants’ private copies will remain.
           </p>
           <div className="danger-actions">
             <button

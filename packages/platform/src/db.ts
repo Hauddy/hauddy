@@ -218,7 +218,7 @@ export interface ConnectorTokenView {
  * scrypt), and the durable inbox is folded into the `messages` table (P3).
  */
 export class Db {
-  constructor(private sql: SqlStorage) {}
+  constructor(readonly sql: SqlStorage) {}
 
   /** Apply the full schema. Idempotent — safe on every construction. */
   init(): void {
@@ -295,6 +295,7 @@ export class Db {
   }): Promise<{ account: AccountRow; apiKey: string }> {
     const apiKey = mintApiKey();
     const { hash, salt, iterations } = await hashPassword(input.password);
+    if (this.preregistrationHeld(input.username)) throw new Error("That username is reserved. Choose a different personal username.");
     const account_id = mintAccountId();
     const key_masked = maskKey(apiKey);
     const created_at = nowIso();
@@ -323,6 +324,9 @@ export class Db {
    *  the same commit, so failures never orphan blobs or resurrect credentials. */
   deleteAccount(accountId: string): boolean {
     if (!this.getAccount(accountId)) return false;
+    const email = this.getAccount(accountId)!.email.toLowerCase();
+    this.sql.exec('DELETE FROM email_tokens WHERE email=?', email);
+    this.sql.exec('DELETE FROM preregistrations WHERE email=?', email);
     const agentIds = this.accountAgents(accountId).map((a) => a.agent_id);
     const tokens = this.rows<{ token: string }>("SELECT token FROM connector_tokens WHERE account_id = ?", accountId).map((r) => r.token);
     // account_id is authoritative. owner is a client-provided hint, so only use
@@ -901,6 +905,7 @@ export class Db {
     if (!name) return { ok: false, reason: "invalid" };
     const agent = this.getAgent(agentId);
     if (!agent) return { ok: false, reason: "invalid" };
+    if (this.preregistrationHeld(name)) return { ok: false, reason: "conflict" };
     const existing = this.first<{ agent_id: string }>("SELECT agent_id FROM nicknames WHERE nickname = ?", name);
     if (existing && existing.agent_id !== agentId) return { ok: false, reason: "conflict", conflict: existing.agent_id };
     // Reservations share the namespace: a hold by ANOTHER account blocks the bind
@@ -948,7 +953,12 @@ export class Db {
       .slice(0, count);
   }
 
-  /** Is a handle free across BOTH bound nicknames and reservations? */
+  preregistrationHeld(rawName: string): boolean {
+    const name = normalizeNickname(rawName);
+    return !!name && !!this.first('SELECT nickname FROM preregistrations WHERE nickname=? AND hold_expires_ms>?', name, Date.now());
+  }
+
+  /** Is a handle free across bound nicknames, account reservations and email holds? */
   nicknameAvailability(rawName: string, forAccountId?: string): NicknameAvailability {
     const name = normalizeNickname(rawName);
     if (!name) return { name: rawName, available: false, reason: "invalid" };
@@ -966,6 +976,7 @@ export class Db {
     if (reserved) {
       return { name: formatNickname(name), available: false, reason: "reserved", mine: !!forAccountId && reserved.account_id === forAccountId };
     }
+    if (this.preregistrationHeld(name)) return { name: formatNickname(name), available: false, reason: "reserved", mine: false };
     return { name: formatNickname(name), available: true };
   }
 
@@ -1233,6 +1244,16 @@ export class Db {
       messageId,
       agentId,
     );
+    // Count activation once when an actual non-human recipient acknowledges an SMS.
+    // Only an aggregate source counter leaves the operational waitlist record.
+    const activation = this.first<{ source: string }>(
+      `UPDATE waitlist_members SET activated_ms=? WHERE activated_ms IS NULL AND email IN (
+        SELECT ac.email FROM accounts ac JOIN agents a ON a.account_id=ac.account_id
+        JOIN messages m ON m.to_agent=a.agent_id
+        WHERE a.agent_id=? AND a.kind!='human' AND m.message_id=? AND m.delivered_at IS NOT NULL
+      ) RETURNING source`, Date.now(), agentId, messageId,
+    );
+    if (activation) this.sql.exec("INSERT INTO acquisition_events(source,event,count) VALUES(?,'activation',1) ON CONFLICT(source,event) DO UPDATE SET count=count+1", activation.source);
   }
 
   private rowToEnvelope(r: Record<string, Bind>): Envelope {

@@ -11,8 +11,10 @@ import OpenSource from './components/OpenSource';
 import Closing from './components/Closing';
 import Footer from './components/Footer';
 import Privacy from './components/Privacy';
+import Reservation from './components/Reservation';
 
 export default function App() {
+  if (window.location.pathname === '/reservation') return <Reservation />;
   if (window.location.pathname === '/privacy') {
     return <Privacy />;
   }

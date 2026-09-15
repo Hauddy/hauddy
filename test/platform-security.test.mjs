@@ -448,3 +448,180 @@ test('desktop settings proxy uses daemon credentials, handles errors and clears 
   assert.equal(loadAccount(), null);
   await assert.rejects(daemon.accountSettings('get'), /Connect your account/);
 });
+
+async function emailFixture(t) {
+  const f = await fixture(t), mail = [];
+  f.hub.env.RESEND_API_KEY = 'fixture-mail-key';
+  t.mock.method(globalThis, 'fetch', async (url, options) => {
+    assert.equal(url, 'https://api.resend.com/emails');
+    mail.push(JSON.parse(options.body));
+    return Response.json({ id: 'fixture-mail' });
+  });
+  const token = () => mail.at(-1).text.match(/#token=([a-f0-9]+)/)[1];
+  return { ...f, mail, token };
+}
+
+test('email reservation blocks binding and signup, then transfers only with verified invited proof', async (t) => {
+  const { request, db, a, b, token, sqlite } = await emailFixture(t);
+  await expectStatus(request('/preregistration/request', {email:'ALICE@example.test', handle:'@Reserved', source:'hero'}),200);
+  assert.equal(db.nicknameAvailability('reserved').available,false);
+  assert.equal(db.bindNickname(b.agent,'reserved').ok,false);
+  assert.equal(db.reserveNickname(a.id,'reserved').ok,false);
+  assert.equal((await request('/accounts', {email:'another@example.test', username:'reserved', password:'password'})).status,409);
+  const proof = token();
+  assert.equal(sqlite.prepare('SELECT COUNT(*) AS n FROM email_tokens WHERE hash=?').get(proof).n,0);
+  await expectStatus(request('/preregistration/verify',{token:proof}),200);
+  await expectStatus(request('/preregistration/verify',{token:proof}),410);
+  await expectStatus(request('/preregistration/claim',{token:proof},a.key),410);
+  db.addInvite('alice@example.test');
+  // Resending a verification for an invited holder sends the claim email.
+  await expectStatus(request('/preregistration/request',{email:'alice@example.test',handle:'reserved'}),200);
+  await expectStatus(request('/preregistration/verify',{token:token()}),200);
+  const claim = token();
+  await expectStatus(request('/preregistration/claim',{token:claim},b.key),403);
+  const competingClaims=await Promise.all([1,2].map(()=>request('/preregistration/claim',{token:claim},a.key)));
+  assert.deepEqual(competingClaims.map(r=>r.status).sort(),[200,410]);
+  assert.deepEqual(db.accountReservations(a.id),['@reserved']);
+  assert.equal(db.getAccount(a.id).username,'alice');
+  await expectStatus(request('/preregistration/claim',{token:claim},a.key),410);
+  assert.equal(sqlite.prepare('SELECT COUNT(*) AS n FROM waitlist_members').get().n,1);
+});
+
+test('competing reservation requests have one hold and cannot learn its owner or create a second hold per email', async(t)=>{
+  const {request,sqlite,mail}=await emailFixture(t);
+  await Promise.all(['alice','bob'].map(n=>request('/preregistration/request',{email:n+'@example.test',handle:'shared'})));
+  assert.equal(sqlite.prepare('SELECT COUNT(*) AS n FROM preregistrations').get().n,1);
+  const owner=sqlite.prepare('SELECT email FROM preregistrations').get().email;
+  assert.equal(mail.length,1);
+  const neutral=await expectStatus(request('/preregistration/request',{email:owner,handle:'second'}),200);
+  assert.equal(neutral.ok,true); assert.equal(neutral.pending,true); assert.match(neutral.request_token,/^[a-f0-9]{64}$/);
+  assert.equal(sqlite.prepare('SELECT COUNT(*) AS n FROM preregistrations').get().n,1);
+});
+
+test('expired holds release the namespace and expired verification cannot revive them', async(t)=>{
+  const {request,sqlite,db,token}=await emailFixture(t);
+  await expectStatus(request('/preregistration/request',{email:'alice@example.test',handle:'expiring'}),200);
+  const proof=token();
+  sqlite.exec('UPDATE preregistrations SET hold_expires_ms=0');
+  assert.equal(db.nicknameAvailability('expiring').available,true);
+  await expectStatus(request('/preregistration/verify',{token:proof}),410);
+});
+
+test('mail failure never verifies a hold and retry preserves one waitlist membership',async(t)=>{
+  const {request,sqlite}=await emailFixture(t);
+  t.mock.method(globalThis,'fetch',async()=>new Response('provider failure',{status:500}));
+  await expectStatus(request('/preregistration/request',{email:'alice@example.test',handle:'mailfail'}),503);
+  assert.equal(sqlite.prepare('SELECT status FROM preregistrations').get(),undefined);
+  assert.equal(sqlite.prepare("SELECT COUNT(*) AS n FROM email_tokens WHERE purpose='verify'").get().n,0);
+  t.mock.method(globalThis,'fetch',async()=>Response.json({id:'ok'}));
+  await expectStatus(request('/preregistration/request',{email:'alice@example.test',handle:'mailfail'}),200);
+  assert.equal(sqlite.prepare('SELECT COUNT(*) AS n FROM waitlist_members').get().n,1);
+});
+
+test('password reset is neutral, single-use, rotates the old key and accepts the new password',async(t)=>{
+  const {request,a,db,token,sqlite}=await emailFixture(t);
+  const unknown=await expectStatus(request('/accounts/recovery/request',{email:'nobody@example.test'}),200);
+  const known=await expectStatus(request('/accounts/recovery/request',{email:'alice@example.test'}),200);
+  assert.deepEqual(unknown,known);
+  const proof=token();
+  const results=await Promise.all([1,2].map(()=>request('/accounts/recovery/reset',{token:proof,password:'a-new-password'})));
+  assert.deepEqual(results.map(r=>r.status).sort(),[200,410]);
+  assert.equal(await db.verifyLogin('alice','fixture-password'),null);
+  assert.equal(await db.verifyLogin('alice','a-new-password'),a.id);
+  assert.equal(db.authenticateAccount(a.key),null);
+  assert.equal(sqlite.prepare("SELECT COUNT(*) AS n FROM email_tokens WHERE purpose='reset'").get().n,0);
+});
+
+test('expired or password-invalidated reset links cannot change credentials',async(t)=>{
+  const {request,db,a,token,sqlite}=await emailFixture(t);
+  await request('/accounts/recovery/request',{email:'alice@example.test'});
+  const expired=token();sqlite.exec('UPDATE email_tokens SET expires_ms=0');
+  await expectStatus(request('/accounts/recovery/reset',{token:expired,password:'new-password'}),410);
+  await request('/accounts/recovery/request',{email:'alice@example.test'});
+  const stale=token();await db.setPassword(a.id,'changed-elsewhere');
+  await expectStatus(request('/accounts/recovery/reset',{token:stale,password:'new-password'}),410);
+});
+
+
+test('only the original pending receipt can correct details and it loses authority after verification', async t => {
+  const {request,token,db,sqlite}=await emailFixture(t);
+  const input={email:'typo@example.test',handle:'correctable'};
+  const first=await expectStatus(request('/preregistration/request',input),200);
+  const resend=await expectStatus(request('/preregistration/request',input),200);
+  await expectStatus(request('/preregistration/cancel',{token:resend.request_token}),410);
+  await expectStatus(request('/preregistration/cancel',{token:first.request_token}),200);
+  assert.equal(db.nicknameAvailability(input.handle).available,true);
+  const next=await expectStatus(request('/preregistration/request',{...input,email:'correct@example.test'}),200);
+  const verified=await expectStatus(request('/preregistration/verify',{token:token()}),200);
+  await expectStatus(request('/preregistration/cancel',{token:next.request_token}),410);
+  await expectStatus(request('/preregistration/cancel',{token:verified.cancel_token}),200);
+  assert.equal(sqlite.prepare('SELECT COUNT(*) AS n FROM waitlist_members').get().n,2);
+});
+
+test('waitlist mirror retries a committed-but-unacknowledged write without duplicating legacy subscribers', async t => {
+  const {request,hub,sqlite}=await emailFixture(t);
+  const entries=new Map([['alice@example.test','legacy']]);
+  let fail=true;
+  hub.env.WAITLIST_DB={prepare:()=>({bind:(email,created,source)=>({run:async()=>{
+    if(!entries.has(email)) entries.set(email,source);
+    if(fail)throw new Error('lost acknowledgement');
+    return {success:true};
+  }})})};
+  await expectStatus(request('/preregistration/request',{email:'alice@example.test',handle:'old-member'}),200);
+  await expectStatus(request('/preregistration/request',{email:'new@example.test',handle:'new-member'}),200);
+  assert.equal(sqlite.prepare('SELECT COUNT(*) AS n FROM waitlist_members WHERE mirrored=0').get().n,2);
+  fail=false; await hub.alarm(); await hub.alarm();
+  assert.equal(entries.size,2); assert.equal(entries.get('alice@example.test'),'legacy');
+  assert.equal(sqlite.prepare('SELECT COUNT(*) AS n FROM waitlist_members WHERE mirrored=0').get().n,0);
+});
+
+test('email throttling survives requests and availability does not consume the send budget', async t => {
+  const {request,hub,sqlite}=await emailFixture(t); hub.env.RATE_LIMIT='on';
+  for(let i=0;i<35;i++) await expectStatus(request('/preregistration/check?handle=available'),200);
+  for(let i=0;i<3;i++) await expectStatus(request('/accounts/recovery/request',{email:'unknown@example.test'}),200);
+  await expectStatus(request('/accounts/recovery/request',{email:'unknown@example.test'}),429);
+  assert.ok(sqlite.prepare('SELECT key FROM rate_limits').all().every(r=>!r.key.includes('unknown@example.test')));
+  for(let i=0;i<26;i++) await expectStatus(request('/accounts/recovery/request',{email:`other${i}@example.test`}),200);
+  await expectStatus(request('/accounts/recovery/request',{email:'next@example.test'}),429);
+});
+
+test('claim failure rolls back its hold and token, and invitation retries keep the original deadline', async t => {
+  const {request,db,a,token,sqlite,hub}=await emailFixture(t);
+  hub.env.ADMIN_TOKEN='admin';
+  await request('/preregistration/request',{email:'alice@example.test',handle:'held-agent'});
+  await expectStatus(request('/preregistration/verify',{token:token()}),200);
+  await expectStatus(request('/admin/invites',{email:'alice@example.test'},'admin'),200);
+  const deadline=sqlite.prepare('SELECT hold_expires_ms FROM preregistrations').get().hold_expires_ms;
+  await expectStatus(request('/admin/invites',{email:'alice@example.test'},'admin'),200);
+  assert.equal(sqlite.prepare('SELECT hold_expires_ms FROM preregistrations').get().hold_expires_ms,deadline);
+  const claim=token();
+  for(let i=0;i<20;i++) assert.equal(db.reserveNickname(a.id,`spare${i}`).ok,true);
+  await expectStatus(request('/preregistration/claim',{token:claim}),409);
+  assert.equal(sqlite.prepare('SELECT nickname FROM preregistrations').get().nickname,'held-agent');
+  sqlite.exec("DELETE FROM reservations WHERE nickname='spare0'");
+  await expectStatus(request('/preregistration/claim',{token:claim}),200);
+});
+
+test('expiry cleanup removes all ownership tokens and source metrics never store arbitrary input', async t => {
+  const {request,hub,sqlite,token}=await emailFixture(t);
+  await request('/preregistration/request',{email:'alice@example.test',handle:'oldhold',source:'personal@example.test'});
+  const result=await expectStatus(request('/preregistration/verify',{token:token()}),200);
+  sqlite.exec('UPDATE preregistrations SET hold_expires_ms=0');
+  await hub.alarm();
+  await request('/preregistration/request',{email:'alice@example.test',handle:'newhold'});
+  await expectStatus(request('/preregistration/cancel',{token:result.cancel_token}),410);
+  assert.equal(sqlite.prepare('SELECT nickname FROM preregistrations').get().nickname,'newhold');
+  assert.ok(sqlite.prepare('SELECT source FROM acquisition_events').all().every(r=>!r.source.includes('@')));
+});
+
+
+test('activation counts once from a recipient acknowledgement, never from queued sends or wrong recipients', async t => {
+  const {request,db,a,b,seedMessage,sqlite}=await emailFixture(t);
+  await request('/preregistration/request',{email:'alice@example.test',handle:'activation-hold',source:'hero'});
+  seedMessage(message('activation-message',a.human,a.agent));
+  const count=()=>sqlite.prepare("SELECT count FROM acquisition_events WHERE source='hero' AND event='activation'").get()?.count ?? 0;
+  assert.equal(count(),0);
+  db.markDelivered('activation-message',b.agent);assert.equal(count(),0);
+  db.markDelivered('activation-message',a.agent);assert.equal(count(),1);
+  db.markDelivered('activation-message',a.agent);assert.equal(count(),1);
+});

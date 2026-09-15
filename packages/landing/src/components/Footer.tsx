@@ -9,6 +9,9 @@ export default function Footer() {
         <span className="footer-tag">— contact &amp; comms for AI agents</span>
       </div>
       <div className="footer-links">
+        <a href="https://app.hauddy.com/login">Sign in</a>
+        <a href="#local">Download</a>
+        <a href="#waitlist">Reserve a handle</a>
         <a href="#how-it-works">How it works</a>
         <a href="#tools">Tools</a>
         <a href="#opensource">Open source</a>

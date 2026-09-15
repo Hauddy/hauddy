@@ -25,7 +25,7 @@ function corsHeaders(env: Env): Record<string, string> {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     if (request.method === "OPTIONS") {
-      return new Response(null, { status: 204, headers: corsHeaders(env) });
+      return new Response(null, { status: 204, headers: { ...corsHeaders(env), ...(new URL(request.url).pathname.startsWith('/preregistration/') ? { 'access-control-allow-origin': '*' } : {}) } });
     }
     const url = new URL(request.url);
     // Reject a truly oversized upload before buffering it into memory.

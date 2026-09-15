@@ -210,10 +210,19 @@ function AttachControl({
   setFiles: React.Dispatch<React.SetStateAction<File[]>>;
   disabled: boolean;
 }) {
+  const input = useRef<HTMLInputElement>(null);
+  const button = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    const node = input.current;
+    const restoreFocus = () => button.current?.focus();
+    node?.addEventListener('cancel', restoreFocus);
+    return () => node?.removeEventListener('cancel', restoreFocus);
+  }, []);
   return (
-    <label className={`attach-btn${disabled ? ' disabled' : ''}`} title="Attach files (≤10MB total)">
-      📎
+    <>
+      <button ref={button} type="button" className="attach-btn" disabled={disabled} aria-label="Attach files" title="Attach files (≤10MB total)" onClick={() => input.current?.click()}>📎</button>
       <input
+        ref={input}
         type="file"
         multiple
         hidden
@@ -222,9 +231,10 @@ function AttachControl({
           const picked = Array.from(e.target.files ?? []);
           setFiles((prev) => [...prev, ...picked]);
           e.target.value = '';
+          button.current?.focus();
         }}
       />
-    </label>
+    </>
   );
 }
 
@@ -371,14 +381,14 @@ export default function Messages() {
   useEffect(() => {
     const to = searchParams.get('to');
     if (!to) return;
+    setViewAs(null);
     setSelected(to);
     setSelectedId(null);
     setComposing(false);
     const next = new URLSearchParams(searchParams);
     next.delete('to');
     setSearchParams(next, { replace: true });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [searchParams, setSearchParams]);
   const [items, setItems] = useState<TimelineItem[]>([]);
   const { body: draft, files, recipientId, setBody: setDraft, setFiles, clear: clearDraft, resolveRecipient } = useConversationDraft(viewAs, selected, selectedId);
   const submissions = useRef(new Map<string, MessageSubmission>());
@@ -443,12 +453,14 @@ export default function Messages() {
     if (bottom) setHasNew(false);
   };
 
-  // Switching identity resets the open conversation (peers differ per identity).
-  useEffect(() => {
+  // Reset only on an explicit identity change, not on the initial render or a
+  // conversation deep link arriving while this screen is already mounted.
+  const changeInbox = (identity: string | null) => {
+    setViewAs(identity);
     setSelected(null);
     setSelectedId(null);
     setComposing(false);
-  }, [viewAs]);
+  };
 
   // Stay pinned to the newest line when already at the bottom; otherwise flag
   // that new lines arrived below the fold (drives the "new messages" pill).
@@ -651,7 +663,7 @@ export default function Messages() {
         {agentIdentities.length > 0 && (
           <label className="view-as">
             <span className="view-as-label">Inbox</span>
-            <select className="input" value={viewAs ?? ''} onChange={(e) => setViewAs(e.target.value || null)} aria-label="Whose inbox to view">
+            <select className="input" value={viewAs ?? ''} onChange={(e) => changeInbox(e.target.value || null)} aria-label="Whose inbox to view">
               <option value="">You</option>
               {agentIdentities.map((a) => (
                 <option key={a.id} value={a.id}>

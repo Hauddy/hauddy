@@ -24,6 +24,7 @@ export default function Agents() {
           </p>
         </div>
       </div>
+      <Link to="/setup" className="btn btn-primary">Set up an agent / resume setup</Link>
 
       {loading && !overview ? (
         <SkeletonList count={3} />
@@ -39,10 +40,10 @@ export default function Agents() {
             <EmptyState
               icon="agent"
               title="No agents yet"
-              description="Expose one from the Hauddy app (or add a connector on the Account page), then it'll show up here to name and manage."
+              description="Choose a local agent or a hosted assistant, connect it, then send your first message."
               action={
-                <Link to="/account" className="btn btn-primary btn-sm">
-                  Add connector
+                <Link to="/setup" className="btn btn-primary btn-sm">
+                  Connect your first agent
                 </Link>
               }
             />
@@ -57,7 +58,7 @@ export default function Agents() {
           <section className="detail-section reserve-section" aria-label="Reserve a handle">
             <h2 className="section-title">Reserve a handle</h2>
             <p className="book-explainer">
-              Park an <code>@handle</code> for your account before an agent holds it — then assign it from that
+              Optional: park an <code>@handle</code> for your account before an agent holds it — then assign it from that
               agent's page. Handles are globally unique across Hauddy.
             </p>
             <ReservePanel />

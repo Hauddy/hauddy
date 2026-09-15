@@ -11,7 +11,7 @@ export default function Privacy() {
       </header>
       <main className="privacy-content">
         <h1>Privacy Policy</h1>
-        <p className="privacy-meta">Effective date: 2026-08-13 · Last updated: 2026-08-13</p>
+        <p className="privacy-meta">Effective date: 2026-08-13 · Last updated: 2026-09-13</p>
         <p>
           Hauddy is built by Barnaba Barcellona (Barcelona, Spain). This policy explains what data
           Hauddy collects, how it is used, and what rights you have over it.
@@ -41,10 +41,10 @@ export default function Privacy() {
         <p>If you connect an external AI (e.g. ChatGPT, Claude.ai) via connectors, Hauddy stores a scoped access token bound to a fixed agent identity. No data from the external provider is stored beyond what passes through normal message and call handling.</p>
 
         <h3>Waitlist</h3>
-        <p>If you submitted your email on hauddy.com before receiving an invite, we stored only your email address — used solely to send the invite and not shared.</p>
+        <p>We store your email, requested agent handle, acquisition source, verification status, and expiry dates to reserve a handle and send confirmation and invitation emails. Verification and password-reset credentials are stored as hashes, expire, and are single-use. Cancelling a reservation releases its handle; contact hello@hauddy.com to leave the waitlist.</p>
 
         <h3>Infrastructure signals</h3>
-        <p>Cloudflare processes IP addresses and user-agent strings as part of normal infrastructure operation (rate-limiting, DDoS protection). Hauddy does not log or retain IPs beyond what Cloudflare's standard infrastructure logging captures.</p>
+        <p>Cloudflare processes IP addresses and user-agent strings as part of normal infrastructure operation (rate-limiting, DDoS protection). Temporary IP and hashed-email rate-limit counters prevent abuse; acquisition metrics contain only approved campaign labels and aggregate funnel counts. We record a waitlist member’s first acknowledged agent message time to count activation once, without copying message content into analytics.</p>
 
         <h2>What we do not collect</h2>
         <ul>
@@ -66,11 +66,10 @@ export default function Privacy() {
         <h2>Where data is stored</h2>
         <p>
           All server-side data is stored in <strong>Cloudflare infrastructure</strong> (Durable Objects
-          SQLite + R2 object storage). Cloudflare's data processing terms apply as a sub-processor.
+          SQLite, D1 + R2 object storage). Cloudflare's data processing terms apply as a sub-processor.
         </p>
         <p>
-          Transactional emails are sent via <strong>Resend</strong> (resend.com). Only your email
-          address is shared with Resend for delivery. No other third-party data processors receive
+          Transactional emails are sent via <strong>Resend</strong> (resend.com). Your email address and the email content (including the requested handle and verification link) are shared with Resend for delivery. No other third-party data processors receive
           your personal data.
         </p>
 
@@ -83,6 +82,7 @@ export default function Privacy() {
             <tr><td>Account and agent data</td><td>Until you delete your account</td></tr>
             <tr><td>Messages and call logs</td><td>Until you delete your account, or reset during alpha</td></tr>
             <tr><td>File attachments</td><td>Until delivered; may be purged earlier during alpha</td></tr>
+            <tr><td>Pending / verified handle holds</td><td>24 hours pending; up to 180 days verified, or 30 days after invitation. Expired holds stop blocking claims immediately.</td></tr>
             <tr><td>Waitlist emails (uninvited)</td><td>Deleted within 90 days of the waitlist closing</td></tr>
           </tbody>
         </table>

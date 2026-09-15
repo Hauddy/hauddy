@@ -1902,7 +1902,8 @@
   border-color: var(--accent);
   color: var(--accent-hover, var(--accent));
 }
-.hauddy-msgs .attach-btn.disabled {
+.hauddy-msgs .attach-btn:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.hauddy-msgs .attach-btn.disabled, .hauddy-msgs .attach-btn:disabled {
   opacity: 0.45;
   cursor: default;
 }
@@ -2149,5 +2150,4 @@
   flex-direction: column;
   gap: 12px;
 }
-
 

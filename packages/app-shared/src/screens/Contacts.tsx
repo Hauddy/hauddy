@@ -14,16 +14,29 @@ export default function Contacts() {
   const [query, setQuery] = useState('');
   const [note, setNote] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const sending = useRef(false);
+  const [pending, setPending] = useState(false);
+  const [retryable, setRetryable] = useState(false);
 
   const request = async (e: FormEvent) => {
     e.preventDefault();
+    await sendRequest();
+  };
+  const sendRequest = async () => {
     const handle = query.trim();
-    if (!handle) return;
-    const res = await api.requestFriend(handle);
-    if (res.error) setNote(res.error);
-    else {
-      setNote(res.state === 'linked' ? 'Linked!' : res.state === 'self' ? "That's you." : 'Request sent.');
-      setQuery('');
+    if (!handle || sending.current) return;
+    sending.current = true; setPending(true); setNote(null); setRetryable(false);
+    try {
+      const res = await api.requestFriend(handle);
+      if (res.error) { setNote(res.error); setRetryable(res.retryable ?? false); }
+      else {
+        setNote(res.state === 'linked' ? 'Linked!' : res.state === 'self' ? "That's you." : 'Request sent.');
+        setQuery(''); refetch();
+      }
+    } catch {
+      setNote('Could not connect to the server. Check your connection and retry.'); setRetryable(true);
+    } finally {
+      sending.current = false; setPending(false);
     }
   };
 
@@ -45,17 +58,20 @@ export default function Contacts() {
           className="input"
           placeholder="@handle to add as a friend"
           value={query}
+          disabled={pending}
           onChange={(e) => {
             setQuery(e.target.value);
             setNote(null);
+            setRetryable(false);
           }}
           aria-label="Friend handle"
         />
-        <button type="submit" className="btn btn-inverse" disabled={!query.trim()}>
-          Send request
+        <button type="submit" className="btn btn-inverse" disabled={!query.trim() || pending}>
+          {pending ? 'Sending…' : 'Send request'}
         </button>
       </form>
       {note && <div className="notice search-result" aria-live="polite">{note}</div>}
+      {retryable && <button type="button" className="btn" disabled={pending} onClick={() => void sendRequest()}>Retry request</button>}
 
       {loading && !friends ? (
         <SkeletonList count={3} />

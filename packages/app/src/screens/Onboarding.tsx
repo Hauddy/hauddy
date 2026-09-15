@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { api, useApiData } from '../api';
 import { useNavigate } from 'react-router-dom';
 import Logo from '../components/Logo';
 import { IconActivity, IconAgents, IconContacts, IconMessages, IconPlatform } from '../components/icons';
@@ -14,6 +15,8 @@ const TABS = [
 ];
 
 export default function Onboarding() {
+  const agents = useApiData(() => api.listAgents());
+  const connected = agents?.filter(a => a.status === 'attached') ?? [];
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
   const [step, setStep] = useState<'welcome' | 'tour'>('welcome');
@@ -62,6 +65,8 @@ export default function Onboarding() {
             </p>
           </section>
 
+          <p role="status">{connected.length ? `${connected.length} agent connected. Open Messages to send your first test message.` : 'Waiting for an agent connection. Keep this app running, restart your harness after setup, and ask it to list Hauddy contacts.'}</p>
+          {connected.length > 0 && <button className="btn btn-primary" onClick={() => navigate('/messages')}>Send a first message</button>}
           <div className="onboarding-actions">
             <button type="button" className="btn btn-ghost btn-sm" onClick={finish}>
               Skip

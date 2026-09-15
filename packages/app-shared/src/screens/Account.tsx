@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { api, apiBase, clearKey, revealKey, useApiData, useApiState, type ConnectorInfo, type ConnectorOAuth } from '../api';
 import ConnectorSnippets from '../components/ConnectorSnippets';
 import CopyChip from '../components/CopyChip';
@@ -13,6 +14,8 @@ export interface AccountProps {
 }
 
 export default function Account({ showDownload = true, version }: AccountProps) {
+  const [params] = useSearchParams();
+  const hostedSetup = params.get('setup') === 'hosted';
   const session = useApiData(() => api.getSession());
   const key = useApiData(() => api.getAccountKey());
   const [latestVersion, setLatestVersion] = useState<string | null>(version ?? null);
@@ -94,7 +97,8 @@ export default function Account({ showDownload = true, version }: AccountProps) 
         </div>
       </div>
 
-      <h2 className="section-title">API key</h2>
+      {hostedSetup && <p><Link to="/setup?path=hosted">Back to hosted setup and connection progress</Link></p>}
+      {!hostedSetup && <><h2 className="section-title">API key</h2>
       <p className="book-explainer">
         This is the key that links your account to the Hauddy app. Copy it, then in the app go to{' '}
         <strong>Account → Set up API key</strong> and paste it. Rotating replaces it (re-paste into the app);
@@ -122,7 +126,8 @@ export default function Account({ showDownload = true, version }: AccountProps) 
         </div>
       )}
 
-      <Connectors />
+      </>}
+      <Connectors guided={hostedSetup} />
 
       <h2 className="section-title">Session</h2>
       <p className="book-explainer">Signing out here does not revoke your API key or disconnect other apps.</p>
@@ -175,7 +180,7 @@ export default function Account({ showDownload = true, version }: AccountProps) 
 /** Scoped connector tokens for outside AIs (ChatGPT, Claude) + scripts. Each
  *  connector is a fixed @handle identity + a revocable, scoped bearer token used
  *  against the remote MCP endpoint and the /v1 REST API. */
-function Connectors() {
+function Connectors({ guided = false }: { guided?: boolean }) {
   const { data: connectors, loading, error: listError, refetch } = useApiState(() => api.listConnectors());
   const [handle, setHandle] = useState('');
   const [label, setLabel] = useState('');
@@ -204,14 +209,14 @@ function Connectors() {
 
   return (
     <>
-      <h2 className="section-title">Connectors (ChatGPT, Claude, curl)</h2>
-      <p className="book-explainer">
+      <h2 className="section-title">{guided ? 'Connect your hosted assistant' : 'Connectors (ChatGPT, Claude, curl)'}</h2>
+      {guided ? <p className="book-explainer">Choose a handle and the capabilities your assistant needs. After creating the connector, choose your provider to see its connection instructions. You can revoke access at any time.</p> : <p className="book-explainer">
         A connector lets an outside AI or script message your agents as a fixed <strong>@handle</strong> — and
         others can reply to it. Each token is scoped and revocable, and is <em>not</em> your account key. Add it
         as a remote MCP server (<code>{mcpUrl}</code>) or call the REST API directly. Every connector also gets an
         OAuth <strong>client_id + secret</strong>, so a browserless agent can authenticate with the{' '}
         <code>client_credentials</code> grant instead of the browser sign-in flow.
-      </p>
+      </p>}
 
       <div className="card conn-card">
         <div className="conn-form">

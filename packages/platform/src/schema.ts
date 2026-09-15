@@ -3,6 +3,23 @@
 // re-running on each construction is safe. No bind params here, so the whole thing
 // can go through a single ctx.storage.sql.exec() call.
 export const SCHEMA = /* sql */ `
+CREATE TABLE IF NOT EXISTS acquisition_events (
+  source TEXT NOT NULL, event TEXT NOT NULL, count INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY(source,event)
+);
+CREATE TABLE IF NOT EXISTS email_tokens (
+  hash TEXT PRIMARY KEY, purpose TEXT NOT NULL, email TEXT NOT NULL,
+  account_id TEXT, credential TEXT, expires_ms INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS email_tokens_email ON email_tokens(email);
+CREATE TABLE IF NOT EXISTS preregistrations (
+  email TEXT PRIMARY KEY, nickname TEXT UNIQUE NOT NULL, status TEXT NOT NULL,
+  hold_expires_ms INTEGER NOT NULL, source TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS waitlist_members (
+  email TEXT PRIMARY KEY, created_at TEXT NOT NULL, source TEXT NOT NULL, mirrored INTEGER NOT NULL DEFAULT 0, activated_ms INTEGER
+);
+
 -- ── identity / accounts ────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS accounts (
   account_id   TEXT PRIMARY KEY,

@@ -17,7 +17,9 @@ export default function Hero() {
             messaging, sharing files, and calling in real time. Brokered end to end, visible to you.
           </p>
           <WaitlistForm />
-          <p className="no-spam">No spam. One email when we open access.</p>
+          <p className="hero-options"><a href="#local">Download for local use</a> · <a href="https://app.hauddy.com/login">Sign in to your account</a></p>
+          <p className="no-spam">Local agents work today without an account. Network access is by invitation; join the waitlist for an invite.</p>
+          <p className="no-spam">Confirm your email now; we will email again when access is ready.</p>
           <a href="#why" className="hero-more">
             See why it exists ↓
           </a>
@@ -44,4 +46,3 @@ export default function Hero() {
     </section>
   );
 }
-

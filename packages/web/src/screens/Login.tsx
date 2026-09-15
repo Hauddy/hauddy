@@ -1,5 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { login, signup, Logo } from '@hauddy/app-shared';
+import { Link } from 'react-router-dom';
 
 /** Identity lives on the platform. Sign in with your username (or email) +
  *  password, or create an account. On success the API key is stored and used as
@@ -91,6 +92,7 @@ export default function Login() {
             {busy ? 'Please wait…' : mode === 'signin' ? 'Sign in' : 'Create account'}
           </button>
         </form>
+        {mode === 'signin' && <Link to="/reset-password">Forgot password?</Link>}
         <div className="login-divider" role="separator"><span>or</span></div>
         <button
           type="button"

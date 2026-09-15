@@ -7,6 +7,7 @@
 
 export {
   api,
+  apiBase,
   configureApi,
   friendHuman,
   useApiData,
@@ -74,3 +75,4 @@ export { default as Messages } from './screens/Messages';
 export { default as Account } from './screens/Account';
 export type { AccountProps } from './screens/Account';
 export { default as Settings } from './screens/Settings';
+export { default as Setup } from './screens/Setup';
