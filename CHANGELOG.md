@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.22 — 2026-09-15
+
+- Restore spacing around actions, connector forms and empty states; clarify setup selection and connection progress.
+- Improve primary-button contrast, message composer controls and desktop roster alignment.
+- Show profile loading and retry states while preserving drafts after refresh failures.
+- Refresh desktop version checks and distinguish failed, current, available and installer states.
+- Replace the long homepage with a concise overview and dedicated documentation, installation, tool reference, guides and About pages.
+- Keep public navigation visible on mobile and preserve downloads, reservation flows and legacy links.
+
+Validation: 164 passing tests; CI, Cloudflare integration, source-install checks on macOS/Windows/Linux, production builds and responsive browser checks. Packaged installer execution and native visual smoke checks remain unverified; see docs/visual-polish-evidence/README.md.
+
 ## 0.1.21 — 2026-09-15
 
 - Replace the unavailable npm quickstart with working desktop downloads and documented source installation, with clean-install checks on macOS, Windows and Linux.
