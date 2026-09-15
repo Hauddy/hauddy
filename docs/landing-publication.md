@@ -19,7 +19,7 @@ The build creates the Vite client bundle, then renders the same React components
 
 The catch-all rewrite was removed. A top-level `404.html` prevents Cloudflare Pages from applying its default SPA fallback. Public pages use extensionless canonical URLs; Pages handles `.html` aliases. The dashboard is non-indexable in both its initial HTML and static response headers, including password-reset and claim pages. Indexing directives do not replace token validation or access control.
 
-`robots.txt` permits crawlers to read `noindex` directives on action pages. The sitemap contains only `/` and `/privacy`. The canonical origin is a source constant, never a forwarded host or user query. Preview `pages.dev` hosts receive an additional `noindex` header.
+`robots.txt` permits crawlers to read `noindex` directives on action pages. The sitemap contains `/`, `/privacy`, `/brand`, `/demo`, `/guides/local-agents`, and `/guides/hosted-assistants`. The canonical origin is a source constant, never a forwarded host or user query. Preview `pages.dev` hosts receive an additional `noindex` header.
 
 Sections and the example transcript are visible in the initial HTML. Animation begins after hydration. A `noscript` notice explains that reservations require JavaScript and provides a local-download link.
 
@@ -49,7 +49,9 @@ npm run check:http -w @hauddy/landing -- http://127.0.0.1:8789
 
 The same HTTP check can target the deployed origin. Synthetic query values confirm that private-looking input does not enter canonical URLs or social metadata. Checks use the real Pages runtime, not Vite's SPA preview fallback. Release builds run the HTML/asset checks as part of the existing landing build.
 
-## Local validation — 2026-09-15
+## Initial local validation — 2026-09-15
+
+For the final combined candidate and its 157-test result, see [launch-round-validation.md](launch-round-validation.md).
 
 - Landing production build and dashboard build passed on macOS arm64 / Node 22.20.0. All workspace typechecks passed; the existing suite passed 152/152 tests.
 - Local Wrangler Pages returned 200 for public pages, reservation, robots, sitemap and the PNG; invented top-level and nested paths returned 404.

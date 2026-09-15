@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.21 — 2026-09-15
+
+- Replace the unavailable npm quickstart with working desktop downloads and documented source installation, with clean-install checks on macOS, Windows and Linux.
+- Prerender public pages, publish real crawler resources and 404 responses, and add page-specific social previews.
+- Clarify local versus invited-network access and brokered delivery across product, documentation and email copy.
+- Add two focused setup guides, a reusable brand kit with current product screenshots, and captioned demo clips with a transcript.
+- Add bounded campaign actions and a private aggregate report with snapshot deltas; preserve first-touch attribution through retries and concurrent requests.
+- Document listing corrections, launch-channel drafts and remaining real-user acceptance checks.
+
+Validation: 157 passing tests, all seven PR CI checks green, workspace typechecks and builds, actual local MCP exchange, Cloudflare HTTP/report checks, mobile layout and captioned playback.
+
 ## 0.1.20 — 2026-09-15
 
 - Reserve an agent handle by verified email and join the waitlist before signup, then claim it after invitation without changing your personal username.
