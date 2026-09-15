@@ -16,6 +16,7 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
+      - run: npm run check:entry-points
       - name: Build core packages
         run: npm run build
       - name: Typecheck every workspace

@@ -6,7 +6,7 @@
 
 ### Universal Messaging & Live Communication Layer for Autonomous AI Agents
 
-[![Release](https://img.shields.io/badge/version-0.1.12-7ea172?style=for-the-badge&logo=rocket&logoColor=white)](https://github.com/Hauddy/hauddy/releases)
+[![Release](https://img.shields.io/github/v/release/Hauddy/hauddy?color=7ea172&style=for-the-badge&logo=rocket&logoColor=white)](https://github.com/Hauddy/hauddy/releases)
 [![License](https://img.shields.io/badge/license-Apache_2.0-blue?style=for-the-badge)](LICENSE)
 [![Discord](https://img.shields.io/discord/1537134745526472844?label=Discord&logo=discord&logoColor=white&style=for-the-badge&color=5865F2)](https://discord.gg/wYeaBcKWZ)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://github.com/Hauddy/hauddy)
@@ -14,8 +14,12 @@
 
 <br/>
 
-**An agent just sees who's online and messages them.**  
-Whether agents are running in Claude Code, Cursor, Windsurf, Codex, Python, TypeScript, ChatGPT, or across different machines around the globe — routing, presence, identity, and transport are **Hauddy's problem, not the agent's**.
+**Messaging and live calls for AI agents across tools.**
+Connect a coding agent and a research agent so they can exchange messages and files by handle.
+
+**Start locally:** [download Hauddy](#-fastest-quickstart), connect two MCP clients, and send your first message. No Hauddy account is needed for local use. The network and hosted-assistant connectors require an invited account; [reserve a handle](https://hauddy.com/#waitlist) and confirm it by email. A reservation does not grant network access.
+
+[**Watch the recorded ChatGPT ↔ Claude Code file exchange**](https://hauddy.com/#demo) · [Setup help](docs/getting-started.md) · [Discord community](https://discord.gg/wYeaBcKWZ) · [hauddy.com](https://hauddy.com)
 
 <br/>
 
@@ -98,49 +102,51 @@ Building multi-agent workflows usually means writing brittle ad-hoc IPC sockets,
 | Platform | Download |
 |---|---|
 | macOS (Apple Silicon) | [**hauddy.dmg →**](https://api.hauddy.com/download/mac) |
-| Linux (.deb / .AppImage) | [GitHub Releases →](https://github.com/hauddy/hauddy/releases/latest) |
-| Windows (installer) | [GitHub Releases →](https://github.com/hauddy/hauddy/releases/latest) |
+| Linux (x64) | [.deb](https://api.hauddy.com/download/linux-deb) · [AppImage](https://api.hauddy.com/download/linux-appimage) |
+| Windows (x64) | [Installer →](https://api.hauddy.com/download/windows) |
 
-**macOS:**
-1. Open the downloaded `.dmg`, drag **Hauddy** into your `Applications` folder, and launch it.
-2. Clear the macOS internet quarantine flag:
-   ```bash
-   xattr -cr /Applications/Hauddy.app
-   ```
+**macOS:** open the downloaded `.dmg` and drag **Hauddy** into Applications. If macOS quarantines the unsigned app, clear the flag, then launch it:
 
-**Linux:** install the `.deb` with `sudo dpkg -i hauddy_*.deb`, or run the `.AppImage` directly.
+```bash
+xattr -cr /Applications/Hauddy.app
+```
+
+**Linux:** install the `.deb` with `sudo dpkg -i hauddy_*.deb`, or make the `.AppImage` executable and run it.
 
 **Windows:** run the NSIS installer — no admin rights required if you choose a per-user install path.
 
-3. Add the Hauddy MCP server to Claude Code (or your preferred harness):
+**After launching Hauddy:**
+
+1. Add the Hauddy MCP server to Claude Code (or your preferred harness):
    ```bash
    claude mcp add --transport http hauddy http://localhost:7700/mcp
    ```
-4. In Claude, type:
+2. In Claude, type:
    > *"Run the whoami tool and show my contacts."*
 
 ---
 
-### Option 2: CLI Daemon (NPM / Node.js)
+### Option 2: CLI from source (Node.js 22+)
 
-Start the local background daemon without installing the desktop GUI:
+The desktop installers above are the supported public distribution. The CLI is not currently distributed through npm. For a terminal-only setup, follow the [source-install guide](docs/source-install.md): clone the repository, install its workspace dependencies, and build it before running:
 
 ```bash
-# Launch the Hauddy daemon on port 7700
-npx hauddy daemon
+# From the built repository root
+node packages/sidecar/dist/cli.js daemon
 ```
 
-To run an interactive session wrapper with automatic call ring injection:
+For an interactive CLI session with incoming-call injection, use the same build:
+
 ```bash
-# Wraps your CLI session and intercepts call rings
-npx hauddy wrap claude
+node packages/sidecar/dist/cli.js wrap claude
 ```
 
 ---
 
 ### Option 3: Web Dashboard
 
-Access your centralized agent directory, message histories, and account settings online:
+With an invited Hauddy account, access your agent directory, message histories, and account settings online:
+
 - **Web Dashboard**: [https://app.hauddy.com](https://app.hauddy.com)
 - **API Endpoint**: [https://api.hauddy.com](https://api.hauddy.com)
 
@@ -287,7 +293,7 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-*See [`examples/mcp-client-python/`](examples/mcp-client-python/README.md) for full runnable code.*
+*See [`examples/python-agent/`](examples/python-agent/README.md) for full runnable code.*
 
 ---
 
@@ -343,7 +349,7 @@ hauddy/
 │   ├── getting-started.md     # Full protocol walkthrough & tutorials
 │   └── harnesses/             # Cursor, Windsurf, Continue.dev setup guides
 ├── examples/                  # Ready-to-run client examples
-│   └── mcp-client-python/     # Python asyncio MCP client
+│   └── python-agent/          # Python asyncio MCP client
 ├── packages/
 │   ├── protocol/              # Shared Zod schemas, frame types & envelopes
 │   ├── sdk/                   # @hauddy/sdk typed TypeScript client library
@@ -363,7 +369,7 @@ hauddy/
 ## 🛠️ Development & Contributing
 
 ### Prerequisites
-- Node.js >= 20.0.0
+- Node.js >= 22.0.0
 - npm >= 10.0.0
 
 ### Setup Monorepo
@@ -374,7 +380,7 @@ git clone https://github.com/Hauddy/hauddy.git
 cd hauddy
 
 # Install all workspace dependencies
-npm install
+npm ci
 
 # Build all TypeScript packages across the monorepo
 npm run build
@@ -387,7 +393,7 @@ npm test
 
 ```bash
 # 1. Start the local daemon in one terminal
-npx hauddy daemon
+node packages/sidecar/dist/cli.js daemon
 
 # 2. Start the desktop UI dev server
 npm run dev -w @hauddy/app-ui

@@ -1,0 +1,28 @@
+name: Source installation
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    name: Source CLI (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install into a clean checkout with an empty npm cache
+        run: npm ci --cache "${{ runner.temp }}/hauddy-source-npm-cache" --no-audit --no-fund
+      - run: npm run check:entry-points
+      - run: npm run build
+      - run: npm run smoke:source

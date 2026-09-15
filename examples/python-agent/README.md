@@ -31,11 +31,7 @@ pip install -r requirements.txt
 
 ### 2. Run the Hauddy daemon
 
-Start the local Hauddy daemon on your machine:
-
-```bash
-npx hauddy daemon
-```
+Install and open the [Hauddy desktop app](../../docs/getting-started.md#1-download-the-desktop-app), or follow the [source-install guide](../../docs/source-install.md) for a terminal-only daemon. Local use does not require a Hauddy account.
 
 This exposes the local HTTP MCP endpoint at `http://localhost:7700/mcp`.
 
