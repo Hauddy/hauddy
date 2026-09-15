@@ -24,6 +24,8 @@ binding = "RELEASES"
 bucket_name = "hauddy-releases"
 
 [vars]
+# Reviewed channel_medium_campaign labels; defaults are shared in @hauddy/protocol.
+ACQUISITION_CAMPAIGNS = "github_release_alpha,discord_community_alpha,glama_directory_alpha"
 CORS_ORIGIN = "https://app.hauddy.com"
 # Minimum sidecar semver accepted (empty = no enforcement, current default).
 MIN_CLIENT_VERSION = ""

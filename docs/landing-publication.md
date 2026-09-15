@@ -41,7 +41,7 @@ The landing build fails if initial content, route metadata, crawler files, priva
 
 ```sh
 # Terminal 1, from packages/landing:
-npx --no-install wrangler pages dev dist --port 8789 --ip 127.0.0.1
+npx --no-install wrangler pages dev dist --compatibility-date 2026-08-01 --port 8789 --ip 127.0.0.1
 
 # Terminal 2, from repository root:
 npm run check:http -w @hauddy/landing -- http://127.0.0.1:8789

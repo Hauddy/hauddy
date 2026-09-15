@@ -625,3 +625,43 @@ test('activation counts once from a recipient acknowledgement, never from queued
   db.markDelivered('activation-message',a.agent);assert.equal(count(),1);
   db.markDelivered('activation-message',a.agent);assert.equal(count(),1);
 });
+
+test('acquisition report protects secrets and separates actions, retries and verified reservations', async(t)=>{
+  const {request,hub,sqlite,token}=await emailFixture(t); hub.env.ADMIN_TOKEN='report-secret';
+  for (const event of ['page_view','download_click','guide_open','demo_play','form_start']) {
+    await expectStatus(request('/preregistration/event',{event,source:'github_release_alpha'},''),200);
+  }
+  await expectStatus(request('/preregistration/event',{event:'page_view',source:'private@example.test'},''),200);
+  for (const event of ['activation','verified_reservation','arbitrary']) await expectStatus(request('/preregistration/event',{event,source:'hero'},''),400);
+  const input={email:'journey@example.test',handle:'journey',source:'github_release_alpha'};
+  await expectStatus(request('/preregistration/request',input,''),200);
+  await expectStatus(request('/preregistration/request',{...input,source:'discord_community_alpha'},''),200);
+  await expectStatus(request('/preregistration/verify',{token:token()},''),200);
+  await expectStatus(request('/preregistration/request',{...input,source:'discord_community_alpha'},''),200);
+  await expectStatus(request('/preregistration/verify',{token:token()},''),200);
+  for (const key of ['', 'wrong']) await expectStatus(request('/admin/acquisition/report',undefined,key),401);
+  await expectStatus(request('/admin/acquisition/report?since=0',undefined,'report-secret'),400);
+  const report=await expectStatus(request('/admin/acquisition/report',undefined,'report-secret'),200);
+  const count=(event,source='github_release_alpha')=>report.counts.find(r=>r.event===event&&r.source===source)?.count??0;
+  assert.equal(count('request'),3); assert.equal(count('verification'),2); assert.equal(count('verified_reservation'),1); assert.equal(count('activation'),0);
+  assert.equal(count('page_view','campaign'),1); assert.equal(count('request','discord_community_alpha'),0);
+  assert.doesNotMatch(JSON.stringify(report),/journey|example.test|report-secret|request_token|message_body/);
+  assert.equal(sqlite.prepare('SELECT source FROM waitlist_members WHERE email=?').get(input.email).source,'github_release_alpha');
+});
+
+test('expired holds preserve the first operational acquisition source',async(t)=>{
+  const {request,sqlite}=await emailFixture(t);
+  await expectStatus(request('/preregistration/request',{email:'first@example.test',handle:'first',source:'glama_directory_alpha'},''),200);
+  sqlite.exec('UPDATE preregistrations SET hold_expires_ms=0');
+  await expectStatus(request('/preregistration/request',{email:'first@example.test',handle:'second',source:'discord_community_alpha'},''),200);
+  assert.equal(sqlite.prepare('SELECT source FROM preregistrations WHERE nickname=?').get('second').source,'glama_directory_alpha');
+});
+
+test('concurrent first requests attribute all retries to the first stored source',async(t)=>{
+ const {request,sqlite}=await emailFixture(t);
+ const sources=['github_release_alpha','discord_community_alpha'];
+ await Promise.all(sources.map(source=>expectStatus(request('/preregistration/request',{email:'race@example.test',handle:'race',source},''),200)));
+ const first=sqlite.prepare('SELECT source FROM waitlist_members WHERE email=?').get('race@example.test').source;
+ const rows=sqlite.prepare("SELECT source,count FROM acquisition_events WHERE event='request'").all();
+ assert.equal(rows.length,1);assert.equal(rows[0].source,first);assert.equal(rows[0].count,2);
+});

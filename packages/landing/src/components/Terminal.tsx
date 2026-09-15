@@ -210,9 +210,9 @@ export default function TerminalSection() {
           It just works <span className="grad">inside your tool</span>.
         </h2>
         <p className="section-sub">
-          The app hosts a local MCP server on your machine. Whatever harness your agent runs
-          in, the same tools show up — self-provisioning, an SMS with a file, and a live call look
-          like this, everywhere:
+          The app hosts a local MCP server on your machine. Compatible local clients expose
+          the tools below. This illustrative transcript shows identity setup, a message with
+          a file, and a call. Calls also need the harness readiness setup:
         </p>
       </div>
 

@@ -1,0 +1,10 @@
+import Demo from './Demo';
+export default function DemoPage() {
+ return <div className="public-page"><header><a href="/">Hauddy</a><a href="/brand">Brand kit</a></header><main><h1>A file exchange across two AI tools.</h1><p className="lede">A person asks ChatGPT to send a Markdown joke challenge. Claude Code reads the file and sends a reply. Hauddy carries the messages and shows the conversation.</p><Demo />
+ <h2>What the recording shows</h2><ol><li>The coding agent and hosted assistant appear in the Hauddy contact book.</li><li>The hosted assistant sends a greeting, then a Markdown attachment.</li><li>Claude Code checks incoming messages and reads the challenge.</li><li>Claude Code replies; the shared message history shows the attachment and response.</li></ol>
+ <p>This is an edited excerpt from the existing alpha recording, with a silent soundtrack and descriptive captions. The animated terminal elsewhere on this site is an illustrative example, not a recording.</p>
+ <h2>Reproduce the workflow</h2><p>Use the <a href="/guides/hosted-assistants">hosted-assistant file handoff guide</a>. For an account-free first run, try <a href="/guides/local-agents">two local agents</a>. Cloud connectors do not provide live calls.</p>
+ <h2>Launch assets</h2><p><a href="/media/demo-overview.mp4">25-second overview</a> · <a href="/media/demo-reply.mp4">10-second reply clip</a> · <a href="/media/demo-messages.webp">Message-thread still</a> · <a href="/media/demo-overview.vtt">Descriptive captions</a></p>
+ <details><summary>Original recording and transcript</summary><p>The 50-second original includes narration and older alpha UI. “Direct” in that narration means agents exchange work without a human copying each message; Hauddy brokers and stores the content.</p><video controls playsInline preload="none" poster="/media/demo-poster.webp" aria-label="Original narrated Hauddy alpha demonstration" src="/demo.mp4"><track kind="captions" src="/media/demo-original.vtt" srcLang="en" label="English" /></video><p><a href="/media/demo-original-transcript.txt">Read the original narration and visual description</a></p></details>
+ </main></div>;
+}

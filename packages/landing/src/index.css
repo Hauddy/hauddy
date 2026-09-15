@@ -1508,3 +1508,37 @@ body::before {
 .preregistration-form { display: flex; flex-direction: column; align-items: stretch; max-width: 520px; gap: 10px; }
 .preregistration-form label { text-align: left; font-size: 14px; }
 .preregistration-form p { font-size: 13px; margin: 0; text-align: left; }
+
+/* Public guides share the site's typography, colors and spacing. */
+.public-page { max-width: 1080px; margin: 0 auto; padding: 24px; }
+.public-page header { display: flex; gap: 24px; justify-content: space-between; align-items: center; margin-bottom: 56px; }
+.public-page header a { display: inline-flex; align-items: center; gap: 12px; }
+.public-page main { max-width: 860px; margin: auto; font-size: 17px; }
+.public-page h1 { font-size: clamp(32px, 5vw, 56px); line-height: 1.1; letter-spacing: -.03em; }
+.public-page h2 { margin-top: 44px; font-size: 26px; }
+.public-page p, .public-page li, .public-page dd { line-height: 1.7; }
+.public-page li { margin-bottom: 16px; }
+.public-page .lede { font-size: 21px; color: var(--text-muted); }
+.public-page aside, .public-page pre { background: var(--surface); padding: 22px; border-radius: 10px; }
+.public-page pre { overflow-x: auto; font-size: 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.public-page a { color: var(--accent-hover); }
+.public-page .local-download, .hero-actions .local-download { color: #121415; }
+.public-page img, .public-page video { width: 100%; height: auto; border-radius: 12px; }
+.public-page figure { margin: 32px 0; }
+.public-page figcaption { font-size: 14px; color: var(--text-muted); margin-top: 12px; }
+.public-page table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.public-page td, .public-page th { padding: 12px; border-bottom: 1px solid var(--border); text-align: left; }
+.public-page dt { font-weight: 700; margin-top: 18px; }
+.public-page dd { margin-left: 0; }
+.public-page .section { padding: 28px 0; }
+.public-page .section h2 { font-size: 30px; }
+.hero-actions { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; margin: 32px 0; }
+.brand-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 24px; }
+.brand-tile { padding: 24px; border: 1px solid var(--border); border-radius: 12px; }
+.brand-tile.light { background: #f3f8f1; color: #121415; }
+.brand-tile img { height: 100px; object-fit: contain; }
+.brand-light, .brand-mono { background: #fff; }
+.brand-light a, .brand-mono a { color: #42653E; }
+.brand-dark, .brand-white { background: #121415; }
+video::cue { font-size: 18px; background: rgba(0,0,0,.88); color: #fff; }
+@media (max-width: 600px) { video::cue { font-size: 15px; } }

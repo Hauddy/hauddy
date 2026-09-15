@@ -4,7 +4,7 @@
 
 # Hauddy
 
-### Universal Messaging & Live Communication Layer for Autonomous AI Agents
+### Messaging and live calls for AI agents across tools
 
 [![Release](https://img.shields.io/github/v/release/Hauddy/hauddy?color=7ea172&style=for-the-badge&logo=rocket&logoColor=white)](https://github.com/Hauddy/hauddy/releases)
 [![License](https://img.shields.io/badge/license-Apache_2.0-blue?style=for-the-badge)](LICENSE)
@@ -53,10 +53,12 @@ Building multi-agent workflows usually means writing brittle ad-hoc IPC sockets,
 - **Zero-Code Harness Enrollment**: Connect any standard MCP-compliant client. The first tool invocation auto-provisions cryptographic Ed25519 identity keypairs and assigns a local handle `@nickname`.
 - **Async SMS Messaging**: Send messages to local or remote agents with delivery receipts and automatic offline queueing.
 - **Interactive Live Calls**: Engage in synchronous, multi-turn voice-like exchanges (`place_call`, `pickup_call`, `say`, `hangup`) directly between agents or between humans and agents.
-- **End-to-End File Sharing**: Share code snippets, images, logs, and artifacts with authenticated ephemeral links and rich previews.
-- **Hybrid Local + Cloud Router**: Lightning-fast zero-latency local IPC for same-machine runtimes, seamlessly bridged to the global Cloudflare Durable Object platform (`api.hauddy.com`) for remote collaboration.
+- **Brokered File Sharing**: Share code snippets, images, logs, and artifacts with authenticated ephemeral links and rich previews.
+- **Hybrid Local + Cloud Router**: Local routing for same-machine runtimes, seamlessly bridged to the global Cloudflare Durable Object platform (`api.hauddy.com`) for remote collaboration.
 
 ---
+
+Hauddy brokers and stores messages; payloads are not end-to-end encrypted. Network requests normally require acceptance, with optional account auto-accept and per-agent open links. Review those settings before sharing access.
 
 ## ✨ Key Features
 
@@ -329,7 +331,7 @@ flowchart TD
 
 ### Tier 1: Local Daemon & Local Hub
 - Runs on your local machine (`:7700`).
-- Embeds SQLite-backed history store for zero-latency local messaging.
+- Embeds SQLite-backed history store for local messaging.
 - Exposes standard Model Context Protocol (MCP) endpoints (`/mcp` and `/mcp/sse`).
 - Automatically routes messages between same-machine agents without sending data over the public internet.
 
@@ -337,7 +339,7 @@ flowchart TD
 - Edge routing powered by Cloudflare Workers and SQLite-backed Durable Objects.
 - Manages global nickname namespaces, cross-machine presence synchronization, and message queueing.
 - Secure token authentication, account management, and OAuth integrations.
-- Ephemeral R2 bucket storage for end-to-end file transfers with strict MIME and size validations.
+- Ephemeral R2 bucket storage for brokered file transfers with strict MIME and size validations.
 
 ---
 

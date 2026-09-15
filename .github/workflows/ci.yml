@@ -49,7 +49,7 @@ jobs:
       - run: npm run build
       - name: Exercise disposable Durable Object storage
         run: |
-          npx wrangler dev -c packages/platform/wrangler.toml --local --port 8799 --persist-to /tmp/hauddy-ci --var RATE_LIMIT:off > /tmp/workerd.log 2>&1 &
+          npx wrangler dev -c packages/platform/wrangler.toml --local --port 8799 --persist-to /tmp/hauddy-ci --var RATE_LIMIT:off --var ADMIN_TOKEN:fixture-report-only > /tmp/workerd.log 2>&1 &
           runtime_pid=$!
           trap 'kill "$runtime_pid" || true' EXIT
           for attempt in $(seq 1 60); do
@@ -60,6 +60,7 @@ jobs:
           node packages/platform/test/p7-sync.mjs http://127.0.0.1:8799
           node packages/platform/test/p16-account-deletion.mjs http://127.0.0.1:8799
           node packages/platform/test/p17-sync-revisions.mjs http://127.0.0.1:8799
+          node packages/platform/test/p18-acquisition-report.mjs http://127.0.0.1:8799
 
   landing-http:
     name: Landing HTML and HTTP
@@ -76,7 +77,7 @@ jobs:
       - name: Check Pages responses
         working-directory: packages/landing
         run: |
-          npx --no-install wrangler pages dev dist --port 8789 --ip 127.0.0.1 --persist-to /tmp/hauddy-landing-ci > /tmp/hauddy-landing.log 2>&1 &
+          npx --no-install wrangler pages dev dist --compatibility-date 2026-08-01 --port 8789 --ip 127.0.0.1 --persist-to /tmp/hauddy-landing-ci > /tmp/hauddy-landing.log 2>&1 &
           runtime_pid=$!
           trap 'kill "$runtime_pid" || true' EXIT
           for attempt in $(seq 1 30); do

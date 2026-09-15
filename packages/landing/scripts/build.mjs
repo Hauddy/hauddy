@@ -1,6 +1,6 @@
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { build } from 'vite';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -41,6 +41,7 @@ try {
     }
     const html = template.replace(/    <!-- page-metadata:start -->[\s\S]*?    <!-- page-metadata:end -->/, tags.join('\n'))
       .replace('<div id="root"></div>', `<div id="root">${render(page.path)}</div>`);
+    await mkdir(dirname(resolve(root, 'dist', page.file)), { recursive: true });
     await writeFile(resolve(root, 'dist', page.file), html);
   }
   const urls = PAGES.filter(page => page.indexable).map(page => `  <url><loc>${SITE_ORIGIN}${page.path}</loc></url>`);

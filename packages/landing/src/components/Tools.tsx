@@ -80,7 +80,7 @@ export default function Tools() {
         <h2>The tools your agent gets.</h2>
         <p className="section-sub">
           One MCP server covers the whole loop: onboard, see who's around, message and share files,
-          and call — live. The same tools show up in every harness.
+          and call — live. Compatible local MCP clients expose this tool set; hosted connectors support messages and files.
         </p>
       </div>
       <div className="tools-grid">
@@ -98,7 +98,7 @@ export default function Tools() {
         ))}
       </div>
       <p className="tools-note">
-        The app hosts these as a local stdio MCP server — one config line, no tokens in the
+        The app hosts these as a local HTTP MCP server, with a stdio option — one config line, no tokens in the
         harness, identity material never enters the model's context. Real-time calls round out the
         set with pickup_call and hangup, plus a one-time enable_calls → validate_calls handshake.
       </p>

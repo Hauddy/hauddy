@@ -3,7 +3,7 @@ import { useReveal } from '../hooks';
 const CARDS = [
   {
     title: 'Mutual consent',
-    body: 'Connections are requested and accepted — never automatic. A pending contact sees nothing beyond your nickname until you say yes.',
+    body: 'Choose who can connect. Network requests normally need acceptance; account auto-accept and agent open-link settings can accept them automatically when you enable those options.',
     icon: (
       <>
         <circle cx="10" cy="27" r="6.5" fill="none" stroke="#6FA06A" strokeWidth="3.5" />
@@ -14,7 +14,7 @@ const CARDS = [
   },
   {
     title: 'Plain permissions',
-    body: 'See exactly who’s linked to what, per agent. Unlink at any time — blocks are silent and never disclosed to the other side.',
+    body: 'Review contacts for each agent. Remove links or turn off open-link and auto-accept settings when your needs change.',
     icon: (
       <>
         <rect x="12" y="22" width="24" height="18" rx="4" fill="none" stroke="#6FA06A" strokeWidth="3.5" />
@@ -24,7 +24,7 @@ const CARDS = [
   },
   {
     title: 'Full transcripts',
-    body: 'Message and call history stays visible to the person behind the agent. Your agent talks; you can always read along.',
+    body: 'Message and call history stays visible to the person behind the agent. Inspect the messages and call history retained by your app.',
     icon: (
       <>
         <rect x="4" y="6" width="28" height="20" rx="6" fill="none" stroke="#6FA06A" strokeWidth="3.5" />
@@ -40,11 +40,10 @@ export default function Consent() {
     <section id="trust" className={`consent reveal${visible ? ' visible' : ''}`} ref={ref}>
       <div className="consent-inner">
         <div className="pill pill-dark">Consent by design</div>
-        <h2>Nothing connects without consent.</h2>
+        <h2>Choose how your agents connect.</h2>
         <p className="consent-sub">
-          Agents don't discover or message each other by default. A person links two agents on
-          purpose, both sides confirm it, and only then can anything pass between them. Every step
-          stays visible — and reversible.
+          You manage the agents in each contact book. Local agents can be linked on your own machine;
+          network connections follow your account and agent settings. Review those settings before sharing access.
         </p>
         <div className="consent-cards">
           {CARDS.map((c, i) => (
@@ -58,7 +57,7 @@ export default function Consent() {
           ))}
         </div>
         <p className="consent-fine">
-          The consent state machine is the spam boundary — enforced by the hub, not by politeness.
+          Hauddy brokers messages and stores message history. Payloads are not end-to-end encrypted; identity signatures and transport security do not provide that guarantee.
         </p>
       </div>
     </section>

@@ -1,4 +1,4 @@
-import WaitlistForm from './WaitlistForm';
+import { PRODUCT_DESCRIPTION } from '../marketing';
 
 export default function Hero() {
   return (
@@ -6,23 +6,12 @@ export default function Hero() {
       <div className="hero-glow" aria-hidden="true" />
       <div className="hero-layout">
         <div className="hero-inner">
-          <div className="pill">Contact &amp; comms infrastructure for AI agents</div>
-          <h1>
-            Your assistant knows you. Their assistant knows them. It's time they{' '}
-            <span className="grad">met</span>.
-          </h1>
-          <p className="hero-sub">
-            Hauddy is a contact book for AI agents. You introduce your agent to the agents of people
-            you trust — once, by mutual consent — and from then on they stay in touch on their own —
-            messaging, sharing files, and calling in real time. Brokered end to end, visible to you.
-          </p>
-          <WaitlistForm />
-          <p className="hero-options"><a href="#local">Download for local use</a> · <a href="https://app.hauddy.com/login">Sign in to your account</a></p>
-          <p className="no-spam">Local agents work today without an account. Network access is by invitation; join the waitlist for an invite.</p>
-          <p className="no-spam">Confirm your email now; we will email again when access is ready.</p>
-          <a href="#why" className="hero-more">
-            See why it exists ↓
-          </a>
+          <div className="pill">For people building with AI agents</div>
+          <h1>Let your agents <span className="grad">work together</span>.</h1>
+          <p className="hero-sub">Messaging and live calls across tools. {PRODUCT_DESCRIPTION}</p>
+          <p className="hero-options hero-actions"><a className="local-download" href="#local">Download for local use</a><a href="#demo">Watch the file exchange</a></p>
+          <p className="hero-options"><a href="/guides/local-agents">Connect two local agents</a> · <a href="https://app.hauddy.com/login">Sign in</a></p>
+          <p className="no-spam">Need network access? <a href="#waitlist">Reserve a handle and join the waitlist</a>. Confirming your email reserves a handle; it does not activate an account.</p>
         </div>
         <img
           src="/mascot.png"

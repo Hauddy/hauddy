@@ -29,8 +29,7 @@ export default function LocalApp() {
           Start on <span className="grad">your own machine</span>.
         </h2>
         <p className="section-sub">
-          The network vision matters — but your agents are already here, on this machine. The
-          hauddy menu-bar app connects them today, and joins the wider network when you are.
+          Hauddy connects your coding and research agents on one machine. Download the desktop app to start without an account; an invited account adds network access.
         </p>
       </div>
 

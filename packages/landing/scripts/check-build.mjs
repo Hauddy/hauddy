@@ -9,6 +9,10 @@ const pages = [
   ['index.html', '/', 'Hauddy — messaging and live calls for AI agents', 'id="local"'],
   ['privacy.html', '/privacy', 'Privacy Policy — Hauddy', '<h1>Privacy Policy</h1>'],
   ['reservation.html', '/reservation', 'Confirm your handle — Hauddy', '<h1>Confirm your handle</h1>'],
+  ['brand.html', '/brand', 'Brand and press kit — Hauddy', '<h1>Brand and press kit</h1>'],
+  ['demo.html', '/demo', 'Watch a cross-tool file exchange — Hauddy', '/media/demo-overview.mp4'],
+  ['guides/local-agents.html', '/guides/local-agents', 'Connect two local AI agents — Hauddy', '<h1>Connect two local agents'],
+  ['guides/hosted-assistants.html', '/guides/hosted-assistants', 'Send files from a hosted assistant to a coding agent — Hauddy', '<h1>Send a file'],
   ['404.html', null, 'Page not found — Hauddy', '<h1>Page not found</h1>'],
 ];
 for (const [file, route, title, content] of pages) {
@@ -19,7 +23,7 @@ for (const [file, route, title, content] of pages) {
   assert.match(html, /<meta name="description" content="[^"]+"/);
   if (route) assert.ok(html.includes(`<link rel="canonical" href="https://hauddy.com${route}"`));
   else assert.doesNotMatch(html, /rel="canonical"/);
-  const publicPage = file === 'index.html' || file === 'privacy.html';
+  const publicPage = file !== 'reservation.html' && file !== '404.html';
   if (publicPage) {
     assert.match(html, /name="robots" content="index, follow"/);
     for (const name of ['title', 'description', 'type', 'url', 'image', 'image:width', 'image:height', 'image:alt']) {
@@ -41,7 +45,7 @@ assert.match(read('index.html'), /<noscript>[\s\S]*opacity: 1/);
 assert.match(read('reservation.html'), /disabled=""[^>]*>Confirm my reservation/);
 assert.equal(existsSync(resolve(dist, '_redirects')), false, 'No catch-all rewrite may hide missing routes');
 const locations = [...read('sitemap.xml').matchAll(/<loc>(.*?)<\/loc>/g)].map(match => match[1]);
-assert.deepEqual(locations, ['https://hauddy.com/', 'https://hauddy.com/privacy']);
+assert.deepEqual(locations, ['/', '/privacy', '/brand', '/demo', '/guides/local-agents', '/guides/hosted-assistants'].map(path => 'https://hauddy.com' + path));
 assert.match(read('robots.txt'), /^User-agent: \*\nAllow: \/\n/m);
 assert.match(read('robots.txt'), /Sitemap: https:\/\/hauddy.com\/sitemap.xml/);
 assert.match(read('_headers'), /\/reservation\*[\s\S]*X-Robots-Tag: noindex/);
@@ -50,3 +54,7 @@ assert.equal(format, 'png'); assert.equal(width, 1200); assert.equal(height, 630
 const web = readFileSync(new URL('../../web/index.html', import.meta.url), 'utf8');
 assert.match(web, /name="robots" content="noindex, nofollow"/);
 console.log('PASS initial HTML, route metadata, crawler files, action-page indexing and social image');
+
+assert.equal(readFileSync(resolve(dist, 'brand/hauddy-brand-v1.zip')).subarray(0,2).toString(), 'PK');
+for (const file of ['demo-overview.vtt','demo-original.vtt']) assert.match(read('media/'+file), /^WEBVTT/);
+for (const file of ['demo-overview.mp4','demo-reply.mp4','demo-poster.webp','demo-messages.webp']) assert.ok(existsSync(resolve(dist,'media',file)));

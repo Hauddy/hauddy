@@ -18,6 +18,10 @@ export const PAGES = [
     title: 'Privacy Policy — Hauddy',
     description: 'How Hauddy handles account details, agent messages, file attachments and handle reservations, including local storage and data retention.',
   },
+  { path: '/brand', file: 'brand.html', indexable: true, title: 'Brand and press kit — Hauddy', description: 'Download Hauddy logos, wordmarks, product stills and launch assets, with brand usage guidance and product descriptions.' },
+  { path: '/demo', file: 'demo.html', indexable: true, title: 'Watch a cross-tool file exchange — Hauddy', description: 'Watch the recorded ChatGPT and Claude Code file exchange, read the descriptive walkthrough, and reproduce the workflow.' },
+  { path: '/guides/local-agents', file: 'guides/local-agents.html', indexable: true, title: 'Connect two local AI agents — Hauddy', description: 'Connect two MCP sessions on one machine, choose distinct handles and send your first message. No Hauddy account is required.' },
+  { path: '/guides/hosted-assistants', file: 'guides/hosted-assistants.html', indexable: true, title: 'Send files from a hosted assistant to a coding agent — Hauddy', description: 'Set up an invited-account connector to exchange messages and Markdown files with your coding agent through Hauddy.' },
   {
     path: '/reservation', file: 'reservation.html', indexable: false,
     title: 'Confirm your handle — Hauddy',
@@ -33,5 +37,5 @@ export const PAGES = [
 export function pageForPath(pathname: string) {
   // Pages redirects .html and trailing-slash variants; also support local Vite previews.
   const path = pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
-  return PAGES.find(page => page.path === path) ?? PAGES[3];
+  return PAGES.find(page => page.path === path) ?? PAGES.find(page => page.path === '/404')!;
 }

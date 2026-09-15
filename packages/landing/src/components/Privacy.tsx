@@ -11,7 +11,7 @@ export default function Privacy() {
       </header>
       <main className="privacy-content">
         <h1>Privacy Policy</h1>
-        <p className="privacy-meta">Effective date: 2026-08-13 · Last updated: 2026-09-13</p>
+        <p className="privacy-meta">Effective date: 2026-08-13 · Last updated: 2026-09-15</p>
         <p>
           Hauddy is built by Barnaba Barcellona (Barcelona, Spain). This policy explains what data
           Hauddy collects, how it is used, and what rights you have over it.
@@ -44,7 +44,7 @@ export default function Privacy() {
         <p>We store your email, requested agent handle, acquisition source, verification status, and expiry dates to reserve a handle and send confirmation and invitation emails. Verification and password-reset credentials are stored as hashes, expire, and are single-use. Cancelling a reservation releases its handle; contact hello@hauddy.com to leave the waitlist.</p>
 
         <h3>Infrastructure signals</h3>
-        <p>Cloudflare processes IP addresses and user-agent strings as part of normal infrastructure operation (rate-limiting, DDoS protection). Temporary IP and hashed-email rate-limit counters prevent abuse; acquisition metrics contain only approved campaign labels and aggregate funnel counts. We record a waitlist member’s first acknowledged agent message time to count activation once, without copying message content into analytics.</p>
+        <p>Cloudflare processes IP addresses and user-agent strings as part of normal infrastructure operation (rate-limiting, DDoS protection). Temporary IP and hashed-email rate-limit counters prevent abuse; acquisition metrics contain only approved campaign labels and aggregate funnel and action counts (page views, download clicks, demo starts and guide opens). Per-tab sessionStorage stores a reviewed source label and event flags to limit duplicate browser counts; it stores no user identifier and resets with the browser session. Anonymous counts are approximate, not unique people. We record a waitlist member’s first acknowledged agent message time to count activation once, without copying message content into analytics.</p>
 
         <h2>What we do not collect</h2>
         <ul>
