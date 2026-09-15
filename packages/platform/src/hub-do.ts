@@ -195,6 +195,47 @@ export class HubDO {
       if (method === "GET" && fileGet) return await this.downloadFile(request, decodeURIComponent(fileGet[1]!));
 
       // ── admin: invite allowlist ("update from the backend manually") ──
+      if (path.startsWith('/preregistration/') || path.startsWith('/accounts/recovery/')) {
+        if (this.rateLimited(request, method === 'GET' ? 'handle-check' : 'email-actions', method === 'GET' ? 120 : 30, 15 * 60_000)) return this.publicJson(429, { error: 'Too many attempts. Please retry later.' });
+        try {
+          const actions = new EmailActions(this.db, this.env, (fn) => this.ctx.storage.transactionSync(fn));
+          if (method === 'GET' && path === '/preregistration/check') {
+            const name = url.searchParams.get('handle') ?? '';
+            const availability = this.db.nicknameAvailability(name);
+            return this.publicJson(200, { ...availability, suggestions: availability.available || availability.reason === 'invalid' ? [] : this.db.suggestNicknames(name) });
+          }
+          if (method !== 'POST') return this.publicJson(405, { error: 'Use POST for this action.' });
+          const body = await this.readBody(request);
+          // Keep expiry cleanup running even if no further requests arrive.
+          await this.ctx.storage.setAlarm(Date.now() + 60_000);
+          let result: unknown;
+          if (path === '/preregistration/event') { actions.event('form_start', body.source); result = { ok: true }; }
+          else if (path === '/accounts/recovery/request') result = await actions.requestReset(body.email);
+          else if (path === '/accounts/recovery/reset') {
+            const reset = await actions.reset(body.token, body.password);
+            for (const ws of this.ctx.getWebSockets()) {
+              const attachment = this.att(ws);
+              if (attachment.accountId !== reset.account_id && this.db.getAgent(attachment.agentId ?? '')?.account_id !== reset.account_id) continue;
+              this.setAtt(ws, freshAtt());
+              try { ws.close(1008, 'password reset'); } catch { /* already disconnected */ }
+            }
+            result = { ok: true };
+          }
+          else if (path === '/preregistration/request') {
+            result = await actions.requestReservation(body.email, body.handle, body.source);
+            await actions.mirrorWaitlist().catch(() => {});
+          } else if (path === '/preregistration/verify') result = await actions.verify(body.token);
+          else if (path === '/preregistration/cancel') result = await actions.cancel(body.token);
+          else if (path === '/preregistration/claim') {
+            const accountId = this.requireAccount(request);
+            if (!accountId) return this.unauthorized();
+            result = await actions.claim(body.token, accountId);
+          } else return this.publicJson(404, { error: 'Unknown action.' });
+          return this.publicJson(200, result);
+        } catch (error) {
+          return this.publicJson(error instanceof EmailActionError ? error.status : 503, { error: error instanceof EmailActionError ? error.message : 'The action could not be completed. Please retry.' });
+        }
+      }
       if (method === "POST" && path === "/admin/invites") {
         const header = request.headers.get("authorization") ?? "";
         const token = header.startsWith("Bearer ") ? header.slice(7) : "";
@@ -203,6 +244,9 @@ export class HubDO {
         const email = typeof body.email === "string" ? body.email.trim() : "";
         if (!/^[^@\s]+@[^@\s]+$/.test(email)) return this.json(400, { error: "a valid email is required" });
         this.db.addInvite(email, typeof body.note === "string" ? body.note : undefined);
+        const actions = new EmailActions(this.db, this.env, (fn) => this.ctx.storage.transactionSync(fn));
+        try { await actions.invite(email); }
+        catch { return this.json(503, { error: 'Invite recorded, but the claim email could not be delivered. Retry this invitation.' }); }
         return this.json(200, { ok: true, invited: email.toLowerCase(), count: this.db.inviteCount() });
       }
 
@@ -685,6 +729,7 @@ export class HubDO {
       return this.json(403, { error: "this email isn't on the invite list yet" });
     }
     if (this.db.accountByUsername(username)) return this.json(409, { error: "that username is taken" });
+    if (this.db.preregistrationHeld(username)) return this.json(409, { error: 'That handle is reserved for an agent. Choose a different personal username.' });
     if (this.db.accountByEmail(email)) return this.json(409, { error: "an account with that email already exists" });
     const { account, apiKey } = await this.db.createAccount({ username, email, password });
     return this.json(200, {
@@ -2031,6 +2076,10 @@ export class HubDO {
    *  failures beyond the runtime's limited automatic alarm retries. */
   async alarm(): Promise<void> {
     try {
+      const actions = new EmailActions(this.db, this.env, (fn) => this.ctx.storage.transactionSync(fn));
+      actions.purge();
+      if (actions.hasExpiringData()) await this.ctx.storage.setAlarm(Date.now() + 60 * 60_000);
+      if (await actions.mirrorWaitlist()) await this.ctx.storage.setAlarm(Date.now() + 60_000);
       await this.cleanupDeletedAccounts();
       await this.files.sweep(Date.now());
     } catch {
@@ -2147,3 +2196,4 @@ export class HubDO {
     return true;
   }
 }
+import { EmailActions, EmailActionError } from './email-actions.js';

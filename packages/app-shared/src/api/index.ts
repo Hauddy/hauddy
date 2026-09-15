@@ -747,11 +747,24 @@ export const api = {
   listFriends(): Promise<FriendsView> {
     return get<FriendsView>('/accounts/friends');
   },
-  async requestFriend(handle: string): Promise<{ state: string; error?: string }> {
+  async requestFriend(handle: string): Promise<{ state: string; error?: string; retryable?: boolean }> {
     try {
-      return await post<{ state: string }>('/accounts/friends/request', { handle });
+      const response = await fetch(BASE + '/accounts/friends/request', {
+        method: 'POST', headers: { 'content-type': 'application/json', ...authHeaders() }, body: JSON.stringify({ handle }),
+      });
+      const result = await response.json().catch(() => ({})) as { state?: string; error?: string };
+      if (response.ok && result.state) { bump(); return { state: result.state }; }
+      if (response.status === 401) {
+        clearKey();
+        return { state: 'error', error: 'Your session expired. Sign in again to send this request.' };
+      }
+      if (response.status === 429) return { state: 'error', error: 'Too many requests. Wait a moment, then retry.', retryable: true };
+      if (response.status >= 500) return { state: 'error', error: 'The server could not process your request. Please retry.', retryable: true };
+      if (result.error === 'E_UNKNOWN_AGENT' || response.status === 404) return { state: 'error', error: `No one with handle ${handle}.` };
+      if (response.status === 403) return { state: 'error', error: 'You do not have permission to send this request.' };
+      return { state: 'error', error: 'The request could not be accepted. Check the handle and try again.' };
     } catch {
-      return { state: 'error', error: `No one with handle ${handle}.` };
+      return { state: 'error', error: 'Could not connect to the server. Check your connection and retry.', retryable: true };
     }
   },
   respondFriend(accountId: string, accept: boolean): Promise<{ state: string }> {

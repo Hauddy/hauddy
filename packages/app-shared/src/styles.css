@@ -1899,7 +1899,8 @@
   border-color: var(--accent);
   color: var(--accent-hover, var(--accent));
 }
-.attach-btn.disabled {
+.attach-btn:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.attach-btn.disabled, .attach-btn:disabled {
   opacity: 0.45;
   cursor: default;
 }
@@ -2146,4 +2147,3 @@
   flex-direction: column;
   gap: 12px;
 }
-

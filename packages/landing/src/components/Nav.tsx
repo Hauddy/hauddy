@@ -38,9 +38,11 @@ export default function Nav() {
           </a>
         ))}
       </div>
-      <a href="#waitlist" className="nav-cta">
-        Join waitlist
-      </a>
+      <div className="nav-actions">
+        <a href="https://app.hauddy.com/login">Sign in</a>
+        <a href="#local">Download</a>
+        <a href="#waitlist" className="nav-cta">Reserve a handle</a>
+      </div>
     </nav>
   );
 }

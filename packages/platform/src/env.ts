@@ -1,5 +1,9 @@
 // Bindings available to the Worker and the Durable Object (see wrangler.toml).
 export interface Env {
+  RESEND_API_KEY?: string;
+  /** Comma-separated approved campaign labels; arbitrary source values are never stored. */
+  ACQUISITION_CAMPAIGNS?: string;
+  WAITLIST_DB?: D1Database;
   /** The single global HubDO namespace (addressed by idFromName("global")). */
   HUB: DurableObjectNamespace;
   /** R2 bucket holding attachment bytes at files/<file_id>. */

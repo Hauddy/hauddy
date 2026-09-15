@@ -37,3 +37,10 @@ LATEST_CLIENT_VERSION = "0.1.12"
 [[routes]]
 pattern = "api.hauddy.com"
 custom_domain = true
+
+# Mirrors durable platform waitlist memberships into the existing marketing list.
+[[d1_databases]]
+binding = "WAITLIST_DB"
+database_name = "hauddy-waitlist"
+database_id = "01917b60-ad44-4f78-bb2a-b7abb3035f9a"
+# Set RESEND_API_KEY on this Worker before enabling email recovery/reservations.
