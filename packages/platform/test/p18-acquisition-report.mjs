@@ -1,0 +1,22 @@
+import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
+import {writeFileSync, mkdtempSync, rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+const origin=process.argv[2] ?? 'http://127.0.0.1:8794';
+assert.ok(['localhost','127.0.0.1'].includes(new URL(origin).hostname),'Synthetic test is local only');
+const scratch=mkdtempSync(join(tmpdir(),'hauddy-report-test-'));
+process.on('exit',()=>rmSync(scratch,{recursive:true,force:true}));
+const baseline=join(scratch,'baseline.json');
+const action=async source=>{const r=await fetch(origin+'/preregistration/event',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({event:'guide_open',source})});assert.equal(r.status,200)};
+const env={...process.env,HAUDDY_ADMIN_TOKEN:'fixture-report-only',HAUDDY_REPORT_ORIGIN:origin};
+const report=(baseline)=>JSON.parse(execFileSync(process.execPath,['scripts/acquisition-report.mjs',...(baseline?[baseline]:[])],{env,encoding:'utf8'}));
+assert.equal((await fetch(origin+'/admin/acquisition/report')).status,401);
+await action('github_release_alpha'); const before=report();writeFileSync(baseline,JSON.stringify(before));
+await action('github_release_alpha');await action('private@example.test');
+const after=report(baseline);
+assert.equal(after.interval.counts.find(r=>r.source==='github_release_alpha'&&r.event==='guide_open').count,1);
+assert.equal(after.interval.counts.find(r=>r.source==='campaign'&&r.event==='guide_open').count,1);
+assert.doesNotMatch(JSON.stringify(after),/private@example|fixture-report-only/);
+
+console.log('PASS actual Workerd endpoint auth, approved/unknown campaign grouping and CLI snapshot deltas without private fields');

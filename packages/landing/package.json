@@ -1,13 +1,15 @@
 {
   "name": "@hauddy/landing",
-  "version": "0.1.20",
+  "version": "0.1.21",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && node scripts/build.mjs && node scripts/check-build.mjs",
     "typecheck": "tsc --noEmit",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:http": "node scripts/check-http.mjs",
+    "social:generate": "node scripts/generate-social-card.mjs"
   },
   "dependencies": {
     "@hauddy/web-tokens": "*",
@@ -18,6 +20,7 @@
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.6.0",
+    "sharp": "^0.33.5",
     "typescript": "~5.5.4",
     "vite": "^5.4.19"
   }

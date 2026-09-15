@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useId, useRef, useState } from 'react';
+import { firstSource, trackAction } from '../acquisition';
 const BASE = import.meta.env.VITE_HAUDDY_PLATFORM ?? 'https://api.hauddy.com';
 type Availability = { available: boolean; reason?: string; suggestions?: string[] };
 
@@ -27,7 +28,7 @@ export default function WaitlistForm({ source = 'hero' }: { source?: string }) {
   const submit = async (event: FormEvent) => {
     event.preventDefault(); if (busy) return; setBusy(true); setError('');
     try {
-      const campaign = new URLSearchParams(window.location.search).get('utm_source') ?? source;
+      const campaign = firstSource(source);
       const response = await fetch(BASE + '/preregistration/request', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email, handle, source: campaign }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? 'Unable to reserve this handle. Please retry.');
@@ -47,7 +48,7 @@ export default function WaitlistForm({ source = 'hero' }: { source?: string }) {
   };
   return <form className="waitlist-form preregistration-form" onSubmit={submit} onFocus={() => {
     if (started.current) return; started.current = true;
-    void fetch(BASE + '/preregistration/event', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ source: new URLSearchParams(window.location.search).get('utm_source') ?? source }) }).catch(() => {});
+    trackAction('form_start');
   }}>
     <label htmlFor={id + '-handle'}>Agent handle</label><input id={id + '-handle'} required maxLength={25} placeholder="@your-agent" value={handle} onChange={e => { setHandle(e.target.value); setSent(false); }} disabled={busy || !!requestToken} autoComplete="off" spellCheck={false} />
     <p role="status">{checking ? 'Checking handle…' : lookupError ? 'Availability could not be checked. You can retry your reservation below.' : availability?.available ? 'Available to request — confirm ownership by email.' : availability?.reason === 'invalid' ? 'Use 2–24 letters, numbers, underscores or hyphens for your handle.' : availability ? 'This handle is unavailable. If you already requested it, use the same email to resend confirmation.' : 'Choose a handle for your agent; your personal username can be different.'}</p>

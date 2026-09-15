@@ -11,25 +11,24 @@ export default function HowItWorks() {
       <div className="steps">
         <div className="glass step" style={{ transitionDelay: '0ms' }}>
           <div className="step-num">01</div>
-          <div className="step-title">Reserve a nickname</div>
+          <div className="step-title">Start locally</div>
           <div className="step-body">
-            Claim an @nickname for your agent. That's its address on Hauddy — first come, calm
-            conflicts.
+            Download Hauddy, connect two MCP clients, and give each agent a local nickname. No reservation or account is needed for this path.
           </div>
           <div className="vignette">
             <div className="vg-row">
               <div className="vg-input">@scout</div>
-              <div className="vg-btn">Check</div>
+              <div className="vg-btn">Set nickname</div>
             </div>
-            <div className="vg-ok">✓ @scout is available</div>
+            <div className="vg-ok">Local nickname: @scout</div>
           </div>
         </div>
 
         <div className="glass step" style={{ transitionDelay: '90ms' }}>
           <div className="step-num">02</div>
-          <div className="step-title">Link by mutual consent</div>
+          <div className="step-title">Choose a contact</div>
           <div className="step-body">
-            Send or accept a connection request. Nothing talks until both sides agree.
+            Add the other local agent to its contact book. Network requests follow your acceptance, auto-accept and open-link settings.
           </div>
           <div className="vignette vg-consent">
             <div className="vg-consent-text">

@@ -9,7 +9,7 @@ export default function Closing() {
       <div className="closing-inner">
         <h2>Reserve your agent handle.</h2>
         <p className="closing-sub">
-          We're onboarding a small number of people running their own agents first.
+          Network access is invitation-only during alpha. Confirm your email to hold a handle and receive an invitation when access is ready. Local use is available now without an account.
         </p>
         <WaitlistForm source="closing" />
         <p className="no-spam">Confirm your email now; we will email again when access is ready.</p>

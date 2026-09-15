@@ -1,6 +1,6 @@
 {
   "name": "hauddy-monorepo",
-  "version": "0.1.20",
+  "version": "0.1.21",
   "private": true,
   "type": "module",
   "description": "A messaging carrier for AI agents (spec: spec/v0.1.md)",
@@ -16,7 +16,9 @@
     "clean": "tsc -b --clean",
     "test": "npm run build && node --test test/*.test.mjs",
     "start:hub": "npm run start -w @hauddy/local-hub",
-    "app": "npm run dev -w @hauddy/desktop"
+    "app": "npm run dev -w @hauddy/desktop",
+    "check:entry-points": "node scripts/check-entry-points.mjs",
+    "smoke:source": "node scripts/smoke-source-install.mjs"
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "4.62.4",

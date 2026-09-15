@@ -9,6 +9,9 @@ on:
 #   CLOUDFLARE_ACCOUNT_ID — r2 object put
 
 jobs:
+  source-install:
+    uses: ./.github/workflows/source-install.yml
+
   # ── Build the macOS DMG on a real Mac runner ──────────────────────────────
   build-mac:
     name: Build macOS DMG
@@ -143,7 +146,7 @@ jobs:
   # ── Upload to R2, deploy Cloudflare, create GitHub Release ───────────────
   deploy:
     name: Deploy & Release
-    needs: [build-mac, build-linux, build-win]
+    needs: [source-install, build-mac, build-linux, build-win]
     runs-on: ubuntu-latest
     permissions:
       contents: write  # needed for creating a GitHub Release

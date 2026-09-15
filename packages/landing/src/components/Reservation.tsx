@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 const BASE = import.meta.env.VITE_HAUDDY_PLATFORM ?? 'https://api.hauddy.com';
 export default function Reservation() {
-  const [token] = useState(() => new URLSearchParams(window.location.hash.slice(1)).get('token') ?? '');
+  const [token, setToken] = useState('');
+  useEffect(() => { setToken(new URLSearchParams(window.location.hash.slice(1)).get('token') ?? ''); }, []);
   const [result, setResult] = useState<{ handle: string; cancel_token: string; invitation_email_pending?: boolean } | null>(null);
   const [busy, setBusy] = useState(false), [error, setError] = useState(''), [cancelled, setCancelled] = useState(false);
   const act = async (cancel = false) => {

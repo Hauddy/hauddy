@@ -1,4 +1,4 @@
-import { normalizeNickname } from '@hauddy/protocol';
+import { ACQUISITION_EVENTS, acquisitionSource, normalizeNickname } from '@hauddy/protocol';
 import { hashPassword, randomHex } from './crypto.js';
 import type { Db } from './db.js';
 import type { Env } from './env.js';
@@ -23,11 +23,9 @@ export class EmailActions {
     this.db.sql.exec('DELETE FROM rate_limits WHERE reset_ms<=?', Date.now());
     this.db.sql.exec('DELETE FROM preregistrations WHERE hold_expires_ms <= ?', Date.now());
   }
-  private source(raw: unknown) {
-    const allowed = ['hero', 'closing', 'landing', ...(this.env.ACQUISITION_CAMPAIGNS ?? '').split(',')];
-    return typeof raw === 'string' && /^[a-zA-Z0-9_-]{1,48}$/.test(raw) && allowed.includes(raw) ? raw : 'campaign';
-  }
+  private source(raw: unknown) { return acquisitionSource(raw, this.env.ACQUISITION_CAMPAIGNS); }
   event(event: string, rawSource: unknown) {
+    if (!(ACQUISITION_EVENTS as readonly string[]).includes(event)) throw new EmailActionError(400, 'Unknown acquisition event.');
     const source = this.source(rawSource);
     this.db.sql.exec('INSERT INTO acquisition_events(source,event,count) VALUES(?,?,1) ON CONFLICT(source,event) DO UPDATE SET count=count+1', source, event);
   }
@@ -95,10 +93,12 @@ export class EmailActions {
     if (!nickname) throw new EmailActionError(400, 'Choose a handle with 2–24 letters, numbers, underscores or hyphens.');
     if (!this.env.RESEND_API_KEY) throw new EmailActionError(503, 'Email delivery is unavailable. Please retry later.');
     await this.rate(email, 'reservation'); this.purge();
-    const source = this.source(rawSource ?? 'landing');
     const { token, record } = await this.newToken('verify', email, DAY, null, nickname);
     const cancellation = await this.newToken('pending-cancel', email, DAY, null, nickname);
     const send = this.atomic(() => {
+      // Read inside the transaction so concurrent first requests share one source.
+      const first = this.row<{ source: string }>('SELECT source FROM waitlist_members WHERE email=?', email);
+      const source = this.source(first?.source ?? rawSource ?? 'landing');
       const other = this.row<Hold>('SELECT * FROM preregistrations WHERE nickname=?', nickname);
       const own = this.row<Hold>('SELECT * FROM preregistrations WHERE email=?', email);
       // Do not reveal which email owns an already held handle, or which other
@@ -115,7 +115,7 @@ export class EmailActions {
       return true;
     });
     if (send) {
-      try { await this.mail(email, 'Confirm your Hauddy handle reservation', `Confirm @${nickname} with this single-use link within 24 hours:\nhttps://hauddy.com/reservation#token=${token}\n\nThis reserves an agent handle and joins the waitlist; it does not activate an account. Unconfirmed holds expire after 24 hours. Confirmed holds last up to 180 days while waiting, with 30 days to claim after invitation. To correct this address, submit again with your correct email after the pending hold expires. If you did not request this, ignore it.`); }
+      try { await this.mail(email, 'Confirm your Hauddy handle reservation', `Hauddy connects AI agents across tools with messaging, files and live calls. Local use needs no account; network access is by invitation.\n\nConfirm @${nickname} with this single-use link within 24 hours:\nhttps://hauddy.com/reservation#token=${token}\n\nThis reserves an agent handle and joins the waitlist; it does not activate an account. Unconfirmed holds expire after 24 hours. Confirmed holds last up to 180 days while waiting, with 30 days to claim after invitation. To correct this address, submit again with your correct email after the pending hold expires. If you did not request this, ignore it.`); }
       catch (error) {
         this.atomic(() => {
           this.db.sql.exec('DELETE FROM email_tokens WHERE hash=?', record.hash);
@@ -137,7 +137,10 @@ export class EmailActions {
       this.token(hash, 'verify'); this.purge();
       const hold = this.row<Hold>('SELECT * FROM preregistrations WHERE email=?', t.email);
       if (!hold || hold.nickname !== t.credential) throw new EmailActionError(410, 'The hold has expired or changed. Request a new reservation.');
-      if (hold.status === 'pending') this.db.sql.exec("UPDATE preregistrations SET status='verified',hold_expires_ms=? WHERE email=?", Date.now() + 180 * DAY, t.email);
+      if (hold.status === 'pending') {
+        this.db.sql.exec("UPDATE preregistrations SET status='verified',hold_expires_ms=? WHERE email=?", Date.now() + 180 * DAY, t.email);
+        this.event('verified_reservation', hold.source);
+      }
       this.db.sql.exec('DELETE FROM email_tokens WHERE hash=?', hash);
       this.storeToken(cancel.record);
       this.event('verification', hold.source);
@@ -164,7 +167,7 @@ export class EmailActions {
       if (current.status !== 'invited') this.event('invitation', current.source);
       return expires;
     });
-    await this.mail(email, 'Your Hauddy invitation is ready', `Your agent handle @${hold.nickname} is held until ${new Date(currentDeadline).toISOString().slice(0, 10)}. Create an account or sign in, then claim it:\nhttps://app.hauddy.com/claim-handle#token=${token}\n\nChoose your own personal username. The reserved handle will be ready to attach to an agent, not used as your personal username.`);
+    await this.mail(email, 'Your Hauddy invitation is ready', `Hauddy connects AI agents across tools with messaging, files and live calls. Your network invitation is ready.\n\nYour agent handle @${hold.nickname} is held until ${new Date(currentDeadline).toISOString().slice(0, 10)}. Create an account or sign in, then claim it:\nhttps://app.hauddy.com/claim-handle#token=${token}\n\nChoose your own personal username. The reserved handle will be ready to attach to an agent, not used as your personal username.`);
   }
   async cancel(rawToken: unknown) {
     const hash = await this.digest(rawToken);

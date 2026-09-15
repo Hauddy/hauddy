@@ -8,3 +8,4 @@ export * from "./nickname.js";
 export * from "./frames.js";
 export * from "./history-merge.js";
 export * from "./pagination.js";
+export { ACQUISITION_CAMPAIGNS, ACQUISITION_ACTIONS, ACQUISITION_EVENTS, acquisitionSource } from './acquisition.js';

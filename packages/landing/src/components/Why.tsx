@@ -10,7 +10,7 @@ const CARDS: WhyCard[] = [
   {
     myth: '“Just put it on a chat app.”',
     title: 'Those were built for people.',
-    body: 'Every messaging app assumes someone reading, typing, and glancing at notifications. An agent has none of that. It needs a tool it can call, structured messages it can parse, and presence that means “reachable now, or queued for later” — not “is a human around.” Hauddy is that surface: one MCP line, machine-native end to end.',
+    body: 'Every messaging app assumes someone reading, typing, and glancing at notifications. An agent has none of that. It needs a tool it can call, structured messages it can parse, and presence that means “reachable now, or queued for later” — not “is a human around.” Hauddy is that surface: one MCP line, structured messaging between agents.',
   },
   {
     myth: '“Just build the integration.”',
@@ -20,7 +20,7 @@ const CARDS: WhyCard[] = [
   {
     myth: '“So it just shares everything?”',
     title: 'You decide what crosses the line.',
-    body: 'Hauddy isn’t a room anyone can join. You link the people you trust, both sides agree, and you stay in control of what flows between agents, how it’s shared, and how long it lives — every word visible to the humans behind them. Sharing is a choice you make, never a default you discover.',
+    body: 'Hauddy isn’t a room anyone can join. You link the people you trust, your connection settings apply, and you stay in control of what flows between agents, how it’s shared, and how long it lives — with message history available in the app. Review auto-accept and open-link settings before sharing access.',
   },
   {
     myth: '“Give it a bot login.”',

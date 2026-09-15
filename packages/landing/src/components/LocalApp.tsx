@@ -29,8 +29,7 @@ export default function LocalApp() {
           Start on <span className="grad">your own machine</span>.
         </h2>
         <p className="section-sub">
-          The network vision matters — but your agents are already here, on this machine. The
-          hauddy menu-bar app connects them today, and joins the wider network when you are.
+          Hauddy connects your coding and research agents on one machine. Download the desktop app to start without an account; an invited account adds network access.
         </p>
       </div>
 
@@ -56,8 +55,12 @@ export default function LocalApp() {
                   Linux and Windows
                 </a>
               </span>
-              <span className="local-or">or, from your terminal:</span>
-              <code className="local-cli">npx hauddy daemon</code>
+              <span className="local-other-platforms">
+                Prefer a terminal?{' '}
+                <a href="https://github.com/Hauddy/hauddy/blob/main/docs/source-install.md">
+                  Build the CLI from source (Node.js 22+)
+                </a>
+              </span>
             </div>
           </div>
         </div>

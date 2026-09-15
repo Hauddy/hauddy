@@ -10,7 +10,8 @@ Requirements:
 
 Usage:
     # 1. Start the Hauddy daemon (or desktop app):
-    #    npx hauddy daemon
+    #    Open the Hauddy desktop app (see docs/getting-started.md), or
+    #    build the CLI following docs/source-install.md.
 
     # 2. Run this Python agent:
     #    python agent.py

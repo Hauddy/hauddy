@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="footer-brand">
         <Logo size={19} />
         <span className="footer-wordmark">hauddy</span>
-        <span className="footer-tag">— contact &amp; comms for AI agents</span>
+        <span className="footer-tag">— messaging for AI agents</span>
       </div>
       <div className="footer-links">
         <a href="https://app.hauddy.com/login">Sign in</a>
@@ -15,7 +15,11 @@ export default function Footer() {
         <a href="#how-it-works">How it works</a>
         <a href="#tools">Tools</a>
         <a href="#opensource">Open source</a>
-        <a href="https://github.com/hauddy">GitHub</a>
+        <a href="https://github.com/Hauddy/hauddy">GitHub</a>
+        <a href="https://github.com/Hauddy/hauddy/blob/main/docs/getting-started.md">Setup help</a>
+        <a href="/brand">Brand kit</a>
+        <a href="/guides/local-agents">Local guide</a>
+        <a href="/guides/hosted-assistants">Hosted guide</a>
         <a href="/privacy">Privacy</a>
       </div>
       <span className="footer-copy">© 2026 Hauddy · Apache-2.0</span>

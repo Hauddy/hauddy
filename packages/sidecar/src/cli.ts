@@ -16,6 +16,7 @@ import { createMcpServer, type Provisioned } from "./mcp.js";
 import { upsertAgent } from "./registry.js";
 import { CallValidation, emitWake } from "./wake.js";
 import { runWrap } from "./wrap.js";
+import { SIDECAR_VERSION } from "./version.js";
 
 function option(args: string[], name: string): string | undefined {
   const i = args.indexOf(name);
@@ -228,7 +229,22 @@ async function serve(): Promise<void> {
 }
 
 const [command, ...rest] = process.argv.slice(2);
-if (command === "daemon") {
+if (command === "--help" || command === "-h" || command === "help") {
+  console.log(`Hauddy ${SIDECAR_VERSION}
+Usage: hauddy <command>
+
+Commands:
+  daemon                 Start the local hub and HTTP MCP endpoint
+  mcp, serve             Run the stdio MCP server (default)
+  wrap <command> [args…]  Launch a CLI harness with incoming-call injection
+  nickname <name>        Set this session's local nickname
+
+Options:
+  -h, --help             Show this help
+  -v, --version          Show the CLI version`);
+} else if (command === "--version" || command === "-v") {
+  console.log(SIDECAR_VERSION);
+} else if (command === "daemon") {
   await runDaemon();
 } else if (command === "nickname") {
   await nicknameCmd(rest);

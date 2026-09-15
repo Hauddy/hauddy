@@ -1,3 +1,5 @@
+import { ACQUISITION_ACTIONS } from '@hauddy/protocol';
+import { acquisitionReport } from './acquisition.js';
 import { timelinePage } from "@hauddy/protocol";
 import {
   controlFrameSchema,
@@ -196,7 +198,7 @@ export class HubDO {
 
       // ── admin: invite allowlist ("update from the backend manually") ──
       if (path.startsWith('/preregistration/') || path.startsWith('/accounts/recovery/')) {
-        if (this.rateLimited(request, method === 'GET' ? 'handle-check' : 'email-actions', method === 'GET' ? 120 : 30, 15 * 60_000)) return this.publicJson(429, { error: 'Too many attempts. Please retry later.' });
+        if (this.rateLimited(request, path === '/preregistration/event' ? 'acquisition-events' : method === 'GET' ? 'handle-check' : 'email-actions', path === '/preregistration/event' ? 120 : method === 'GET' ? 120 : 30, 15 * 60_000)) return this.publicJson(429, { error: 'Too many attempts. Please retry later.' });
         try {
           const actions = new EmailActions(this.db, this.env, (fn) => this.ctx.storage.transactionSync(fn));
           if (method === 'GET' && path === '/preregistration/check') {
@@ -209,7 +211,11 @@ export class HubDO {
           // Keep expiry cleanup running even if no further requests arrive.
           await this.ctx.storage.setAlarm(Date.now() + 60_000);
           let result: unknown;
-          if (path === '/preregistration/event') { actions.event('form_start', body.source); result = { ok: true }; }
+          if (path === '/preregistration/event') {
+            const event = body.event ?? 'form_start';
+            if (event !== 'form_start' && !(ACQUISITION_ACTIONS as readonly unknown[]).includes(event)) throw new EmailActionError(400, 'Unknown browser event.');
+            actions.event(String(event), body.source); result = { ok: true };
+          }
           else if (path === '/accounts/recovery/request') result = await actions.requestReset(body.email);
           else if (path === '/accounts/recovery/reset') {
             const reset = await actions.reset(body.token, body.password);
@@ -235,6 +241,12 @@ export class HubDO {
         } catch (error) {
           return this.publicJson(error instanceof EmailActionError ? error.status : 503, { error: error instanceof EmailActionError ? error.message : 'The action could not be completed. Please retry.' });
         }
+      }
+      if (method === 'GET' && path === '/admin/acquisition/report') {
+        const token = request.headers.get('authorization')?.replace(/^Bearer /, '');
+        if (!this.env.ADMIN_TOKEN || token !== this.env.ADMIN_TOKEN) return this.unauthorized();
+        if (url.search) return this.json(400, { error: 'This report is cumulative. Use saved snapshots for reporting intervals.' });
+        return Response.json(acquisitionReport(this.db, this.env.ACQUISITION_CAMPAIGNS), { headers: { 'cache-control': 'no-store' } });
       }
       if (method === "POST" && path === "/admin/invites") {
         const header = request.headers.get("authorization") ?? "";

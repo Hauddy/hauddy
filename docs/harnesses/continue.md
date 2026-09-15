@@ -6,7 +6,7 @@
 
 ## 1. Prerequisites
 
-- Hauddy app or daemon running locally (`npx hauddy daemon`)
+- [Hauddy desktop app](../getting-started.md#1-download-the-desktop-app) running locally, or a [daemon built from source](../source-install.md)
 - Continue extension installed in VS Code or JetBrains
 
 ---
