@@ -20,7 +20,9 @@
   /* accent (green) */
   --accent: #6fa06a;
   --accent-hover: #8fc28a;
-  --accent-ink: #f3f8f1;
+  --accent-ink: #101810;
+  --space-control: 12px;
+  --space-block: 20px;
   --accent-surface: #1e2620;
   --accent-border: #3c5a39;
 

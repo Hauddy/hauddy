@@ -7,7 +7,7 @@ async function get(path, status, type) {
   assert.ok(response.headers.get('content-type')?.includes(type), `${path}: Content-Type`);
   return { response, text: await response.text() };
 }
-for (const [path, title] of [['/', 'Hauddy — messaging'], ['/privacy', 'Privacy Policy — Hauddy'], ['/brand', 'Brand and press kit'], ['/demo', 'Watch a cross-tool'], ['/guides/local-agents', 'Connect two local'], ['/guides/hosted-assistants', 'Send files from']]) {
+for (const [path, title] of [['/', 'Hauddy — messaging'], ['/privacy', 'Privacy Policy — Hauddy'], ['/brand', 'Brand and press kit'], ['/demo', 'Watch a cross-tool'], ['/guides/local-agents', 'Connect two local'], ['/guides/hosted-assistants', 'Send files from'], ['/docs', 'Documentation'], ['/docs/installation', 'Install and connect'], ['/docs/tools', 'MCP tool reference'], ['/guides', 'Workflow guides'], ['/about', 'Why Hauddy']]) {
   const { text } = await get(path, 200, 'text/html');
   assert.ok(text.includes(`<title>${title}`));
   assert.match(text, /<h1>/);

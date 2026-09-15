@@ -1,0 +1,6 @@
+import React from 'react';import {createRoot} from 'react-dom/client';import {HashRouter,Routes,Route,Navigate} from 'react-router-dom';
+import {api} from '../app/src/api';import Layout from '../app/src/components/Layout';import Agents from '../app/src/screens/Agents';import Account from '../app/src/screens/Account';import '../app/src/index.css';
+const agents=['scout','builder','long-project-researcher'].map((n,i)=>({localId:n,agentId:'audit-'+i,status:i?'detached':'attached',nicknames:['@'+n],speakingAs:'@'+n,description:null}));
+for(const k of Object.keys(api)) if(typeof api[k]==='function')api[k]=async()=>{throw new Error('Visual audit: action disabled');};
+Object.assign(api,{listAgents:async()=>agents,listNetworkAgents:async()=>[],listExposure:async()=>agents.map(a=>({localId:a.localId,exposed:true,nickname:a.nicknames[0],platformNickname:a.nicknames[0],platformOnline:false})),getPlatform:async()=>({connected:true,endpoint:null,email:'example@example.invalid'}),notifications:async()=>({friend_requests:0,unread_messages:0,missed_calls:0})});
+createRoot(document.getElementById('root')!).render(<HashRouter><Routes><Route element={<Layout/>}><Route path="/" element={<Agents/>}/><Route path="/account" element={<Account/>}/><Route path="*" element={<Navigate to="/" replace/>}/></Route></Routes></HashRouter>);

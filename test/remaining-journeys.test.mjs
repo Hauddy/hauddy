@@ -12,6 +12,7 @@ after(()=>rmSync(dir,{recursive:true,force:true}));
 const outfile=resolve(dir,'ui.mjs');
 await build({stdin:{contents:"export { default as WaitlistForm } from './packages/landing/src/components/WaitlistForm'; export { default as Reservation } from './packages/landing/src/components/Reservation'; export { default as App, safeReturnPath } from './packages/web/src/App'; export { default as Contacts } from './packages/app-shared/src/screens/Contacts'; export { default as Setup } from './packages/app-shared/src/screens/Setup'; export {api,configureApi} from './packages/app-shared/src/api';",resolveDir:process.cwd()},outfile,bundle:true,platform:'node',format:'esm',packages:'external',jsx:'automatic',alias:{'@hauddy/app-shared':resolve('packages/app-shared/src/index.ts')},define:{'import.meta.env':'{}'}});
 const {App,safeReturnPath,Contacts,Setup,WaitlistForm,Reservation,api,configureApi}=await import(pathToFileURL(outfile));
+const progressLabels = root => root.findByProps({'aria-label':'Connection progress'}).findAllByType('li').map(node => node.children.filter(child => typeof child === 'string').join(''));
 async function mount(t, component=App, signedIn=true, path='/messages?to=@alpha', overrides={}) {
  const old={document:globalThis.document,window:globalThis.window,localStorage:globalThis.localStorage,requestAnimationFrame:globalThis.requestAnimationFrame};
  const values=new Map(signedIn?[['hauddy.platformKey','fixture-key']]:[]);
@@ -78,19 +79,19 @@ test('offline friend request retains the handle, prevents duplicates and offers 
 });
 test('setup uses actual connection and message evidence rather than a clicked completion flag',async t=>{
  const ui=await mount(t,Setup,true,'/setup?path=hosted&agent=c',{nicknamesOverview:async()=>({agents:[{id:'c',nickname:'@connector',kind:'connector',online:false,connector:{lastUsedMs:123}}],reserved:[]}),consoleThread:async()=>({peer_id:'c',messages:[{mine:true,body:'hello',outbound_state:'sent'}]})});
- const progress=ui.root.findByProps({'aria-label':'Connection progress'});
- assert.deepEqual(progress.findAllByType('li').map(n=>n.props.children),['✓ Configured','✓ Connected or seen by Hauddy','✓ First message recorded']);
+ assert.deepEqual(progressLabels(ui.root),['Configured','Connected or seen by Hauddy','First message recorded']);
+ assert.ok(ui.root.findByProps({'aria-label':'Connection progress'}).findAllByType('li').every(node => node.props.className === 'complete'));
 });
 
 
 test('changing setup agents clears stale success while the new history is loading',async t=>{
  let resolveSecond;
  const ui=await mount(t,Setup,true,'/setup?path=hosted&agent=first',{nicknamesOverview:async()=>({agents:['first','second'].map(id=>({id,kind:'connector',online:false})),reserved:[]}),consoleThread:async id=>id==='first'?{messages:[{mine:true,outbound_state:'sent',delivered_at:'now'}]}:new Promise(resolve=>{resolveSecond=resolve;})});
- const progress=()=>ui.root.findByProps({'aria-label':'Connection progress'}).findAllByType('li').map(n=>n.props.children);
- assert.equal(progress()[2],'✓ First message recorded');
+ const progress=()=>progressLabels(ui.root);
+ assert.equal(progress()[2],'First message recorded');
  await ui.navigate('/setup?path=hosted&agent=second');
  assert.equal(progress()[1],'Waiting for the first connection');
- assert.equal(progress()[2],'Send a first test message');
+ assert.equal(progress()[2],'Checking message history…');
  await act(async()=>resolveSecond({messages:[]}));
  assert.equal(progress()[2],'Send a first test message');
 });

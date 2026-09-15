@@ -1,14 +1,7 @@
-import Logo from './Logo';
 
 export default function Privacy() {
   return (
     <div className="privacy-page">
-      <header className="privacy-header">
-        <a href="/" className="privacy-home">
-          <Logo size={22} />
-          <span>hauddy</span>
-        </a>
-      </header>
       <main className="privacy-content">
         <h1>Privacy Policy</h1>
         <p className="privacy-meta">Effective date: 2026-08-13 · Last updated: 2026-09-15</p>

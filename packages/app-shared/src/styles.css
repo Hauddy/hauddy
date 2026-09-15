@@ -2147,3 +2147,38 @@
   flex-direction: column;
   gap: 12px;
 }
+
+/* Consistent separation of actions, forms and their results. */
+.conn-card + .conn-list { margin-top: var(--space-block); }
+.conn-actions, .danger-actions { flex-wrap: wrap; }
+.contact-main-link, .contact-nick, .agent-nick { overflow-wrap: anywhere; }
+.setup-page { max-width: 720px; }
+.setup-paths { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 28px; }
+.setup-path { display: flex; flex-direction: column; gap: 8px; padding: 18px; border: 1px solid var(--border-strong); border-radius: var(--radius-md); background: var(--surface); color: var(--text-muted); text-align: left; font: inherit; font-size: 13px; cursor: pointer; }
+.setup-path-title { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15px; color: var(--text); }
+.setup-path[aria-pressed="true"] { border-color: var(--accent-hover); background: var(--accent-surface); box-shadow: inset 0 0 0 1px var(--accent-hover); }
+.setup-path:focus-visible, .setup-help summary:focus-visible { outline: 2px solid var(--accent-hover); outline-offset: 3px; }
+.setup-instructions { margin-bottom: 28px; }
+.setup-instructions .section-title, .setup-progress .section-title { margin-top: 0; font-size: 17px; }
+.setup-instructions ol { padding-left: 22px; color: var(--text-muted); }
+.setup-instructions li + li { margin-top: 12px; }
+.setup-progress { padding: 24px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); }
+.setup-checklist { list-style: none; padding: 0; display: grid; gap: 14px; margin: 24px 0; color: var(--text-muted); }
+.setup-checklist li { display: flex; align-items: center; gap: 12px; }
+.setup-checklist li > span { display: inline-grid; place-items: center; width: 26px; height: 26px; flex: none; border: 1px solid var(--border-strong); border-radius: 50%; font-size: 12px; }
+.setup-checklist .complete { color: var(--accent-hover); }
+.setup-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.setup-help { margin: 24px 0; color: var(--text-muted); }
+.setup-help summary { cursor: pointer; color: var(--text); }
+.action-icon { display: block; flex: none; }
+.attach-btn { background: var(--surface); padding: 0; min-height: 40px; width: 40px; color: var(--text-muted); }
+.attach-btn:hover:not(:disabled) { background: var(--surface-2); }
+.chat-compose { align-items: stretch; gap: 10px; }
+.chat-compose .input { min-width: 0; min-height: 40px; }
+.chat-compose .btn { min-height: 40px; }
+.call-btn { min-height: 36px; min-width: 36px; padding: 8px; }
+@media (max-width: 480px) {
+  .setup-paths { grid-template-columns: 1fr; }
+  .setup-progress { padding: 18px; }
+  .chat-compose { gap: 8px; }
+}

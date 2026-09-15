@@ -112,3 +112,22 @@ test('a lost save response is reconciled when the server actually saved the pref
   assert.equal(ui.checkbox().props.checked, false);
   assert.equal(ui.root.findAllByProps({ role: 'alert' }).length, 0);
 });
+
+test('profile failure never exposes empty editable defaults; retry loads the profile', async t => {
+  let fail = true;
+  const ui = await mount(t, false, {getIdentity: async()=>{if(fail)throw Error('profile unavailable');return {handle:'@tester',bio:'Kept bio'};}});
+  assert.equal(ui.root.findAllByProps({autoComplete:'username'}).length,0);
+  assert.equal(ui.root.findAllByProps({'aria-label':'Retry Could not load your profile'}).length,1);
+  fail=false;
+  await act(async()=>ui.root.findByProps({'aria-label':'Retry Could not load your profile'}).props.onClick());
+  assert.equal(ui.root.findByProps({autoComplete:'username'}).props.value,'tester');
+  assert.equal(ui.root.findAllByType('textarea')[0].props.value,'Kept bio');
+});
+test('failed profile refresh retains loaded fields and an in-progress draft', async t=>{
+ let fail=false;
+ const ui=await mount(t,false,{getIdentity:async()=>{if(fail)throw Error('offline');return {handle:'@tester',bio:'Original'};}});
+ await act(async()=>ui.root.findAllByType('textarea')[0].props.onChange({target:{value:'Unsaved draft'}}));
+ fail=true;await ui.refresh();
+ assert.equal(ui.root.findAllByType('textarea')[0].props.value,'Unsaved draft');
+ assert.equal(ui.root.findAllByProps({'aria-label':'Retry Could not refresh your profile'}).length,1);
+});

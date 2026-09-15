@@ -428,3 +428,5 @@
     height: 30px;
   }
 }
+
+.login-recovery { margin-top: 14px; align-self: flex-start; font-size: 13px; }

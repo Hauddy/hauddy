@@ -13,6 +13,11 @@ const pages = [
   ['demo.html', '/demo', 'Watch a cross-tool file exchange — Hauddy', '/media/demo-overview.mp4'],
   ['guides/local-agents.html', '/guides/local-agents', 'Connect two local AI agents — Hauddy', '<h1>Connect two local agents'],
   ['guides/hosted-assistants.html', '/guides/hosted-assistants', 'Send files from a hosted assistant to a coding agent — Hauddy', '<h1>Send a file'],
+  ['docs/index.html', '/docs', 'Documentation — Hauddy', '<h1>Start with a conversation.'],
+  ['docs/installation.html', '/docs/installation', 'Install and connect your tools — Hauddy', '<h1>Connect your first tools.'],
+  ['docs/tools.html', '/docs/tools', 'MCP tool reference — Hauddy', 'id="send_sms"'],
+  ['guides/index.html', '/guides', 'Workflow guides — Hauddy', '<h1>Make your first handoff.'],
+  ['about.html', '/about', 'Why Hauddy — connecting agents across tools', '<h1>Agents should be easy to reach.'],
   ['404.html', null, 'Page not found — Hauddy', '<h1>Page not found</h1>'],
 ];
 for (const [file, route, title, content] of pages) {
@@ -45,7 +50,7 @@ assert.match(read('index.html'), /<noscript>[\s\S]*opacity: 1/);
 assert.match(read('reservation.html'), /disabled=""[^>]*>Confirm my reservation/);
 assert.equal(existsSync(resolve(dist, '_redirects')), false, 'No catch-all rewrite may hide missing routes');
 const locations = [...read('sitemap.xml').matchAll(/<loc>(.*?)<\/loc>/g)].map(match => match[1]);
-assert.deepEqual(locations, ['/', '/privacy', '/brand', '/demo', '/guides/local-agents', '/guides/hosted-assistants'].map(path => 'https://hauddy.com' + path));
+assert.deepEqual(locations, ['/', '/privacy', '/brand', '/demo', '/guides/local-agents', '/guides/hosted-assistants', '/docs', '/docs/installation', '/docs/tools', '/guides', '/about'].map(path => 'https://hauddy.com' + path));
 assert.match(read('robots.txt'), /^User-agent: \*\nAllow: \/\n/m);
 assert.match(read('robots.txt'), /Sitemap: https:\/\/hauddy.com\/sitemap.xml/);
 assert.match(read('_headers'), /\/reservation\*[\s\S]*X-Robots-Tag: noindex/);
