@@ -15,6 +15,7 @@ function* files(dir) {
 for (const file of ['README.md', ...files('docs'), ...files('examples'), ...files('packages/landing/src')]) {
   assert.doesNotMatch(read(file), /\bnpx\s+(?:--yes\s+|-y\s+)?hauddy(?:@[^\s`]+)?\s|\bnpm\s+(?:install|i)\s+(?:--global\s+|-g\s+)?hauddy(?:[\s`]|$)/, `${file}: CLI must use the documented source install or desktop downloads`);
 }
+assert.doesNotMatch(read('packages/landing/src/components/Terminal.tsx'), /"command": "npx"/);
 assert.match(read('README.md'), /img\.shields\.io\/github\/v\/release\/Hauddy\/hauddy/);
 assert.doesNotMatch(read('docs/getting-started.md'), /(?:Linux|Windows).*coming soon/i);
 for (const file of ['README.md', 'docs/getting-started.md']) {

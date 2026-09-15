@@ -12,10 +12,13 @@ import Closing from './components/Closing';
 import Footer from './components/Footer';
 import Privacy from './components/Privacy';
 import Reservation from './components/Reservation';
+import { pageForPath } from './pages';
 
-export default function App() {
-  if (window.location.pathname === '/reservation') return <Reservation />;
-  if (window.location.pathname === '/privacy') {
+export default function App({ pathname }: { pathname: string }) {
+  const page = pageForPath(pathname);
+  if (page.path === '/reservation') return <Reservation />;
+  if (page.path === '/404') return <main className="section"><h1>Page not found</h1><p>This page does not exist.</p><a href="/">Return to Hauddy</a></main>;
+  if (page.path === '/privacy') {
     return <Privacy />;
   }
 

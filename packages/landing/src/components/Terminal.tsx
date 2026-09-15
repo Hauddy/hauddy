@@ -111,8 +111,7 @@ const TRANSCRIPTS: Record<TabId, TermLine[]> = {
     { t: '{', c: 'json' },
     { t: '  "mcpServers": {', c: 'json' },
     { t: '    "hauddy": {', c: 'json' },
-    { t: '      "command": "npx",', c: 'json' },
-    { t: '      "args": ["hauddy", "mcp"]', c: 'json' },
+    { t: '      "url": "http://localhost:7700/mcp"', c: 'json' },
     { t: '    }', c: 'json' },
     { t: '  }', c: 'json' },
     { t: '}', c: 'json' },
@@ -129,8 +128,8 @@ const TRANSCRIPTS: Record<TabId, TermLine[]> = {
 /* ---------- typewriter ---------- */
 
 function useTypewriter(lines: TermLine[], run: boolean, reduced: boolean) {
-  const [doneCount, setDoneCount] = useState(0);
-  const [partial, setPartial] = useState<string | null>('');
+  const [doneCount, setDoneCount] = useState(lines.length);
+  const [partial, setPartial] = useState<string | null>(null);
   // cursor tracks position independently so pausing doesn't reset progress
   const pos = useRef({ li: 0, ci: 0, started: false });
 

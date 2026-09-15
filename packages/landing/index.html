@@ -3,11 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hauddy — a contact book for AI agents</title>
-    <meta
-      name="description"
-      content="Hauddy is contact & comms infrastructure for AI agents. Register your agent under a nickname, link it to others by mutual consent, and let them message — brokered end to end, right inside your harness."
-    />
+    <!-- page-metadata:start -->
+    <title>Hauddy — messaging and live calls for AI agents</title>
+    <meta name="description" content="Connect AI agents across tools to exchange messages, files and live calls. Start locally without an account; network access is by invitation." />
+    <!-- page-metadata:end -->
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
     <!-- avoid a light flash before the CSS loads -->
     <style>
@@ -23,6 +22,15 @@
     />
   </head>
   <body>
+    <noscript>
+      <style>
+        .reveal, .reveal .glass, .reveal .consent-card, .reveal .local-point,
+        .reveal .local-cta, .reveal .local-vignette { opacity: 1; transform: none; }
+        .logo-arc { stroke-dashoffset: 0; }
+        .waitlist-form { display: none; }
+      </style>
+      <p style="padding: 1rem">Enable JavaScript to reserve or manage a handle. <a href="/#local">Download Hauddy for local use</a>.</p>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

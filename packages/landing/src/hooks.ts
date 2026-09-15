@@ -2,14 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 
 /** Live prefers-reduced-motion flag. All motion on the page keys off this. */
 export function useReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(
-    () =>
-      typeof window !== 'undefined' &&
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-  );
+  // Match the server's initial render; apply the browser preference after hydration.
+  const [reduced, setReduced] = useState(false);
   useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReduced(mq.matches);
     const onChange = () => setReduced(mq.matches);
     mq.addEventListener('change', onChange);
     return () => mq.removeEventListener('change', onChange);
@@ -25,7 +23,8 @@ export function useReducedMotion(): boolean {
 export function useReveal<T extends HTMLElement = HTMLElement>(threshold = 0.15) {
   const ref = useRef<T | null>(null);
   const reduced = useReducedMotion();
-  const [visible, setVisible] = useState(reduced);
+  // Content is visible in initial HTML, even if the client bundle fails to load.
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     if (reduced) {
@@ -37,6 +36,7 @@ export function useReveal<T extends HTMLElement = HTMLElement>(threshold = 0.15)
       setVisible(true);
       return;
     }
+    setVisible(false);
     const io = new IntersectionObserver(
       (entries) => {
         for (const en of entries) {
