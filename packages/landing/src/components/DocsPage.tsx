@@ -68,7 +68,8 @@ export default function DocsPage({ path }: { path: string }) {
             for Claude Code, Codex and other clients. With Claude Code’s global
             local stdio setup, register once and ask each project’s agent to run
             <code> whoami</code>. Hauddy creates or reloads its project identity
-            automatically. HTTP connections select identity through their URL;
+            automatically. On Hauddy 0.1.23+, HTTP connections select identity
+            through <code>whoami</code> with a stable <code>local_id</code>, or an explicit URL ID;
             the guide explains both options.
           </p>
           <p>

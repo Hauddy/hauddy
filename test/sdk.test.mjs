@@ -26,4 +26,13 @@ test('SDK connects to the actual local MCP endpoint and terminates its session',
   await client.close();
   const result = await fetch(local.url + '/mcp', { method: 'POST', headers: { 'mcp-session-id': session, 'content-type': 'application/json' }, body: '{}' });
   assert.equal(result.status, 404);
+  const unbound = new HauddyClient({ hub: local.url + '/mcp' });
+  await unbound.connect();
+  try {
+    await assert.rejects(unbound.whoami(), /local_id/);
+    assert.equal((await unbound.whoami('sdk-bot')).agent_id, agent.agent_id);
+    await assert.rejects(unbound.whoami('different-agent'), /already bound/);
+  } finally {
+    await unbound.close();
+  }
 });

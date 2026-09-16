@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { MAX_ATTACHMENTS_BYTES, type Attachment } from "@hauddy/protocol";
 import type { Daemon } from "./daemon.js";
-import { createMcpServer } from "./mcp.js";
+import { createMcpServer, type Provision } from "./mcp.js";
 import { CallValidation, emitWake } from "./wake.js";
 
 const CORS = {
@@ -33,8 +33,8 @@ export interface LocalApiHandle {
 export async function startLocalApi(opts: LocalApiOptions): Promise<LocalApiHandle> {
   const { daemon } = opts;
 
-  // One transport per MCP session — each new Claude Code window gets its own
-  // agent identity (matching the stdio `hauddy mcp` per-directory behaviour).
+  // One transport per MCP session. Identity is selected by URL ID or whoami;
+  // a new transport alone does not determine which durable agent to reuse.
   const mcpSessions = new Map<string, StreamableHTTPServerTransport>();
 
   const json = (res: http.ServerResponse, status: number, body: unknown): void => {
@@ -360,9 +360,8 @@ export async function startLocalApi(opts: LocalApiOptions): Promise<LocalApiHand
       if (method === "GET" && p === "/api/activity") return json(res, 200, daemon.listActivity());
 
       // ---- HTTP MCP endpoint (/mcp) ----
-      // Each new Claude Code window starts a fresh MCP session and gets its own
-      // agent identity — matching the per-directory behaviour of `hauddy mcp`
-      // (stdio). Existing sessions are routed by Mcp-Session-Id header.
+      // Sessions without a URL ID must identify through whoami before use.
+      // Existing sessions are routed by Mcp-Session-Id header.
       // Usage: claude mcp add --transport http hauddy http://localhost:7700/mcp
       if (p === "/mcp" || p.startsWith("/mcp/")) {
         const sessionId = req.headers["mcp-session-id"] as string | undefined;
@@ -377,18 +376,40 @@ export async function startLocalApi(opts: LocalApiOptions): Promise<LocalApiHand
           void transport.handleRequest(req, res, body);
           return;
         }
-        // New session — derive a stable localId from the optional ?id= query param.
-        // Defaults to "http-default" so reconnects in the same project reuse the
-        // same agent identity instead of creating a new one each time.
+        // Never silently bind every unconfigured client to the same "claude"
+        // identity. Let whoami select a stable ID, then lock it for this session.
         const reqUrl = new URL(req.url ?? "/mcp", "http://localhost");
-        const idParam = reqUrl.searchParams.get("id")?.replace(/[^a-z0-9_-]/gi, "").slice(0, 40);
-        const localId = idParam ?? "claude";
+        const idParam = reqUrl.searchParams.get("id");
+        if (idParam !== null && !/^[a-zA-Z0-9_-]{1,40}$/.test(idParam)) {
+          return json(res, 400, { error: "Invalid MCP identity ID: use 1–40 letters, digits, underscores or hyphens." });
+        }
+        let localId = idParam ?? undefined;
+        let selectedProvision: Provision | undefined;
+        const provision: Provision = () => {
+          if (!localId) throw new Error("Identity not selected. Call whoami with this project's or agent's stable local_id first; do not rename another agent to identify yourself.");
+          selectedProvision ??= daemon.createHttpMcpProvision(localId, (caller, msg) => emitWake(mcpServer, caller, msg));
+          return selectedProvision();
+        };
         const validation = new CallValidation();
         const mcpServer = createMcpServer(
-          daemon.createHttpMcpProvision(localId, (caller, msg) => emitWake(mcpServer, caller, msg)),
+          provision,
           validation,
-          { transport: "http" },
+          {
+            transport: "http",
+            identify: async (requestedId) => {
+              if (requestedId !== undefined) {
+                if (localId !== undefined && localId !== requestedId) {
+                  throw new Error(`This session is already bound to local_id '${localId}'. Open a separate MCP connection for '${requestedId}'; renaming does not switch identities.`);
+                }
+                localId = requestedId;
+              }
+              return localId ? provision() : null;
+            },
+          },
         );
+        // Preserve configured-ID setup (including SDK clients) at connection
+        // time. This creates the lazy provision, not an agent registration.
+        if (localId) selectedProvision = daemon.createHttpMcpProvision(localId, (caller, msg) => emitWake(mcpServer, caller, msg));
         const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: () => randomUUID() });
         transport.onclose = () => { if (transport.sessionId) mcpSessions.delete(transport.sessionId); };
         await mcpServer.connect(transport);
