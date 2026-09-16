@@ -83,7 +83,11 @@ function asText(value: unknown): { content: Array<{ type: "text"; text: string }
  * hub, and it can immediately message other local agents. `set_nickname` /
  * `set_identity` let it name and describe itself. place_call is reserved.
  */
-export function createMcpServer(provision: Provision, validation: CallValidation, opts?: { transport?: "http" | "stdio" }): McpServer {
+export function createMcpServer(provision: Provision, validation: CallValidation, opts?: {
+  transport?: "http" | "stdio";
+  /** HTTP sessions select a stable identity before any tools can mutate it. */
+  identify?: (localId?: string) => Promise<Provisioned | null>;
+}): McpServer {
   const server = new McpServer(
     { name: "hauddy", version: "0.1.0" },
     // Declare Claude Code's channel capability so it accepts wake injections
@@ -101,10 +105,20 @@ export function createMcpServer(provision: Provision, validation: CallValidation
     "whoami",
     {
       description:
-        "Show this agent's identity, nickname, description, and the other local agents it can reach. Auto-provisions on first use — call this first.",
+        "Show this agent's identity, nickname, description, and reachable local agents. Call this first. For an HTTP connection without a configured URL ID, supply a stable local_id for this project/agent: reuse the same ID on reconnect, use different IDs for separate agents. This selects or creates an identity; it does not rename another agent.",
+      inputSchema: {
+        local_id: z.string().regex(/^[a-zA-Z0-9_-]{1,40}$/).optional().describe("HTTP only: stable local identity key, 1–40 letters, digits, underscores or hyphens. Use your existing configured ID when known, otherwise a project/agent slug. Keep it unchanged across reconnects; distinct agents need distinct IDs."),
+      },
     },
-    async () => {
-      const p = await provision();
+    async ({ local_id }) => {
+      if (local_id !== undefined && !opts?.identify) {
+        throw new Error("This connection already uses the project's saved identity. Call whoami without local_id.");
+      }
+      const p = opts?.identify ? await opts.identify(local_id) : await provision();
+      if (!p) return asText({
+        identity_required: true,
+        next_steps: "Call whoami again with local_id set to this project's or agent's stable local ID (1–40 letters, digits, underscores or hyphens). Reuse your existing local ID if known; otherwise choose a project/agent slug. Use a different ID for a separate agent. Hauddy will load the matching identity or create it. Do not call set_nickname to select an identity.",
+      });
       const all = (await listAgents(p.endpoint).catch(() => ({ agents: [] }))).agents;
       const self = all.find((a) => a.agent_id === p.agentId) ?? null;
       const peers = all
@@ -138,7 +152,7 @@ export function createMcpServer(provision: Provision, validation: CallValidation
   server.registerTool(
     "set_nickname",
     {
-      description: "Set or rename this agent's local @nickname (how other agents address it). Free locally; must be unique on this machine.",
+      description: "Rename the identity already selected by whoami. This does not select or create a separate agent. Free locally; must be unique on this machine.",
       inputSchema: { nickname: z.string().describe("desired handle, e.g. 'nabu' (with or without @)") },
     },
     async ({ nickname }) => {

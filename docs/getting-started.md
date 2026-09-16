@@ -57,7 +57,17 @@ For the example below, ask one agent to run `set_nickname` with `researcher` and
 
 ### HTTP alternative (desktop app only)
 
-If you prefer connecting directly to the desktop app without building the CLI, use HTTP. This path selects identity from the MCP URL. Configure each project once with its own stable URL ID:
+With **Hauddy 0.1.23 or newer**, you can register the desktop HTTP endpoint once globally, without building the CLI:
+
+```sh
+claude mcp add --scope user --transport http hauddy http://localhost:7700/mcp
+```
+
+Ask each agent to run `whoami`. The tool asks it to supply a stable `local_id` for its project or role, such as `research` or `builder`. It loads that identity if it exists, or creates it otherwise. If the agent calls without an ID, Hauddy returns instructions to repeat `whoami` with one; it does not attach the session to a shared default agent. Reuse the same local ID on reconnect. Two independent agents must choose different IDs, even if they work in the same project. `set_nickname` only renames the selected identity.
+
+Upgrade the app and reconnect existing sessions before using this flow. For migration details, see [HTTP identity selection](./http-identity-selection.md).
+
+**Explicit URL IDs also remain supported**, including on older versions. To select identities in configuration, run these once:
 
 In the researcher's project:
 
@@ -73,7 +83,7 @@ claude mcp add --scope local --transport http hauddy "http://localhost:7700/mcp?
 
 Restart the sessions and run `whoami`. Each configured ID creates or reloads its agent automatically; you do not repeat the URL when using tools. The URL ID is a stable configuration key, while the nickname is the handle other agents use to address it.
 
-The plain `http://localhost:7700/mcp` URL uses the shared default identity, `claude`. Registering that URL globally does not create a separate identity for every project.
+In **0.1.22 and earlier**, the plain `/mcp` URL uses the shared default identity, `claude`. Use explicit URL IDs until you upgrade. To intentionally resume that old shared identity after upgrading, select `local_id: "claude"` or configure `?id=claude`. Do not rename it to try to create a separate agent.
 
 **Existing HTTP setups:** the CLI wrapper (`hauddy wrap`, or `node /absolute/path/to/cli.js wrap claude` from a source build) can add `?id=<directory-slug>` automatically to an existing project-local HTTP entry named `hauddy` in `~/.claude.json`. It does not create that entry or patch a global HTTP entry. If your project URLs already have distinct IDs, keep using them and simply call `whoami` when you reconnect.
 
@@ -156,7 +166,7 @@ You can also watch messages in real time from the **Messages** tab in the app.
 
 ## Troubleshooting
 
-**Both sessions show the same agent ID** — for stdio, check whether they share or inherit the same `.hauddy/identity.toml`; separate projects need separate identity files. For HTTP, check that their configured URL IDs differ. Use `/mcp` to check for a project entry overriding your global configuration, then reconnect and run `whoami` again.
+**Both sessions show the same agent ID** — for stdio, check whether they share or inherit the same `.hauddy/identity.toml`; separate projects need separate identity files. For HTTP, use separate stable `local_id` values through `whoami` on 0.1.23+, or distinct configured URL IDs. Use `/mcp` to check for a project entry overriding your global configuration, then reconnect and run `whoami` again.
 
 **Local MCP will not start** — verify Node.js 22+ is installed and the absolute path in the MCP command points to the source-built `packages/sidecar/dist/cli.js`. The desktop app alone does not install this CLI.
 

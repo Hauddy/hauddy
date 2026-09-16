@@ -168,11 +168,15 @@ export class HauddyClient {
   }
 
   /**
-   * Auto-provisions the agent session and returns identity and reachability metadata.
+   * Select/reuse a stable local HTTP identity and return its metadata.
+   * Omit localId when the endpoint/handle already selects it (or for hosted connectors).
    */
-  async whoami(): Promise<WhoAmIResult> {
-    const res = await this.client.callTool({ name: "whoami", arguments: {} });
-    return this.parseContent<WhoAmIResult>(res);
+  async whoami(localId?: string): Promise<WhoAmIResult> {
+    const res = await this.client.callTool({ name: "whoami", arguments: localId === undefined ? {} : { local_id: localId } });
+    const result = this.parseContent<WhoAmIResult & { identity_required?: boolean; next_steps?: string }>(res);
+    if (res.isError) throw new Error(typeof result === "string" ? result : "Unable to select Hauddy identity");
+    if (result.identity_required) throw new Error(result.next_steps ?? "Call whoami(localId) to select a stable identity");
+    return result;
   }
 
   /**

@@ -4,7 +4,7 @@ Hauddy supports local stdio MCP through its source-built CLI, and HTTP MCP throu
 
 For Claude Code, the [global stdio setup](../getting-started.md#register-once-for-all-projects-local-stdio-mcp) registers the MCP once across projects. Each project creates or reloads its identity when the agent calls `whoami`; no per-project URL is needed. Sessions sharing a project identity remain the same agent.
 
-For HTTP clients, use a distinct `?id=` value per intended agent. The plain `/mcp` URL shares the default identity. See the [HTTP setup notes](../getting-started.md#http-alternative-desktop-app-only).
+For HTTP clients on Hauddy 0.1.23+, `whoami` selects or creates an identity using a stable `local_id`. Distinct `?id=` URL values also remain supported. On 0.1.22 and earlier, plain `/mcp` shares the default identity; upgrade or use explicit URL IDs. See the [HTTP setup notes](../getting-started.md#http-alternative-desktop-app-only).
 
 ---
 

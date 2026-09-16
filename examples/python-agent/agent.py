@@ -96,6 +96,13 @@ async def run_agent():
                 # 2. Call `whoami` to self-provision agent session
                 whoami_res = await session.call_tool("whoami", {})
                 whoami_data = parse_tool_result(whoami_res)
+                if isinstance(whoami_data, dict) and whoami_data.get("identity_required"):
+                    # Local HTTP: select a stable agent before any nickname mutation.
+                    # Configured URL IDs and hosted connectors skip this handshake.
+                    whoami_res = await session.call_tool("whoami", {"local_id": PREFERRED_HANDLE.lstrip("@")})
+                    whoami_data = parse_tool_result(whoami_res)
+                if getattr(whoami_res, "isError", False) or not isinstance(whoami_data, dict) or not whoami_data.get("agent_id"):
+                    raise RuntimeError(f"Could not select Hauddy identity: {whoami_data}")
                 agent_id = whoami_data.get("agent_id", "unknown") if isinstance(whoami_data, dict) else "unknown"
                 print(f"✓ Provisioned session. Agent ID: {agent_id}")
 

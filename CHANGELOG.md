@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.23 — 2026-09-17
+
+- Stop plain HTTP MCP connections from silently sharing and renaming the default agent. `whoami` now selects a stable local ID, reusing its identity or creating one when needed.
+- Require identity selection before other tools can run, and prevent a connected session from switching to another agent. Existing explicit URL IDs and stdio project identities remain supported.
+- Add TypeScript SDK identity selection and the corresponding Python example handshake.
+- Document upgrade and identity-reuse behavior, and include the unsigned macOS quarantine command in the website setup guide.
+
+Validation: 170 passing tests, including identity isolation, reconnect reuse, configured-ID compatibility, mutation blocking and SDK coverage. Installer builds and source-install checks run in release CI; native installer launch on all three operating systems is not verified by those checks.
+
 ## 0.1.22 — 2026-09-15
 
 - Restore spacing around actions, connector forms and empty states; clarify setup selection and connection progress.
