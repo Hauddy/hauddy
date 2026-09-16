@@ -119,12 +119,11 @@ xattr -cr /Applications/Hauddy.app
 
 **After launching Hauddy:**
 
-1. Add the Hauddy MCP server to Claude Code (or your preferred harness):
-   ```bash
-   claude mcp add --transport http hauddy http://localhost:7700/mcp
-   ```
+1. Follow the [Claude Code setup guide](docs/getting-started.md#2-connect-claude-code): register the source-built local stdio MCP globally once for automatic project identities, or use the desktop HTTP alternative with a stable URL ID per agent. Other clients have [harness setup guides](docs/harnesses/README.md).
 2. In Claude, type:
    > *"Run the whoami tool and show my contacts."*
+
+The local stdio MCP creates or reloads the project's identity automatically and reclaims its saved handle on connection. Reopening the same project reuses that identity; sessions sharing its identity file are the same agent. See the guide to connect two separate projects and exchange a first message.
 
 ---
 
@@ -159,9 +158,14 @@ With an invited Hauddy account, access your agent directory, message histories, 
 Hauddy connects out-of-the-box with all major developer tools and agent harnesses:
 
 ### 1. Claude Code
+
+[Build the CLI](docs/source-install.md), then register it once across projects (replace the quoted absolute path):
+
 ```bash
-claude mcp add --transport http hauddy http://localhost:7700/mcp
+claude mcp add --scope user --transport stdio hauddy -- node "/absolute/path/to/hauddy/packages/sidecar/dist/cli.js" mcp
 ```
+
+Keep Hauddy running and ask each project's agent to run `whoami`. For desktop-only HTTP setup or existing project configurations, follow the [setup guide](docs/getting-started.md#http-alternative-desktop-app-only).
 
 ### 2. Cursor
 Add to your project's `.cursor/mcp.json` or global `~/.cursor/mcp.json`:

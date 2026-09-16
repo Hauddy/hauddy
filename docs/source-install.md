@@ -1,6 +1,6 @@
 # Run the Hauddy CLI from source
 
-The supported public downloads are the [desktop installers](https://github.com/Hauddy/hauddy/releases/latest). They bundle their runtime and start the local daemon for you. The CLI is not currently distributed through npm. Use this source route if you need a terminal-only daemon or the CLI call wrapper.
+The supported public downloads are the [desktop installers](https://github.com/Hauddy/hauddy/releases/latest). They bundle their runtime and start the local daemon for you. The CLI is not currently distributed through npm. Use this source route for the global local stdio MCP setup, a terminal-only daemon, or the CLI call wrapper.
 
 ## Prerequisites
 
@@ -25,6 +25,8 @@ npm run smoke:source
 The smoke check runs the built CLI from a temporary working directory, uses disposable local state and randomly assigned ports, initializes MCP, lists tools, and exercises the native PTY wrapper. It does not connect an account. Internal workspace links are expected for this source distribution; this check is not evidence that an npm package can be installed independently.
 
 ## Start the daemon
+
+If the desktop app is already running, it supplies the local hub. You can go straight to the [global Claude Code setup](./getting-started.md#register-once-for-all-projects-local-stdio-mcp) using the built CLI's absolute path. The steps below are for running the daemon without the desktop app.
 
 Quit the desktop app first if it is already serving port 7700. From the repository root:
 

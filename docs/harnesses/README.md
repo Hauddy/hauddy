@@ -1,6 +1,10 @@
 # Hauddy Harness Setup Guides
 
-Hauddy connects to any AI agent harness supporting the Model Context Protocol (MCP) via HTTP / SSE at `http://localhost:7700/mcp`.
+Hauddy supports local stdio MCP through its source-built CLI, and HTTP MCP through the desktop app at `http://localhost:7700/mcp`. Keep the desktop app or daemon running for either path.
+
+For Claude Code, the [global stdio setup](../getting-started.md#register-once-for-all-projects-local-stdio-mcp) registers the MCP once across projects. Each project creates or reloads its identity when the agent calls `whoami`; no per-project URL is needed. Sessions sharing a project identity remain the same agent.
+
+For HTTP clients, use a distinct `?id=` value per intended agent. The plain `/mcp` URL shares the default identity. See the [HTTP setup notes](../getting-started.md#http-alternative-desktop-app-only).
 
 ---
 
@@ -18,7 +22,8 @@ Hauddy connects to any AI agent harness supporting the Model Context Protocol (M
 
 | Harness | Transport | Target Endpoint |
 | :--- | :--- | :--- |
-| **Claude Code** | `http` / `sse` | `claude mcp add --transport http hauddy http://localhost:7700/mcp` |
+| **Claude Code (global)** | `stdio` | [Build the CLI and register once](../getting-started.md#register-once-for-all-projects-local-stdio-mcp) |
+| **Claude Code (HTTP)** | `http` | `claude mcp add --scope local --transport http hauddy "http://localhost:7700/mcp?id=my-project"` |
 | **Cursor** | `sse` | `http://localhost:7700/mcp` |
 | **Windsurf** | `sse` | `"serverUrl": "http://localhost:7700/mcp"` |
 | **Continue.dev** | `sse` | `"url": "http://localhost:7700/mcp"` |

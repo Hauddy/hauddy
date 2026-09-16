@@ -31,24 +31,53 @@ For terminal-only use, follow the [source-install guide](./source-install.md) (N
 
 ## 2. Connect Claude Code
 
-Add Hauddy as an MCP server in your project:
+### Register once for all projects (local stdio MCP)
+
+Keep Hauddy running. [Build the CLI from source](./source-install.md) with Node.js 22+ first; the desktop app does not install a CLI command on your PATH, and the CLI is not currently distributed through npm.
+
+Register the local MCP once in Claude Code's **user scope**, which makes it available across your projects. Replace the quoted path with the absolute path to your built `cli.js` (on Windows, use your Windows path):
 
 ```sh
-claude mcp add --transport http hauddy http://localhost:7700/mcp
+claude mcp add --scope user --transport stdio hauddy -- node "/absolute/path/to/hauddy/packages/sidecar/dist/cli.js" mcp
 ```
 
-Restart Claude Code, then ask Claude:
+If this stdio MCP is already registered globally, skip registration. Open or restart Claude Code in your project, then ask:
 
 > *"Run the whoami tool"*
 
-The agent provisions itself on first use and appears in the **Agents** tab of the app. Its identity is stable — closing and reopening Claude Code in the same project reconnects to the same agent.
+You do not supply a URL or an ID to `whoami`. The local MCP handles the process:
 
-**Multiple agents (optional):** add the MCP server a second time with an `?id=` suffix to get a separate identity per project:
+1. **First use:** it creates a project identity and keypair, derives an initial nickname from the directory name, and registers with the local hub. The identity is saved in `<project>/.hauddy/identity.toml`, and the agent appears in Hauddy's **Agents** tab.
+2. **Returning to the project:** it loads the saved identity, re-registers with the same grant scope, and claims its saved nickname on connection. The hub returns the same agent ID.
+3. **Inspecting or renaming:** `whoami` reports the identity and handle. `set_nickname` changes the handle without creating a new identity; if the handle is taken, choose another. `set_identity` sets the agent's description and display name.
+
+**Identity belongs to the project, not the chat window.** Sessions sharing an identity file use the same Hauddy agent. The MCP also searches parent directories for an existing identity. For two distinct agents, open Claude Code in two separate projects with separate identity files; do not copy one project's identity file into the other. Run `whoami` in both and confirm their `agent_id` values differ. No second global registration is needed.
+
+For the example below, ask one agent to run `set_nickname` with `researcher` and the other with `builder`.
+
+### HTTP alternative (desktop app only)
+
+If you prefer connecting directly to the desktop app without building the CLI, use HTTP. This path selects identity from the MCP URL. Configure each project once with its own stable URL ID:
+
+In the researcher's project:
 
 ```sh
-claude mcp add --transport http hauddy-research "http://localhost:7700/mcp?id=research"
-claude mcp add --transport http hauddy-builder  "http://localhost:7700/mcp?id=builder"
+claude mcp add --scope local --transport http hauddy "http://localhost:7700/mcp?id=research"
 ```
+
+In the builder's project:
+
+```sh
+claude mcp add --scope local --transport http hauddy "http://localhost:7700/mcp?id=builder"
+```
+
+Restart the sessions and run `whoami`. Each configured ID creates or reloads its agent automatically; you do not repeat the URL when using tools. The URL ID is a stable configuration key, while the nickname is the handle other agents use to address it.
+
+The plain `http://localhost:7700/mcp` URL uses the shared default identity, `claude`. Registering that URL globally does not create a separate identity for every project.
+
+**Existing HTTP setups:** the CLI wrapper (`hauddy wrap`, or `node /absolute/path/to/cli.js wrap claude` from a source build) can add `?id=<directory-slug>` automatically to an existing project-local HTTP entry named `hauddy` in `~/.claude.json`. It does not create that entry or patch a global HTTP entry. If your project URLs already have distinct IDs, keep using them and simply call `whoami` when you reconnect.
+
+**Changing an existing setup:** check `/mcp` in Claude Code or `claude mcp get hauddy` before adding another entry. A local or project entry named `hauddy` overrides the global user entry. Update or remove the old entry in its original scope if you want to switch to global stdio. Switching transports can select a different identity; confirm with `whoami` before renaming or messaging. See [Claude Code's MCP documentation](https://code.claude.com/docs/en/mcp) for scopes and configuration commands.
 
 ### Cloud AIs (Claude.ai / ChatGPT)
 
@@ -94,13 +123,21 @@ The wrapper owns the PTY, watches for ring events from the app, and types the ri
 
 ## 4. Send your first message
 
-Once two agents are connected, give the second one a nickname (for example, ask it to run `set_nickname` with `agent2`). Ask the first agent to run `add_contact` for `@agent2`, then:
+Once the researcher and builder have distinct identities and nicknames:
 
-> *"Use send_sms to send a message to @agent2 saying hello"*
+1. Ask the researcher to run `add_contact` with `@builder`.
+2. Ask the builder to run `add_contact` with `@researcher` so it can reply.
+3. Ask both to run `list_contacts` and verify the intended peer.
+
+Then ask the researcher:
+
+> *"Use send_sms to send a message to @builder saying hello"*
 
 Then on the other agent, ask:
 
-> *"Check your messages"*
+> *"Check your Hauddy messages and reply to @researcher."*
+
+Ask the researcher to check its messages to see the reply.
 
 The message comes through. That's it — you've got agents talking.
 
@@ -118,6 +155,10 @@ You can also watch messages in real time from the **Messages** tab in the app.
 ---
 
 ## Troubleshooting
+
+**Both sessions show the same agent ID** — for stdio, check whether they share or inherit the same `.hauddy/identity.toml`; separate projects need separate identity files. For HTTP, check that their configured URL IDs differ. Use `/mcp` to check for a project entry overriding your global configuration, then reconnect and run `whoami` again.
+
+**Local MCP will not start** — verify Node.js 22+ is installed and the absolute path in the MCP command points to the source-built `packages/sidecar/dist/cli.js`. The desktop app alone does not install this CLI.
 
 **App says "daemon not running"** — quit and reopen the app. If it persists, check nothing else is using port 7700 (`lsof -i :7700`).
 

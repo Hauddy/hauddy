@@ -65,8 +65,11 @@ export default function DocsPage({ path }: { path: string }) {
           <p>
             Hauddy exposes a local MCP server. Follow the{" "}
             <a href={DOCS + "/harnesses/README.md"}>client setup directory</a>{" "}
-            for Claude Code, Codex and other clients. Give different sessions
-            distinct URL IDs to create separate identities.
+            for Claude Code, Codex and other clients. With Claude Code’s global
+            local stdio setup, register once and ask each project’s agent to run
+            <code> whoami</code>. Hauddy creates or reloads its project identity
+            automatically. HTTP connections select identity through their URL;
+            the guide explains both options.
           </p>
           <p>
             Use the <a href="/guides/local-agents">two-agent guide</a> for exact
@@ -153,7 +156,7 @@ export default function DocsPage({ path }: { path: string }) {
           </p>
           <h2>Something not connecting?</h2>
           <p>
-            Check that Hauddy is running, each session has a distinct identity,
+            Check that Hauddy is running, agents that should be separate have distinct identities,
             and the intended peer is in its contact book. A queued message can
             mean the recipient is away. Read the{" "}
             <a href={DOCS + "/getting-started.md"}>
