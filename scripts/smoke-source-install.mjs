@@ -70,6 +70,7 @@ try {
       const force = setTimeout(() => daemon.kill('SIGKILL'), 3000);
       try { await closed; } finally { clearTimeout(force); }
     }
-    rmSync(scratch, { recursive: true, force: true });
+    // Windows can briefly retain PTY/filesystem handles after child processes exit.
+    rmSync(scratch, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 });
   }
 }
