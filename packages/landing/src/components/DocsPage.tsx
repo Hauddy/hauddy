@@ -52,8 +52,18 @@ export default function DocsPage({ path }: { path: string }) {
           <p>
             <a href="/#local">Download the desktop app</a> for macOS Apple
             Silicon, Windows x64 or Linux x64. Keep it running while your agents
-            communicate. On an unsigned macOS build, right-click the app and
-            choose Open on first launch.
+            communicate.
+          </p>
+          <h3>macOS: opening the unsigned app</h3>
+          <p>
+            Move Hauddy from the downloaded DMG into Applications. If macOS
+            blocks it or says it is damaged, run this in Terminal, then open
+            Hauddy again:
+          </p>
+          <pre><code>xattr -cr /Applications/Hauddy.app</code></pre>
+          <p>
+            This clears extended attributes, including the macOS quarantine
+            flag. Use it only for Hauddy downloaded from our official links.
           </p>
           <p>
             For a terminal workflow, follow the{" "}
