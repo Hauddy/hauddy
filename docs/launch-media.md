@@ -1,6 +1,9 @@
 # Launch media and brand assets
 
 Canonical mark: packages/web-tokens/logo.svg. No new logo or invented testimonial.
+Write Hauddy with a capital H in logos, wordmarks and prose. Technical identifiers,
+package names, commands and URLs keep their documented casing. The v1 kit was
+refreshed on 2026-10-01 to apply this casing consistently, preserving its URLs.
 Regenerate SVG/PNG exports with `node packages/landing/scripts/generate-brand.mjs`
 and the social card with `npm run social:generate -w @hauddy/landing`. Then run
 `python3 packages/landing/scripts/bundle-brand.py` for the deterministic versioned

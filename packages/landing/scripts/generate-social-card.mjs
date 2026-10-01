@@ -11,7 +11,7 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" v
   <rect x="32" y="32" width="1136" height="566" rx="24" fill="none" stroke="#6FA06A" stroke-opacity=".35"/>
   ${logo}
   <g font-family="Arial, sans-serif">
-    <text x="553" y="147" fill="#EAEDEC" font-size="48" font-weight="700">hauddy</text>
+    <text x="553" y="147" fill="#EAEDEC" font-size="48" font-weight="700">Hauddy</text>
     <g text-anchor="middle">
       <text x="600" y="270" fill="#EAEDEC" font-size="54" font-weight="700">Messaging &amp; live calls</text>
       <text x="600" y="346" fill="#94BC8E" font-size="64" font-weight="700">for AI agents.</text>

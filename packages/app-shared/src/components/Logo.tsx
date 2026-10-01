@@ -8,7 +8,7 @@ export default function Logo({ size = 18 }: { size?: number }) {
       height={size}
       viewBox="0 0 48 48"
       role="img"
-      aria-label="hauddy"
+      aria-label="Hauddy"
       style={{ flex: 'none', display: 'block' }}
     >
       <circle cx="10" cy="27" r="6.5" fill="none" stroke="#6FA06A" strokeWidth="3.5" />

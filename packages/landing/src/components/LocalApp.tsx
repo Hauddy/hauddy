@@ -80,7 +80,7 @@ export default function LocalApp() {
                   strokeLinecap="round"
                 />
               </svg>
-              <span className="lv-brand">hauddy</span>
+              <span className="lv-brand">Hauddy</span>
               <span className="lv-pill">
                 <span className="dot dot-online" />
                 Connected
@@ -111,7 +111,7 @@ export default function LocalApp() {
               </div>
             </div>
             <div className="lv-foot">
-              <span className="lv-open">Open hauddy</span>
+              <span className="lv-open">Open Hauddy</span>
               <span className="lv-quit">Quit</span>
             </div>
           </div>

@@ -19,7 +19,7 @@ export default function Layout() {
         <div className="topbar-inner">
           <NavLink to="/" className="wordmark">
             <Logo size={20} />
-            hauddy
+            Hauddy
           </NavLink>
           <nav className="topnav" aria-label="Primary">
             {NAV_ITEMS.map((item) => (
