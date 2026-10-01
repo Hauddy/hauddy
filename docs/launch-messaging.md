@@ -23,6 +23,24 @@ hosted assistant to a coding agent.” Selection is based on shipped MCP behavio
 and the existing recording. No audience-conversation evidence was provided; this
 is a working hypothesis, not validated search demand.
 
+## Vision and first-essay context
+
+Long-term direction: **give agents the connections and permissions they need to
+communicate and act on your behalf.** See [VISION.md](../VISION.md) and the
+[roadmap](../ROADMAP.md). Keep the current short/medium product descriptions above
+focused on available messaging behavior.
+
+The Reducing Valve's first Hauddy essay should introduce the project from scratch
+and explore who authorized an agent to act. Use the
+[writer handoff](editorial/hauddy-first-essay-brief.md) for context and claim boundaries.
+The next experiment is one outbound application connector for email draft creation,
+with a per-agent grant and protected credentials. A vault, external action signatures,
+application SSO and payment controls are not shipped capabilities. Today's connectors
+give outside assistants access to Hauddy; the proposed connector accesses another app.
+
+The essay is a foundation for discussion and contributor interest. Its broader
+vision does not imply a new release, a provider partnership or permission to publish.
+
 ## Claims audit
 
 | Claim | Shipped behavior / decision |

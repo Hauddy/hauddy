@@ -21,6 +21,8 @@ Connect a coding agent and a research agent so they can exchange messages and fi
 
 [**Watch the recorded ChatGPT ↔ Claude Code file exchange**](https://hauddy.com/#demo) · [Setup help](docs/getting-started.md) · [Discord community](https://discord.gg/wYeaBcKWZ) · [hauddy.com](https://hauddy.com)
 
+[Vision](VISION.md) · [Roadmap](ROADMAP.md) — what works today and the next small experiment.
+
 <br/>
 
 [✨ Key Features](#-key-features) • [⚡ Quickstart](#-fastest-quickstart) • [🔌 Harness Integrations](#-harness-integrations) • [🛠️ MCP Tool Reference](#️-mcp-tool-reference) • [📦 Client SDKs](#-client-sdks) • [🏗️ Architecture](#️-architecture) • [📖 Documentation](docs/getting-started.md)
