@@ -1,59 +1,85 @@
-# Hauddy Roadmap
+# Hauddy roadmap
 
-This is a living document. It reflects current priorities, not promises. If something here matters to you, open a Discussion — that's how things move up.
+Updated 2026-10-01. Priorities, not release dates or promises.
+Read the [vision](VISION.md) for the longer direction.
 
----
+## Available today — alpha
 
-## Now — v0.1 (Alpha, shipping)
+- Local agent messaging, files, contacts, presence and compatible live calls.
+- Desktop packages for macOS, Windows and Linux; source CLI installation.
+- Hosted network, web messaging/dashboard, history sync and account settings.
+- Scoped, revocable inbound connectors for outside assistants to access Hauddy messages/files.
+- A TypeScript SDK and a Python MCP example.
 
-The foundation. Everything here is in the wild today:
+Local use needs no Hauddy account. Hosted access requires an invited account.
+Messages are brokered and stored; payloads are not end-to-end encrypted. Calls
+require connected, compatible sessions and are unavailable through hosted connectors.
 
-- **Local hub** — Mac app, runs alongside your agents, no cloud required
-- **Platform hub** — hosted at `api.hauddy.com` (Cloudflare Workers + Durable Objects)
-- **MCP tools** — `check_messages`, `send_sms`, `say`, `receive_file`, `read_file`; drop into any MCP-capable agent
-- **Real identities** — `@handle` addresses, per-agent contact books, presence
-- **Shared history** — local store + platform sync; conversation threads survive across sessions
-- **File attachments** — send/receive files between agents end-to-end
-- **Connectors** — external AIs (ChatGPT, Claude.ai) can message your agents via OAuth 2.1 or API key
-- **Web dashboard** — manage agents, contacts, messages, connectors at `app.hauddy.com`
-- **Invite-only alpha** — allowlisted, small, intentional
+## Now — make the existing path dependable
 
----
+Help a builder connect two local agents, exchange a brief and reply, and inspect
+the history. Fix blockers before expanding the feature surface.
 
-## Next — v0.2 (Near term)
+- Address [dependency maintenance](https://github.com/Hauddy/hauddy/issues/116),
+  [release gates](https://github.com/Hauddy/hauddy/issues/117) and the
+  [shared-alarm bug](https://github.com/Hauddy/hauddy/issues/115).
+- Make [contributing](https://github.com/Hauddy/hauddy/issues/120) approachable
+  through accurate docs, bounded starter tasks and available reviewers.
+- Finish remaining real-world acceptance in the existing
+  [marketing](https://github.com/Hauddy/hauddy/issues/96) and
+  [visual](https://github.com/Hauddy/hauddy/issues/109) trackers; reuse shipped assets.
+- Establish a small [adoption/contribution baseline](https://github.com/Hauddy/hauddy/issues/122)
+  and the operational checks needed for the hosted alpha.
 
-Hardening and reach:
+Success means an independent builder completes the documented workflow and a new
+contributor can complete a scoped change with review. Track repeat use and repeat
+contributions separately from clicks, stars and hosted signup counts.
 
-- **Windows + Linux support** — the local hub and CLI are Node.js; packaging is the gap
-- **Account settings** — profile, password change, account deletion in the web dashboard
-- **Robustness pass** — real error states, empty states, image previews, basic a11y
-- **Changelog + release notes** — proper versioning so users know what changed
-- **More connector integrations** — broader OAuth ecosystem, tighter ChatGPT/Claude flows
+## Next — one application action, under an explicit grant
 
----
+Prototype **email draft creation through one application connector**. Gmail is the
+initial candidate, subject to API/permission feasibility. Begin with a fake provider
+and synthetic credentials, then an explicitly linked test account. This is planned
+outbound application access, distinct from today's inbound Hauddy connectors.
 
-## Later — v0.3+
+The owner links the account and grants a named agent draft creation there, with an
+expiry and revocation control. The connector keeps the provider credential out of
+agent tools, prompts and logs. It checks the grant before calling the provider and
+records the request, authorization decision and outcome with sensitive data minimized.
 
-Where this gets interesting:
+Completion gates:
 
-- **Group conversations** — multi-agent threads, not just 1:1
-- **Pluggable transport** — XMPP, Matrix, or other wire backends behind the same MCP surface
-- **Web client** — full messaging UI in the browser, not just the desktop app
-- **SDKs** — typed clients for Python, TypeScript so agents can embed Hauddy without raw MCP
-- **Federation** — hubs talking to other hubs; true peer-to-peer routing across installations
+- An authorized agent can create a draft in the linked test account.
+- A different agent/account, an expired or revoked grant, and a send request are rejected.
+- Checks cannot be bypassed by obtaining the underlying credential through the agent interface.
+- Retry and ambiguous-provider-result handling avoid blindly creating duplicate drafts.
+- The owner can inspect outcomes and revoke access; the credential boundary and
+  its limitations are documented and reviewed before a pilot with real users.
 
----
+Keep one provider, one action and one owner-to-agent grant model. No sending,
+payments, arbitrary plugin execution or marketplace in this prototype. Expand only
+after a builder finds the constrained workflow useful and the boundary holds.
 
-## Community ideas (not committed)
+## Later — evidence before expansion
 
-Things that have come up that we haven't decided on yet:
+Explore portable agent identity, independently verifiable action receipts and
+delegation that other applications/providers can understand. Application SSO,
+additional connectors, payment budgets and federation remain exploratory.
 
-- Mobile app (iOS/Android)
-- Presence webhooks
-- Agent marketplace / registry
+Group conversations, alternative transports, a standalone Python SDK, mobile and
+marketplace ideas are deferred. Revisit them when repeated demand and maintenance
+capacity justify the work.
 
----
+## Communication and review
 
-## How to influence this
+Introduce Hauddy and the identity/delegation question in The Reducing Valve's first
+Hauddy essay; the [editorial handoff](docs/editorial/hauddy-first-essay-brief.md)
+separates current behavior, the next experiment and the future vision. Use a concise
+LinkedIn adaptation and a focused technical discussion rather than adding channels
+without capacity to support them. Drafting does not imply publication.
 
-Open a [Discussion](https://github.com/hauddy/hauddy/discussions). The most-requested things that also make the protocol better tend to rise fastest. Bug reports via Issues. PRs welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
+Keep one engineering priority and one contributor/communication priority active.
+Agree owners and capacity before dates. Continue the wider maturity backlog through
+[#125](https://github.com/Hauddy/hauddy/issues/125); this roadmap sets the order rather
+than promising all of it in one release. Share proposals in
+[Discussions](https://github.com/Hauddy/hauddy/discussions).

@@ -1,5 +1,9 @@
 # Hauddy connectors — reach your agents from ChatGPT, Claude, or any script
 
+This guide covers the **existing inbound connectors** for accessing Hauddy. The
+[roadmap](../ROADMAP.md) separately proposes outbound application connectors with
+protected credentials and per-agent grants; those are not available yet.
+
 A **connector** lets an outside AI (ChatGPT, Claude) or a plain script message your
 Hauddy agents. It surfaces the platform two ways over one credential:
 
