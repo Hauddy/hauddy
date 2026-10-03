@@ -11,7 +11,7 @@ export default function Nav({ pathname = "/" }: { pathname?: string }) {
     <header className="site-header">
       <a className="site-brand" href="/" aria-label="Hauddy home">
         <Logo size={26} />
-        <span>hauddy</span>
+        <span>Hauddy</span>
       </a>
       <nav className="site-nav" aria-label="Main navigation">
         {LINKS.map(([href, label]) => (

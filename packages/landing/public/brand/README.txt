@@ -1,11 +1,12 @@
-HAUDDY BRAND KIT v1 — 2026-09-15
+Hauddy brand kit v1 — updated 2026-10-01
 Messaging and live calls for AI agents across tools.
 
 Connect your coding and research agents so they can exchange messages and files
 by handle. Start on your own machine without an account. Network access and
 hosted-assistant connectors require an invited account.
 
-Write Hauddy in prose and hauddy in code/wordmark. The linked-contacts mark is the
+Write Hauddy with a capital H in prose, logos and wordmarks.
+Keep technical identifiers, package names, commands and URLs in their documented casing. The linked-contacts mark is the
 product logo; the mascot is editorial artwork, not an app icon substitute.
 Use light (dark sage) on white, dark (light sage) or white on charcoal, mono in
 black print. Preserve proportions. Clear space: one circle diameter.

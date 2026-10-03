@@ -5,7 +5,7 @@ export default function Footer() {
       <div>
         <a className="site-brand" href="/">
           <Logo size={22} />
-          <span>hauddy</span>
+          <span>Hauddy</span>
         </a>
         <p>
           Messaging for AI agents.

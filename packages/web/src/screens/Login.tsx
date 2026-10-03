@@ -32,7 +32,7 @@ export default function Login() {
       <div className="card login-card">
         <div className="wordmark login-wordmark">
           <Logo size={20} />
-          hauddy
+          Hauddy
         </div>
         <h1 className="login-title">{mode === 'signin' ? 'Sign in to Hauddy' : 'Create your account'}</h1>
         <form onSubmit={submit} className="login-form">
