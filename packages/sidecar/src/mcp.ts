@@ -76,6 +76,21 @@ function asText(value: unknown): { content: Array<{ type: "text"; text: string }
   return { content: [{ type: "text", text: JSON.stringify(value, null, 2) }] };
 }
 
+/** Books store handles, while MCP recipients may also be contact agent IDs. */
+async function contactBookError(p: Provisioned, to: string): Promise<string | null> {
+  const book = p.getBook?.();
+  if (book == null) return null;
+  const bare = to.replace(/^@+/, "").toLowerCase();
+  if (book.includes(bare)) return null;
+  if (to.startsWith("agt_")) {
+    // Resolve against this agent's curated contacts, never the global directory.
+    const { contacts } = await listContacts(p.endpoint, p.agentId);
+    if (contacts.some((contact) => contact.agent_id === to)) return null;
+    return `Agent ID ${to} is not in your contacts. Use list_contacts to find a recipient's agent_id or @nickname. To add a new contact, use add_contact with their @handle.`;
+  }
+  return `@${bare} is not in your contacts. Use add_contact("@${bare}") first.`;
+}
+
 /**
  * The Hauddy MCP surface (spec §9). Adding this one server to any harness is
  * the entire integration: the first tool call self-provisions the session as a
@@ -268,7 +283,7 @@ export function createMcpServer(provision: Provision, validation: CallValidation
     "list_contacts",
     {
       description:
-        "List the agents in your contact book, with presence. Use add_contact to add a peer before messaging them.",
+        "List the agents in your contact book, with presence. Pass a contact's agent_id or @nickname to send_sms or place_call. Use add_contact with an @handle to add a new peer.",
     },
     async () => {
       const p = await provision();
@@ -339,13 +354,8 @@ export function createMcpServer(provision: Provision, validation: CallValidation
     },
     async ({ to, body, attachments }) => {
       const p = await provision();
-      if (p.getBook) {
-        const bare = to.replace(/^@+/, "").toLowerCase();
-        const book = p.getBook();
-        if (book !== null && !book.includes(bare)) {
-          return asText({ ok: false, error: `@${bare} is not in your contacts. Use add_contact("@${bare}") first.` });
-        }
-      }
+      const contactError = await contactBookError(p, to);
+      if (contactError) return asText({ ok: false, error: contactError });
       const atts = attachments?.length ? await uploadAttachments(p, attachments, to) : undefined;
       const receipt = await p.connection.sendSms(to, body, atts);
       p.activity?.push("sms", `→ ${to}: ${receipt.status}${atts?.length ? ` (+${atts.length} file)` : ""}`);
@@ -517,13 +527,8 @@ export function createMcpServer(provision: Provision, validation: CallValidation
     },
     async ({ to }) => {
       const p = await provision();
-      if (p.getBook) {
-        const bare = to.replace(/^@+/, "").toLowerCase();
-        const book = p.getBook();
-        if (book !== null && !book.includes(bare)) {
-          return asText({ ok: false, error: `@${bare} is not in your contacts. Use add_contact("@${bare}") first.` });
-        }
-      }
+      const contactError = await contactBookError(p, to);
+      if (contactError) return asText({ ok: false, error: contactError });
       const self = await me(p);
       const callId = `call_${crypto.randomBytes(5).toString("hex")}`;
       p.connection.activeCall = { id: callId, peer: to };
