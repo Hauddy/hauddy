@@ -61,6 +61,8 @@ jobs:
           node packages/platform/test/p16-account-deletion.mjs http://127.0.0.1:8799
           node packages/platform/test/p17-sync-revisions.mjs http://127.0.0.1:8799
           node packages/platform/test/p18-acquisition-report.mjs http://127.0.0.1:8799
+      - name: Verify shared alarms with disposable Workerd storage
+        run: node packages/platform/test/p19-alarms.mjs
 
   landing-http:
     name: Landing HTML and HTTP

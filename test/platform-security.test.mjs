@@ -15,6 +15,7 @@ after(() => rmSync(output, { recursive: true, force: true }));
 execFileSync(process.execPath, ["node_modules/typescript/bin/tsc", "-p", "packages/platform/tsconfig.json", "--noEmit", "false", "--outDir", output]);
 const { Db } = await import(pathToFileURL(resolve(output, "db.js")));
 const { HubDO } = await import(pathToFileURL(resolve(output, "hub-do.js")));
+const { FileStoreR2 } = await import(pathToFileURL(resolve(output, "files-r2.js")));
 
 async function fixture(t) {
   const sqlite = new DatabaseSync(":memory:");
@@ -35,7 +36,8 @@ async function fixture(t) {
   hub.files = { sweep: async () => {} };
   hub.ctx = { getWebSockets: () => [], storage: {
     get: async (key) => kv.get(key), put: async (key, value) => kv.set(key, value),
-    delete: async (key) => kv.delete(key), setAlarm: async () => {},
+    delete: async (key) => kv.delete(key), setAlarm: async () => {}, getAlarm: async () => null,
+    transaction: async (fn) => fn(hub.ctx.storage),
     list: async ({ prefix, limit, startAfter }) => new Map([...kv].filter(([k]) => k.startsWith(prefix) && (!startAfter || k > startAfter)).sort(([a], [b]) => a.localeCompare(b)).slice(0, limit)),
     transactionSync(fn) {
       sqlite.exec("BEGIN");
@@ -664,4 +666,130 @@ test('concurrent first requests attribute all retries to the first stored source
  const first=sqlite.prepare('SELECT source FROM waitlist_members WHERE email=?').get('race@example.test').source;
  const rows=sqlite.prepare("SELECT source,count FROM acquisition_events WHERE event='request'").all();
  assert.equal(rows.length,1);assert.equal(rows[0].source,first);assert.equal(rows[0].count,2);
+});
+
+async function alarmFixture(t) {
+  const f = await fixture(t);
+  const now = 1_800_000_000_000;
+  t.mock.method(Date, 'now', () => now);
+  let next = null;
+  const storage = f.hub.ctx.storage;
+  storage.getAlarm = async () => next;
+  storage.setAlarm = async (at) => { next = at; };
+  f.hub.files = new FileStoreR2(f.hub.env.FILES, f.db, storage);
+  const seedAttachment = (delay) => {
+    const file_id = `alarm-file-${delay}`;
+    f.blobs.add(`files/${file_id}`);
+    f.db.insertAttachment({ file_id, name: 'fixture', mime: 'text/plain', size: 1,
+      owner: f.a.agent, to_ref: null, account_id: f.a.id, created_ms: now - 1000, expires_ms: now + delay });
+  };
+  const seedWaitlist = (count) => {
+    for (let i = 0; i < count; i++) f.db.sql.exec(
+      'INSERT INTO waitlist_members(email,created_at,source,mirrored) VALUES(?,?,?,0)',
+      `alarm-${i}@example.test`, new Date(now).toISOString(), 'landing');
+    f.hub.env.WAITLIST_DB = { prepare: () => ({ bind: () => ({ run: async () => {} }) }) };
+  };
+  return { ...f, now, storage, seedAttachment, seedWaitlist, next: () => next,
+    fire: async () => { next = null; await f.hub.alarm(); } };
+}
+
+test('shared alarm retains waitlist continuation before a later attachment expiry', async (t) => {
+  const f = await alarmFixture(t);
+  f.seedWaitlist(101);
+  f.seedAttachment(86_400_000);
+  await f.fire();
+  assert.equal(f.db.sql.exec('SELECT COUNT(*) AS n FROM waitlist_members WHERE mirrored=0').toArray()[0].n, 1);
+  assert.equal(f.next(), f.now + 60_000);
+  await f.fire();
+  assert.equal(f.db.sql.exec('SELECT COUNT(*) AS n FROM waitlist_members WHERE mirrored=0').toArray()[0].n, 0);
+  assert.equal(f.next(), f.now + 86_400_000);
+});
+
+for (const expiry of [30_000, 86_400_000]) {
+  test(`shared alarm selects email maintenance or earlier attachment expiry (${expiry})`, async (t) => {
+    const f = await alarmFixture(t);
+    f.db.sql.exec('INSERT INTO email_tokens(hash,purpose,email,expires_ms) VALUES(?,?,?,?)',
+      'future-token', 'reset', 'fixture@example.test', f.now + 7_200_000);
+    f.seedAttachment(expiry);
+    f.seedAttachment(-1);
+    await f.fire();
+    assert.equal(f.next(), f.now + Math.min(expiry, 3_600_000));
+    assert.equal(f.db.getAttachment('alarm-file--1'), undefined);
+    assert.ok(!f.blobs.has('files/alarm-file--1'));
+  });
+}
+
+test('shared alarm drains expired data and empty queues without an idle loop', async (t) => {
+  const f = await alarmFixture(t);
+  f.db.sql.exec('INSERT INTO email_tokens(hash,purpose,email,expires_ms) VALUES(?,?,?,?)',
+    'expired-token', 'reset', 'fixture@example.test', f.now - 1);
+  f.db.sql.exec('INSERT INTO preregistrations(email,nickname,status,hold_expires_ms,source) VALUES(?,?,?,?,?)',
+    'fixture@example.test', 'expired-hold', 'pending', f.now - 1, 'landing');
+  f.seedAttachment(-1);
+  await f.fire();
+  assert.equal(f.next(), null);
+  assert.equal(f.db.sql.exec('SELECT COUNT(*) AS n FROM email_tokens').toArray()[0].n, 0);
+  assert.equal(f.db.sql.exec('SELECT COUNT(*) AS n FROM preregistrations').toArray()[0].n, 0);
+  await f.fire();
+  assert.equal(f.next(), null);
+});
+
+test('email requests and attachment uploads preserve an earlier cleanup deadline', async (t) => {
+  const f = await alarmFixture(t);
+  f.hub.env.FILES.put = async (key) => { f.blobs.add(key); };
+  await f.storage.setAlarm(f.now + 1000);
+  await expectStatus(f.request('/preregistration/event', { event: 'form_start', source: 'landing' }), 200);
+  await expectStatus(f.request('/accounts/recovery/request', { email: 'unknown@example.test' }), 200);
+  const result = await f.hub.files.put(new Uint8Array([1]).buffer,
+    { name: 'fixture', mime: 'text/plain', owner: f.a.agent, to: null, account_id: f.a.id }, f.now);
+  assert.equal(result.ok, true);
+  assert.equal(f.next(), f.now + 1000);
+  await expectStatus(deleteRequest(f.hub, f.a.key), 200);
+  assert.equal(f.next(), f.now, 'deletion brings a future alarm forward');
+  await expectStatus(f.request('/preregistration/event', { event: 'form_start' }, f.b.key), 200);
+  assert.equal(f.next(), f.now, 'email traffic cannot postpone immediate cleanup');
+  await f.fire();
+  assert.equal(f.next(), null, 'successful deletion and empty queues settle');
+});
+
+for (const failure of ['mirror', 'cleanup', 'attachment']) {
+  test(`shared alarm retries ${failure} failure and settles after recovery`, async (t) => {
+    const f = await alarmFixture(t);
+    f.seedAttachment(86_400_000);
+    if (failure === 'mirror') f.seedWaitlist(1);
+    if (failure === 'attachment') f.seedAttachment(-1);
+    if (failure === 'cleanup') f.db.deleteAccount(f.a.id);
+    const restore = failure === 'mirror'
+      ? t.mock.method(f.hub.env.WAITLIST_DB, 'prepare', () => { throw new Error('D1 unavailable'); })
+      : t.mock.method(f.hub.env.FILES, 'delete', async () => { throw new Error('R2 unavailable'); });
+    await f.fire();
+    assert.equal(f.next(), f.now + 60_000);
+    restore.mock.restore();
+    await f.fire();
+    assert.equal(f.next(), failure === 'cleanup' ? null : f.now + 86_400_000);
+    assert.equal(f.db.pendingAccountCleanup().length, 0);
+  });
+}
+
+test('failure retry preserves a nearer alarm scheduled by an overlapping request', async (t) => {
+  const f = await alarmFixture(t);
+  t.mock.method(f.hub.files, 'sweep', async () => {
+    await f.storage.setAlarm(f.now + 1000);
+    throw new Error('R2 unavailable');
+  });
+  await f.fire();
+  assert.equal(f.next(), f.now + 1000);
+});
+
+test('alarm storage failures propagate for runtime retry, then recover without an idle loop', async (t) => {
+  const f = await alarmFixture(t);
+  f.seedAttachment(86_400_000);
+  const fail = t.mock.method(f.storage, 'setAlarm', async () => { throw new Error('alarm storage unavailable'); });
+  await assert.rejects(f.fire(), /alarm storage unavailable/);
+  fail.mock.restore();
+  await f.fire();
+  assert.equal(f.next(), f.now + 86_400_000);
+  await f.hub.files.delete('alarm-file-86400000');
+  await f.fire();
+  assert.equal(f.next(), null);
 });

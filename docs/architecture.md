@@ -191,3 +191,30 @@ Use the hub history methods for filtering and pagination, respecting their
 in-memory implementation and caller scope. Preserve the existing ID/nickname
 mapping rules rather than assuming every stored peer is a nickname. Keep local
 reads useful offline, and describe their limit as already-synced history.
+
+## Shared platform alarm
+
+`HubDO` has one durable alarm for email expiry maintenance, waitlist mirroring,
+account deletion cleanup and attachment expiry. Every scheduling path uses
+`scheduleAlarmBy()` in `packages/platform/src/alarms.ts`: a storage transaction
+compares the current alarm with the requested deadline and only brings it
+forward. Request handlers, file uploads/sweeps and failure retries must not
+replace an earlier deadline with a later one.
+
+The runtime consumes the firing alarm before calling `alarm()`; `getAlarm()`
+then returns null until a new alarm is scheduled. Each remaining job contributes
+its next deadline: email maintenance uses an hour, a full waitlist batch needs a
+one-minute continuation, and files use the earliest remaining expiry. Failures
+request a one-minute retry without postponing other scheduled work. If alarm
+storage itself remains unavailable, the error escapes for runtime retries.
+Empty queues do not re-arm the alarm. Do not clear the alarm at the end of a
+handler: a request may have scheduled new work during an external-service await.
+See [Cloudflare's alarm semantics](https://developers.cloudflare.com/durable-objects/api/alarms/).
+
+`test/platform-security.test.mjs` covers mixed deadlines, request scheduling,
+cleanup/storage failures and recovery. After `npm ci` and `npm run build`, run
+`node packages/platform/test/p19-alarms.mjs` for real Workerd alarm execution
+against disposable SQLite, R2 and D1. That standalone fixture verifies the
+101-member waitlist regression, email maintenance, concurrent scheduling and
+idle completion without connecting to a deployed service; CI runs it alongside
+the platform integration checks.

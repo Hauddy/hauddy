@@ -1,5 +1,6 @@
 import { ACQUISITION_ACTIONS } from '@hauddy/protocol';
 import { acquisitionReport } from './acquisition.js';
+import { scheduleAlarmBy } from './alarms.js';
 import { timelinePage } from "@hauddy/protocol";
 import {
   controlFrameSchema,
@@ -209,7 +210,7 @@ export class HubDO {
           if (method !== 'POST') return this.publicJson(405, { error: 'Use POST for this action.' });
           const body = await this.readBody(request);
           // Keep expiry cleanup running even if no further requests arrive.
-          await this.ctx.storage.setAlarm(Date.now() + 60_000);
+          await scheduleAlarmBy(this.ctx.storage, Date.now() + 60_000);
           let result: unknown;
           if (path === '/preregistration/event') {
             const event = body.event ?? 'form_start';
@@ -294,7 +295,7 @@ export class HubDO {
         const accountId = this.requireAccount(request);
         if (!accountId) return this.unauthorized();
         // Arm before committing: a crash or R2/KV failure leaves a durable retry.
-        await this.ctx.storage.setAlarm(Date.now());
+        await scheduleAlarmBy(this.ctx.storage, Date.now());
         const agents = new Set(this.db.accountAgents(accountId).map((a) => a.agent_id));
         const ok = this.ctx.storage.transactionSync(() => this.db.deleteAccount(accountId));
         for (const ws of this.ctx.getWebSockets()) {
@@ -2090,12 +2091,13 @@ export class HubDO {
     try {
       const actions = new EmailActions(this.db, this.env, (fn) => this.ctx.storage.transactionSync(fn));
       actions.purge();
-      if (actions.hasExpiringData()) await this.ctx.storage.setAlarm(Date.now() + 60 * 60_000);
-      if (await actions.mirrorWaitlist()) await this.ctx.storage.setAlarm(Date.now() + 60_000);
+      if (actions.hasExpiringData()) await scheduleAlarmBy(this.ctx.storage, Date.now() + 60 * 60_000);
+      if (await actions.mirrorWaitlist()) await scheduleAlarmBy(this.ctx.storage, Date.now() + 60_000);
       await this.cleanupDeletedAccounts();
       await this.files.sweep(Date.now());
     } catch {
-      await this.ctx.storage.setAlarm(Date.now() + 60_000);
+      // If scheduling itself fails, let the runtime retry the thrown error.
+      await scheduleAlarmBy(this.ctx.storage, Date.now() + 60_000);
     }
   }
 
