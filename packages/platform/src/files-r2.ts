@@ -1,4 +1,5 @@
 import { randomHex } from "./crypto.js";
+import { scheduleAlarmBy } from "./alarms.js";
 import type { AttachmentRow, Db } from "./db.js";
 
 const R2_PREFIX = "files/";
@@ -54,7 +55,7 @@ export class FileStoreR2 {
     };
     await this.bucket.put(R2_PREFIX + file_id, bytes);
     this.db.insertAttachment(row);
-    await this.scheduleSweep(row.expires_ms);
+    await scheduleAlarmBy(this.storage, row.expires_ms);
     return { ok: true, file: row };
   }
 
@@ -83,12 +84,6 @@ export class FileStoreR2 {
   async sweep(nowMs: number): Promise<void> {
     for (const id of this.db.expiredAttachments(nowMs)) await this.delete(id);
     const next = this.db.nextAttachmentExpiry();
-    if (next !== null) await this.storage.setAlarm(next);
-  }
-
-  /** Ensure an alarm is armed no later than this file's expiry. */
-  private async scheduleSweep(expiresMs: number): Promise<void> {
-    const current = await this.storage.getAlarm();
-    if (current === null || expiresMs < current) await this.storage.setAlarm(expiresMs);
+    if (next !== null) await scheduleAlarmBy(this.storage, next);
   }
 }
