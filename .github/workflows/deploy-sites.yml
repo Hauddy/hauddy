@@ -7,12 +7,16 @@ permissions:
   contents: read
 
 concurrency:
-  group: production-sites
+  group: production-promotion
   cancel-in-progress: false
 
 jobs:
+  verify:
+    uses: ./.github/workflows/ci.yml
+
   deploy:
     name: Deploy production websites
+    needs: verify
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     env:
@@ -30,9 +34,22 @@ jobs:
         run: npm run build -w @hauddy/web
       - name: Build landing site
         run: npm run build -w @hauddy/landing
+      - name: Snapshot production websites
+        run: node scripts/release-downloads.mjs snapshot . rollback-sites sites
       - name: Deploy web dashboard
         working-directory: packages/web
         run: npx wrangler pages deploy dist --project-name hauddy-app --branch main
       - name: Deploy landing site
         working-directory: packages/landing
         run: npx wrangler pages deploy dist --branch main
+
+      - name: Restore websites after failure
+        if: failure()
+        run: node scripts/release-downloads.mjs restore . rollback-sites sites
+      - name: Retain rollback evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rollback-sites
+          path: rollback-sites
+          retention-days: 30

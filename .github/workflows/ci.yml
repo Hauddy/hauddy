@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_call:
 
 jobs:
   typecheck:
@@ -19,6 +20,12 @@ jobs:
       - run: npm run check:entry-points
       - name: Build core packages
         run: npm run build
+      - name: Check deployment safeguards
+        run: node --test test/release-safety.test.mjs
+      - name: Build shared and desktop UI
+        run: npm run build -w @hauddy/app-ui
+      - name: Build web dashboard
+        run: npm run build -w @hauddy/web
       - name: Typecheck every workspace
         run: npm run typecheck --workspaces --if-present
 
