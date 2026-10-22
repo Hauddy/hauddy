@@ -15,9 +15,9 @@
     "bundle-daemon": "node scripts/bundle-daemon.mjs",
     "build": "npm run build -w @hauddy/app-ui && node scripts/make-icons.mjs && node scripts/bundle-daemon.mjs && tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "dist": "npm run build && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg",
-    "dist:linux": "npm run build && electron-builder --linux deb AppImage",
-    "dist:win": "npm run build && electron-builder --win nsis"
+    "dist": "npm run build && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg --publish never",
+    "dist:linux": "npm run build && electron-builder --linux deb AppImage --publish never",
+    "dist:win": "npm run build && electron-builder --win nsis --publish never"
   },
   "devDependencies": {
     "@types/node": "^22.5.0",
@@ -82,7 +82,8 @@
       ],
       "category": "Utility",
       "icon": "assets/icon.png",
-      "artifactName": "hauddy_${version}_${arch}.${ext}"
+      "artifactName": "hauddy_${version}_${arch}.${ext}",
+      "executableName": "hauddy"
     },
     "deb": {
       "packageCategory": "utils",
