@@ -18,9 +18,9 @@
   },
   "dependencies": {
     "@hauddy/protocol": "0.1.23",
-    "ws": "^8.18.0"
+    "ws": "^8.22.0"
   },
   "devDependencies": {
-    "@types/ws": "^8.5.10"
+    "@types/ws": "^8.18.2"
   }
 }
