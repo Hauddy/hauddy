@@ -1,6 +1,8 @@
 // Bindings available to the Worker and the Durable Object (see wrangler.toml).
 export interface Env {
   RESEND_API_KEY?: string;
+  /** Staging disables outbound email even if a provider secret is accidentally configured. */
+  EMAIL_DELIVERY?: "disabled";
   /** Comma-separated approved campaign labels; arbitrary source values are never stored. */
   ACQUISITION_CAMPAIGNS?: string;
   WAITLIST_DB?: D1Database;

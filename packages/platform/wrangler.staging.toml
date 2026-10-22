@@ -1,6 +1,4 @@
-# Staging deploy — validates the platform hub on real Cloudflare infra via the
-# *.workers.dev URL, WITHOUT binding api.hauddy.com (no cutover). Same DO class +
-# R2 bucket as production. Delete after cutover, or keep for future staging.
+# Dedicated rehearsal resources; no production routes, storage or outbound email.
 name = "hauddy-platform-staging"
 main = "src/worker.ts"
 compatibility_date = "2026-01-01"
@@ -16,8 +14,21 @@ new_sqlite_classes = ["HubDO"]
 
 [[r2_buckets]]
 binding = "FILES"
-bucket_name = "hauddy-files"
+bucket_name = "hauddy-staging-files"
+
+[[r2_buckets]]
+binding = "RELEASES"
+bucket_name = "hauddy-staging-releases"
+
+[[d1_databases]]
+binding = "WAITLIST_DB"
+database_name = "hauddy-staging-waitlist"
+database_id = "ee0f9559-f199-4e94-a17c-368b571cadbe"
 
 [vars]
-CORS_ORIGIN = "https://app.hauddy.com"
-RATE_LIMIT = "off"   # smoke test creates many accounts from one IP; validate functionality
+CORS_ORIGIN = "http://localhost:5173"
+EMAIL_DELIVERY = "disabled"
+MIN_CLIENT_VERSION = ""
+LATEST_CLIENT_VERSION = ""
+# Omit RATE_LIMIT: public staging retains normal limits. Only local fixtures may
+# explicitly override it with --var RATE_LIMIT:off.

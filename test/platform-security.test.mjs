@@ -793,3 +793,14 @@ test('alarm storage failures propagate for runtime retry, then recover without a
   await f.fire();
   assert.equal(f.next(), null);
 });
+
+test('staging blocks outbound reservation and recovery mail even with a provider key', async t => {
+  const { hub, request, db } = await fixture(t);
+  hub.env.EMAIL_DELIVERY = 'disabled';
+  hub.env.RESEND_API_KEY = 'fixture-do-not-use';
+  const outbound = t.mock.method(globalThis, 'fetch', async () => { throw Error('unexpected outbound mail'); });
+  await expectStatus(request('/preregistration/request', { email: 'fixture@example.test', handle: 'fixture' }), 503);
+  await expectStatus(request('/accounts/recovery/request', { email: 'alice@example.test' }), 200);
+  assert.equal(outbound.mock.callCount(), 0);
+  assert.equal(db.sql.exec('SELECT COUNT(*) AS n FROM email_tokens').toArray()[0].n, 0);
+});

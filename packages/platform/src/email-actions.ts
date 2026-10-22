@@ -56,7 +56,7 @@ export class EmailActions {
     return !!this.row('SELECT 1 FROM email_tokens LIMIT 1') || !!this.row('SELECT 1 FROM preregistrations LIMIT 1') || !!this.row('SELECT 1 FROM rate_limits LIMIT 1');
   }
   private async mail(email: string, subject: string, text: string) {
-    if (!this.env.RESEND_API_KEY) throw new EmailActionError(503, 'Email delivery is unavailable. Please retry later.');
+    if (this.env.EMAIL_DELIVERY === 'disabled' || !this.env.RESEND_API_KEY) throw new EmailActionError(503, 'Email delivery is unavailable. Please retry later.');
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST', headers: { 'content-type': 'application/json', authorization: `Bearer ${this.env.RESEND_API_KEY}` },
       body: JSON.stringify({ from: 'Hauddy <hello@hauddy.com>', to: [email], subject, text }), signal: AbortSignal.timeout(10_000),
@@ -91,7 +91,7 @@ export class EmailActions {
   async requestReservation(rawEmail: unknown, rawHandle: unknown, rawSource: unknown) {
     const email = this.email(rawEmail), nickname = normalizeNickname(String(rawHandle ?? ''));
     if (!nickname) throw new EmailActionError(400, 'Choose a handle with 2–24 letters, numbers, underscores or hyphens.');
-    if (!this.env.RESEND_API_KEY) throw new EmailActionError(503, 'Email delivery is unavailable. Please retry later.');
+    if (this.env.EMAIL_DELIVERY === 'disabled' || !this.env.RESEND_API_KEY) throw new EmailActionError(503, 'Email delivery is unavailable. Please retry later.');
     await this.rate(email, 'reservation'); this.purge();
     const { token, record } = await this.newToken('verify', email, DAY, null, nickname);
     const cancellation = await this.newToken('pending-cancel', email, DAY, null, nickname);
