@@ -3,17 +3,38 @@ name: Release
 on:
   push:
     tags: ['v[0-9]*']
+  workflow_dispatch: # Build a candidate without deploying or creating a tag.
 
 # Required secrets:
 #   CLOUDFLARE_API_TOKEN  — wrangler deploy + pages deploy + r2 object put
 #   CLOUDFLARE_ACCOUNT_ID — r2 object put
 
+permissions:
+  contents: read
+
+concurrency:
+  group: production-promotion
+  cancel-in-progress: false
+
 jobs:
+  verify:
+    uses: ./.github/workflows/ci.yml
+
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/check-release-version.mjs
+
   source-install:
     uses: ./.github/workflows/source-install.yml
 
   # ── Build the macOS DMG on a real Mac runner ──────────────────────────────
   build-mac:
+    needs: version
     name: Build macOS DMG
     runs-on: macos-latest
     outputs:
@@ -32,16 +53,9 @@ jobs:
       - name: Resolve version from tag
         id: ver
         run: |
-          VERSION=${GITHUB_REF_NAME#v}
+          VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "dmg=Hauddy-${VERSION}-arm64.dmg" >> $GITHUB_OUTPUT
-
-      - name: Sync version across all packages
-        run: |
-          node scripts/set-version.mjs ${{ steps.ver.outputs.version }}
-          # Bake SIDECAR_VERSION into src/version.ts; tsc -b doesn't run npm
-          # prebuild lifecycle scripts so we must call gen-version.mjs explicitly.
-          node packages/sidecar/scripts/gen-version.mjs
 
       - name: Build TypeScript packages
         run: npm run build
@@ -59,10 +73,11 @@ jobs:
         with:
           name: mac-dmg
           path: packages/desktop/release/*.dmg
-          retention-days: 1
+          retention-days: 30
 
   # ── Build the Linux .deb and .AppImage on an Ubuntu runner ────────────────
   build-linux:
+    needs: version
     name: Build Linux Packages
     runs-on: ubuntu-latest
     steps:
@@ -78,13 +93,8 @@ jobs:
       - name: Resolve version from tag
         id: ver
         run: |
-          VERSION=${GITHUB_REF_NAME#v}
+          VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Sync version across all packages
-        run: |
-          node scripts/set-version.mjs ${{ steps.ver.outputs.version }}
-          node packages/sidecar/scripts/gen-version.mjs
 
       - name: Build TypeScript packages
         run: npm run build
@@ -100,10 +110,11 @@ jobs:
           path: |
             packages/desktop/release/*.deb
             packages/desktop/release/*.AppImage
-          retention-days: 1
+          retention-days: 30
 
   # ── Build the Windows NSIS installer on a Windows runner ──────────────────
   build-win:
+    needs: version
     name: Build Windows Installer
     runs-on: windows-latest
     steps:
@@ -120,14 +131,8 @@ jobs:
         id: ver
         shell: bash
         run: |
-          VERSION=${GITHUB_REF_NAME#v}
+          VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Sync version across all packages
-        shell: bash
-        run: |
-          node scripts/set-version.mjs ${{ steps.ver.outputs.version }}
-          node packages/sidecar/scripts/gen-version.mjs
 
       - name: Build TypeScript packages
         run: npm run build
@@ -141,12 +146,13 @@ jobs:
         with:
           name: win-installer
           path: packages/desktop/release/*.exe
-          retention-days: 1
+          retention-days: 30
 
   # ── Upload to R2, deploy Cloudflare, create GitHub Release ───────────────
   deploy:
     name: Deploy & Release
-    needs: [source-install, build-mac, build-linux, build-win]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: [verify, version, source-install, build-mac, build-linux, build-win]
     runs-on: ubuntu-latest
     permissions:
       contents: write  # needed for creating a GitHub Release
@@ -165,9 +171,6 @@ jobs:
 
       - run: npm ci
 
-      - name: Sync version across all packages
-        run: node scripts/set-version.mjs ${{ env.VERSION }}
-
       - name: Build TypeScript packages
         run: npm run build
 
@@ -177,46 +180,28 @@ jobs:
           path: dist-artifacts
           merge-multiple: true
 
-      # Upload all platform builds to R2.
-      # Each gets a stable "latest" pointer (served by /download/<platform>) and an
-      # immutable versioned archive. Linux/Windows names are found by glob since
-      # electron-builder's exact output name varies slightly across versions.
-      - name: Upload release artifacts to R2
-        working-directory: packages/platform
-        run: |
-          # macOS
-          npx wrangler r2 object put hauddy-releases/downloads/mac-arm64-latest.dmg \
-            --file "$GITHUB_WORKSPACE/dist-artifacts/$DMG" \
-            --content-type application/octet-stream --remote
-          npx wrangler r2 object put "hauddy-releases/downloads/Hauddy-${VERSION}-arm64.dmg" \
-            --file "$GITHUB_WORKSPACE/dist-artifacts/$DMG" \
-            --content-type application/octet-stream --remote
+      - name: Build web dashboard
+        run: npm run build -w @hauddy/web
+      - name: Build landing site
+        run: npm run build -w @hauddy/landing
+      - name: Record release artifacts and checksums
+        run: node scripts/release-artifacts.mjs dist-artifacts
+      - name: Save verification evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-manifest
+          path: dist-artifacts/release-manifest.json
+          retention-days: 90
+      - name: Snapshot current download pointers
+        run: node scripts/release-downloads.mjs snapshot dist-artifacts rollback-downloads
+      - name: Archive versioned installers
+        run: node scripts/release-downloads.mjs archive dist-artifacts rollback-downloads
 
-          # Linux .deb
-          DEB=$(find "$GITHUB_WORKSPACE/dist-artifacts" -name "*.deb" | head -1)
-          npx wrangler r2 object put hauddy-releases/downloads/linux-amd64-latest.deb \
-            --file "$DEB" --content-type application/octet-stream --remote
-          npx wrangler r2 object put "hauddy-releases/downloads/$(basename "$DEB")" \
-            --file "$DEB" --content-type application/octet-stream --remote
-
-          # Linux AppImage
-          APPIMAGE=$(find "$GITHUB_WORKSPACE/dist-artifacts" -name "*.AppImage" | head -1)
-          npx wrangler r2 object put hauddy-releases/downloads/linux-x86_64-latest.AppImage \
-            --file "$APPIMAGE" --content-type application/octet-stream --remote
-          npx wrangler r2 object put "hauddy-releases/downloads/$(basename "$APPIMAGE")" \
-            --file "$APPIMAGE" --content-type application/octet-stream --remote
-
-          # Windows
-          EXE=$(find "$GITHUB_WORKSPACE/dist-artifacts" -name "*.exe" | head -1)
-          npx wrangler r2 object put hauddy-releases/downloads/windows-x64-latest.exe \
-            --file "$EXE" --content-type application/octet-stream --remote
-          npx wrangler r2 object put "hauddy-releases/downloads/$(basename "$EXE")" \
-            --file "$EXE" --content-type application/octet-stream --remote
-
-      # Publish assets before /api/version and the dashboard advertise this version.
-      - name: Create GitHub Release
+      # Prepare a draft; publish only after production promotion succeeds.
+      - name: Create draft GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          draft: true
           name: Hauddy v${{ env.VERSION }}
           body: |
             ## Download
@@ -237,29 +222,42 @@ jobs:
             dist-artifacts/*.deb
             dist-artifacts/*.AppImage
             dist-artifacts/*.exe
+            dist-artifacts/release-manifest.json
           fail_on_unmatched_files: true
 
-      # Deploy the platform Worker. Passes LATEST_CLIENT_VERSION so /api/version
-      # and the auth_rejected frame can report the newest available download.
+      # Deploy code while preserving the previously advertised client version.
       - name: Deploy platform Worker
         working-directory: packages/platform
-        run: npx wrangler deploy --var "LATEST_CLIENT_VERSION:${VERSION}"
-
-      # Build and deploy the web dashboard (app.hauddy.com)
-      - name: Build web dashboard
-        run: npm run build -w @hauddy/web
+        run: |
+          PREVIOUS_VERSION=$(node -p "require('../../rollback-downloads/snapshot.json').version")
+          npx wrangler deploy --var "LATEST_CLIENT_VERSION:${PREVIOUS_VERSION}"
 
       - name: Deploy web dashboard
         working-directory: packages/web
         run: |
           npx wrangler pages deploy dist --project-name hauddy-app --branch main
 
-      # Build and deploy the landing site (hauddy.com)
-      - name: Build landing site
-        run: npm run build -w @hauddy/landing
-
       - name: Deploy landing site
         working-directory: packages/landing
         run: |
-          npx wrangler pages project create hauddy-landing --production-branch main 2>/dev/null || true
           npx wrangler pages deploy dist --branch main
+
+      - name: Promote stable downloads
+        run: node scripts/release-downloads.mjs promote dist-artifacts rollback-downloads
+      - name: Advertise the new client version
+        working-directory: packages/platform
+        run: npx wrangler deploy --var "LATEST_CLIENT_VERSION:${VERSION}"
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release edit "$GITHUB_REF_NAME" --draft=false --latest
+      - name: Restore previous production state after failure
+        if: failure()
+        run: node scripts/release-downloads.mjs restore dist-artifacts rollback-downloads
+      - name: Retain rollback evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rollback-downloads
+          path: rollback-downloads
+          retention-days: 30
