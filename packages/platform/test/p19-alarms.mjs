@@ -5,18 +5,18 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 import { build } from 'esbuild';
-import { Miniflare } from 'miniflare';
+import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
 
 const scratch = await mkdtemp(join(tmpdir(), 'hauddy-alarms-'));
 let mf;
 try {
   const bundle = await build({ entryPoints: ['packages/platform/test/fixtures/alarm-worker.js'],
     bundle: true, format: 'esm', platform: 'browser', write: false });
-  mf = new Miniflare({ modules: true, script: bundle.outputFiles[0].text,
+  mf = new Miniflare(convertV4MiniflareOptions({ modules: true, script: bundle.outputFiles[0].text,
     compatibilityDate: '2026-01-01',
     durableObjects: { HUB: { className: 'AlarmTestHub', useSQLite: true } },
     durableObjectsPersist: join(scratch, 'do'), r2Buckets: ['FILES'], r2Persist: join(scratch, 'r2'),
-    d1Databases: ['WAITLIST_DB'], d1Persist: join(scratch, 'd1'), bindings: { RATE_LIMIT: 'off' } });
+    d1Databases: ['WAITLIST_DB'], d1Persist: join(scratch, 'd1'), bindings: { RATE_LIMIT: 'off' } }));
   const request = async (path, scenario) => {
     const response = await mf.dispatchFetch(`http://alarm.test/${path}?case=${scenario}`);
     assert.equal(response.status, 200, await response.clone().text());

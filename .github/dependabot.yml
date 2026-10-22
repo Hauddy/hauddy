@@ -1,0 +1,11 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+    groups:
+      compatible-patches:
+        update-types: [patch, minor]
+    # Major upgrades remain individual PRs for compatibility review.

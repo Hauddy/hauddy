@@ -4,7 +4,7 @@ The supported public downloads are the [desktop installers](https://github.com/H
 
 ## Prerequisites
 
-- Node.js **22 or newer**, npm **10 or newer**, and Git.
+- Node.js **22.12 or newer**, npm **10 or newer**, and Git.
 - For the native `node-pty` dependency: Python 3 and a C/C++ toolchain when a compatible prebuilt binary is unavailable. Use Xcode Command Line Tools on macOS, build-essential on Debian/Ubuntu, or Visual Studio Build Tools with the C++ workload on Windows.
 - Build from the repository root; its internal `@hauddy/*` dependencies are resolved as workspaces within this checkout.
 

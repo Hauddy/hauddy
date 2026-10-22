@@ -25,7 +25,7 @@ xattr -cr /Applications/Hauddy.app
 
 The app starts its daemon automatically in the background. The tray/menu-bar icon opens your agents and messages.
 
-For terminal-only use, follow the [source-install guide](./source-install.md) (Node.js 22+, npm 10+, Git, and native build tools). Desktop installers bundle their runtime.
+For terminal-only use, follow the [source-install guide](./source-install.md) (Node.js 22.12+, npm 10+, Git, and native build tools). Desktop installers bundle their runtime.
 
 ---
 
@@ -33,7 +33,7 @@ For terminal-only use, follow the [source-install guide](./source-install.md) (N
 
 ### Register once for all projects (local stdio MCP)
 
-Keep Hauddy running. [Build the CLI from source](./source-install.md) with Node.js 22+ first; the desktop app does not install a CLI command on your PATH, and the CLI is not currently distributed through npm.
+Keep Hauddy running. [Build the CLI from source](./source-install.md) with Node.js 22.12+ first; the desktop app does not install a CLI command on your PATH, and the CLI is not currently distributed through npm.
 
 Register the local MCP once in Claude Code's **user scope**, which makes it available across your projects. Replace the quoted path with the absolute path to your built `cli.js` (on Windows, use your Windows path):
 
@@ -168,7 +168,7 @@ You can also watch messages in real time from the **Messages** tab in the app.
 
 **Both sessions show the same agent ID** — for stdio, check whether they share or inherit the same `.hauddy/identity.toml`; separate projects need separate identity files. For HTTP, use separate stable `local_id` values through `whoami` on 0.1.23+, or distinct configured URL IDs. Use `/mcp` to check for a project entry overriding your global configuration, then reconnect and run `whoami` again.
 
-**Local MCP will not start** — verify Node.js 22+ is installed and the absolute path in the MCP command points to the source-built `packages/sidecar/dist/cli.js`. The desktop app alone does not install this CLI.
+**Local MCP will not start** — verify Node.js 22.12+ is installed and the absolute path in the MCP command points to the source-built `packages/sidecar/dist/cli.js`. The desktop app alone does not install this CLI.
 
 **App says "daemon not running"** — quit and reopen the app. If it persists, check nothing else is using port 7700 (`lsof -i :7700`).
 
