@@ -18,6 +18,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check:entry-points
+      - run: node scripts/check-staging-isolation.mjs
       - name: Build core packages
         run: npm run build
       - name: Check deployment safeguards
@@ -56,7 +57,7 @@ jobs:
       - run: npm run build
       - name: Exercise disposable Durable Object storage
         run: |
-          npx wrangler dev -c packages/platform/wrangler.toml --local --port 8799 --persist-to /tmp/hauddy-ci --var RATE_LIMIT:off --var ADMIN_TOKEN:fixture-report-only > /tmp/workerd.log 2>&1 &
+          npx wrangler dev -c packages/platform/wrangler.staging.toml --local --port 8799 --persist-to /tmp/hauddy-ci --var RATE_LIMIT:off --var ADMIN_TOKEN:fixture-report-only > /tmp/workerd.log 2>&1 &
           runtime_pid=$!
           trap 'kill "$runtime_pid" || true' EXIT
           for attempt in $(seq 1 60); do
