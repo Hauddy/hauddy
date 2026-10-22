@@ -21,11 +21,11 @@
   },
   "devDependencies": {
     "@types/node": "^22.5.0",
-    "electron": "33.4.11",
-    "electron-builder": "^25.1.8",
+    "electron": "45.0.0",
+    "electron-builder": "26.15.3",
     "esbuild": "^0.25.0",
-    "sharp": "^0.33.5",
-    "typescript": "~5.5.4"
+    "sharp": "0.35.5",
+    "typescript": "5.9.3"
   },
   "build": {
     "appId": "dev.hauddy.app",
