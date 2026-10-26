@@ -25,21 +25,25 @@ is a working hypothesis, not validated search demand.
 
 ## Vision and first-essay context
 
-Long-term direction: **give agents the connections and permissions they need to
-communicate and act on your behalf.** See [VISION.md](../VISION.md) and the
-[roadmap](../ROADMAP.md). Keep the current short/medium product descriptions above
-focused on available messaging behavior.
+Current direction: **make communication between trusted agents dependable.**
+Hauddy is a personal, non-commercial, open-source project focused on messaging,
+contacts, presence, calls and files. See [VISION.md](../VISION.md) and the
+[roadmap](../ROADMAP.md) for scope and review requirements.
 
-The Reducing Valve's first Hauddy essay should introduce the project from scratch
-and explore who authorized an agent to act. Use the
-[writer handoff](editorial/hauddy-first-essay-brief.md) for context and claim boundaries.
-The next experiment is one outbound application connector for email draft creation,
-with a per-agent grant and protected credentials. A vault, external action signatures,
-application SSO and payment controls are not shipped capabilities. Today's connectors
-give outside assistants access to Hauddy; the proposed connector accesses another app.
+The Reducing Valve's first Hauddy essay should introduce the existing messaging
+workflow. The [writer handoff](editorial/hauddy-first-essay-brief.md) replaces the
+previous connector/vault experiment brief. Third-party MCP wrapping, credential
+gating, delegated authority and outbound application actions remain conceptual only,
+subject to separate written clearance before implementation. The email-draft prototype
+is on hold, including fake-provider work; do not describe it as the next experiment.
 
-The essay is a foundation for discussion and contributor interest. Its broader
-vision does not imply a new release, a provider partnership or permission to publish.
+Keep employer titles, affiliation and implied endorsement out of project promotion,
+speaker biographies and related public materials. Use only personal work and public
+information; private review correspondence and internal documents do not belong here.
+Pricing, paid services, a business entity, funding or revenue require fresh review
+before proceeding. These boundaries do not change the Apache-2.0 license.
+
+An editorial draft does not authorize publication, outreach or implementation.
 
 ## Claims audit
 

@@ -4,6 +4,19 @@ Thanks for your interest in Hauddy — messaging for AI agents. The protocol is 
 public draft ([`spec/v0.1.md`](spec/v0.1.md)) and the implementation is
 Apache-2.0. Issues, ideas, and pull requests are all welcome.
 
+## Project scope
+
+Hauddy is a personal, non-commercial, open-source communication project. Contributions
+should improve messaging, contacts, presence, calls, file sharing and their supporting
+infrastructure. Read [VISION.md](VISION.md) and [ROADMAP.md](ROADMAP.md) before
+proposing features. Material scope changes and the conceptual ideas held there require
+separate written clearance before implementation, including prototypes. An issue or
+PR invitation does not substitute for that review.
+
+Keep confidential employer material, internal documents and proprietary knowledge out
+of contributions. Public project promotion must not use the maintainer's employer title,
+affiliation or implied endorsement. These activity boundaries do not modify Apache-2.0.
+
 ## Ground rules
 
 - **The spec is the source of truth.** If a change alters wire behaviour, update

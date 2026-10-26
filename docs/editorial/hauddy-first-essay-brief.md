@@ -1,194 +1,95 @@
 # The Reducing Valve: first Hauddy essay — writer handoff
 
-Prepared 2026-10-01. **Core concepts and editorial brief, not a finished essay.**
-The next writing agent should develop the full body in the author's voice.
-Canonical direction: [vision](../../VISION.md) and [roadmap](../../ROADMAP.md).
+Updated 2026-10-26. **Editorial brief, not a finished essay or publication approval.**
+This replaces the earlier connector/vault experiment brief. Canonical scope:
+[vision](../../VISION.md) and [roadmap](../../ROADMAP.md).
 
 ## Assignment and reader context
 
-This is The Reducing Valve's first essay introducing Hauddy. Assume the reader has
-never encountered the project, agent identities, MCP or the founder's work on it.
-Explain the problem and introduce the software before discussing its trajectory.
-Do not refer to earlier Hauddy essays or assume a launch announcement has happened.
+Introduce Hauddy from scratch to technical readers and builders who may never have
+encountered the project or MCP. Explain the practical communication problem before
+discussing any broader questions. Use the author's personal builder perspective;
+do not use an employer title, affiliation, endorsement or internal knowledge.
 
-The audience is thoughtful technical readers, AI builders and people interested in
-how software changes human agency. Explain an agent simply: software that can carry
-out steps and use tools on someone's behalf, rather than only respond in a chat.
-
-The existing communication strategy gives The Reducing Valve the ideas, Barnaba the
-builder's perspective, and Hauddy the practical implementation. Preserve that
-relationship. The essay should be useful even to someone who never installs Hauddy.
-Keep the ambition candid and the present-day product concrete. No invented personal
-anecdotes, adoption figures, customer stories or claims that the future is inevitable.
+Hauddy is a personal, non-commercial, open-source project developed on personal time
+and equipment. Keep private employment-review correspondence and approval paperwork
+out of the essay and repository. Do not claim that approval has been granted.
 
 ## Working title and central question
 
-**Who Sent This Agent? Identity and Authority on the Agent Internet**
+**A Contact Book for AI Agents**
 
-Central question: **When an agent says “I'm acting for you,” what should another
-system require as proof?**
+Central question: **How can two agents in different tools exchange a message or file
+while the person using them can inspect the conversation?**
 
-Thesis: As agents communicate and act through applications, identity and delegated
-authority need to travel in a form other systems can verify and enforce. Open
-implementations and interoperable providers could make that infrastructure available
-across tools. Hauddy begins with communication and is exploring a small next step:
-handling application connections and permissions for agents.
+Start with a research agent sending a brief to a coding agent and receiving a reply.
+Hauddy transports the exchange; it does not assign work, track a task lifecycle or
+choose an agent based on its skills. Do not invent anecdotes, measured productivity
+gains, adoption figures, customer stories or inevitable future outcomes.
 
-Treat increasing agent-to-agent activity as the motivating possibility. Do not
-predict that human messaging will disappear or that every application will adopt
-one new identity provider.
+## Current behavior the writer can describe
 
-## Introduce Hauddy in plain language
+- Messaging, contacts, presence, compatible live calls and file sharing between agents.
+- Local use without a Hauddy account; invited accounts for hosted network access.
+- Desktop packages, a web dashboard, a TypeScript SDK and a Python MCP example.
+- Inbound connectors that let outside assistants access Hauddy messages/files through
+  scoped, revocable tokens. These do not operate external applications on an owner's behalf.
+- Brokered and stored payloads, without end-to-end payload encryption. Calls need
+  connected, compatible sessions and are unavailable through hosted connectors.
+- Handles and keypairs for routing/authentication within Hauddy; contact settings
+  that control communication. Account/key binding is not real-world identity certification.
 
-Facts the writer can use:
+Explain contact acceptance accurately: optional account auto-accept and agent open-link
+settings exist. Do not imply every connection always requires a manual acceptance.
 
-- Hauddy is an open-source alpha for messaging and live calls between AI agents
-  across tools. A research agent can send a brief or file to a coding agent and
-  receive a reply, with history a person can inspect.
-- Local use does not need a Hauddy account. The hosted network requires an invited
-  account. Desktop packages, a web dashboard, a TypeScript SDK and a Python MCP
-  example exist; a standalone Python SDK is not being claimed.
-- Current hosted connectors let an outside assistant access Hauddy messages/files
-  through a scoped, revocable identity. They do not yet operate Gmail, Teams or payments.
-- Hauddy brokers/stores payloads. It is not currently end-to-end encrypted.
-- The code is open source and the hosted service is centrally operated. Account/key
-  binding inside that service is not certification of a person's legal identity.
+## Broader ideas — conceptual only, subject to separate review
 
-Possible introductory material, to rewrite rather than paste as finished copy:
+The earlier passport / mandate / receipt framing may be discussed as a general
+question about identity, permission and evidence. It is not Hauddy's committed
+trajectory or a feature announcement. Keep any such discussion clearly separate
+from the current messaging utility and grounded only in public information.
 
-> I'm building Hauddy, an open-source way for AI agents to exchange messages and
-> files across tools. The starting point is practical: give a research agent a way
-> to pass work to a coding agent, and let the person behind them inspect the exchange.
-> Working on that problem raises a larger question: when software speaks or acts
-> for someone, how should the receiving system know whose authority it carries?
+Wrapping third-party MCP servers, credential gating, application vaults, delegated
+authority, outbound application actions, application SSO and payment controls are
+outside the implementation roadmap. The email-draft connector is on hold, including
+fake-provider prototypes. Separate written clearance is required before implementation;
+interest from readers does not authorize the experiment.
 
-## The concepts to develop
-
-### 1. An address and a claim of ownership are insufficient
-
-A familiar email address, display name or agent handle may help route a message.
-The receiving system also needs evidence of the agent, its relationship to an
-account, and the authority behind this particular action.
-
-Existing email, messaging and identity systems already authenticate accounts.
-Explain the missing context when an agent acts through one; do not claim those
-systems have no security or that changing the transport solves impersonation.
-
-### 2. Keep identity, permission and evidence distinct
-
-| Reader-friendly idea | Meaning |
-|---|---|
-| Passport | Which agent is acting and what relationship to an account/organization is attested |
-| Mandate | Which actions it may take, in which application, under what limits and until when |
-| Receipt | Evidence of the requested action, the authorization used and the outcome |
-
-“Agent passport” is a metaphor for the trajectory, not an existing product or legal
-credential. A valid signature proves use of a signing credential; it does not prove
-which model composed the text, that the agent is uncompromised, or that its request
-is sensible. A human or application still decides which issuers and claims to trust.
-
-### 3. Carry agent context into existing applications
-
-Use one email example to make the idea concrete. **This is hypothetical:** an email
-leaves the owner's linked account with verifiable evidence of the specific agent,
-the owner/account relationship and the authorization used. The evidence binds to
-the particular content and recipients so it cannot simply be pasted onto another
-message. A compatible verifier would be needed; no native Gmail badge is promised.
-
-Teams illustrates the same principle with permission to post in one channel.
-A purchase is a later, higher-stakes extension: one account, selected merchants,
-per-transaction and cumulative limits. A spending limit needs durable accounting,
-concurrency control and safe retries; writing a budget into a credential is not
-sufficient. These examples do not assert current provider API capabilities.
-
-### 4. The connector and vault make a useful first step
-
-Credential storage, token refresh, provider-specific calls, permission checks and
-failure handling are recurring implementation work for agent builders. Hauddy's
-value proposition can extend to handling that work behind a consistent interface.
-
-Conceptual flow:
-
-1. The owner links an application and grants an agent a narrow action.
-2. The agent requests the action through Hauddy.
-3. The connector checks the grant, including expiry and revocation.
-4. The connector uses its protected application credential and records the result.
-
-**The agent requests an action; it never retrieves the underlying vault secret.**
-An unrestricted credential available through another route would undermine this
-boundary. Permissions must be enforced by the application or by the connector that
-controls access. Protected storage alone does not make a safe action system.
-
-The actual next experiment is smaller than the hypothetical email example:
-**create an email draft through one provider, initially using a fake provider and
-then a linked test account.** Gmail is the candidate, pending API/permission review.
-Sending, portable signatures and payments are outside that first prototype.
-
-### 5. An open ecosystem can include privately operated providers
-
-Hauddy could operate one trusted service while publishing software other providers
-can run. The wider goal requires compatible formats, independently checkable proofs,
-explicit issuer policies and support for different providers. Open-source code is
-one part of that goal; it does not by itself deliver interoperability.
-
-Build on existing identity/authorization standards. Do not claim Hauddy invented
-delegation, already implements federation, or should become the sole authority for
-agents. Disclose only the identity information an action needs; avoid proposing a
-public global dossier of an owner's agents and activity.
+Do not solicit code contributions for these ideas, describe them as “coming next,”
+or supply an implementation handoff. An essay about wider questions must not imply
+a provider partnership, enterprise governance offering or commercial plan.
 
 ## Suggested narrative order
 
-1. Open with a clearly hypothetical message: it comes from a familiar account, but
-   an agent performed the action. What exactly has been authorized?
-2. Explain why more autonomous action makes that question practical.
-3. Introduce Hauddy, the current two-agent workflow and the founder's reason for
-   investigating the problem. Ask the author for any genuine personal anecdote.
-4. Develop passport / mandate / receipt through the email example.
-5. Explain the connector/vault as useful infrastructure and describe the deliberately
-   small draft-creation experiment.
-6. Expand to interoperable providers and application access as a direction, naming
-   the unsolved trust and enforcement questions.
-7. Close by inviting builders to challenge the model, try the existing messaging
-   workflow, or contribute a small implementation/documentation improvement.
+1. Describe a concrete need to move a brief or file between two agent sessions.
+2. Introduce Hauddy and show the existing exchange and inspectable history.
+3. Explain handles, contact settings, presence and delivery in plain language.
+4. State the alpha's access and security limitations.
+5. If useful, distinguish communication identity from the broader conceptual question
+   of authority to act; label the latter outside the current scope and subject to review.
+6. Invite readers to try the messaging workflow, report setup problems or contribute
+   a small improvement within the current scope.
 
-Avoid turning the piece into a product catalogue, standards tutorial or funding
-pitch. Introduce purchases only briefly to show why the distinction matters.
+## Claim boundaries
 
-## Claim boundaries for the writer
-
-| Can describe as current | Must describe as planned or exploratory |
+| Can describe as current | Must not present as planned implementation |
 |---|---|
-| Agent messaging/files, identities and inspectable history within Hauddy | Application credential vault and outbound application connectors |
-| Scoped, revocable inbound Hauddy connector tokens | Gmail/Teams actions under per-agent grants |
-| Account/key relationships within Hauddy | Portable ownership/delegation proofs or real-world identity assurance |
-| Open-source implementation and centrally operated hosted service | Multiple interoperable issuers, application SSO and independent verification |
-| A small contributor-focused alpha | Payment controls, a plugin marketplace or ecosystem-scale adoption |
+| Messaging/files, contacts, presence and compatible calls | Third-party MCP wrappers or credential-gated application access |
+| Scoped, revocable inbound Hauddy connectors | Outbound email/app actions and application credential vaults |
+| Account/key relationships inside Hauddy | Portable ownership/delegation proofs, enterprise identity or application SSO |
+| Open-source code and an invited hosted alpha | Paid tiers, commercial services, funding or revenue plans |
 
-Use “Hauddy” with a capital H. Preserve lowercase in technical identifiers and URLs.
-Use “acting for a linked account” unless stronger ownership verification is actually
-established. Avoid “impersonation-proof,” “certified owner,” “universal SSO,” and any
-suggestion that identity prevents prompt injection or all misuse.
+The project's non-commercial status concerns the maintainer's activity and does not
+change the Apache-2.0 license. Use “Hauddy” with a capital H, preserving lowercase
+technical identifiers and URLs. Avoid claims such as “certified owner,” “universal
+SSO,” “impersonation-proof,” or claims that identity prevents prompt injection.
 
-## Sources and editorial handoff
+## Handoff
 
-Use these as grounding, not as evidence Hauddy implements the standards:
+Use the [connector guide](../connectors.md), [launch messaging](../launch-messaging.md),
+[vision](../../VISION.md) and [roadmap](../../ROADMAP.md) as current product references.
+Ask the author for personal experience rather than inventing it.
 
-- [RFC 8693, delegation versus impersonation](https://www.rfc-editor.org/rfc/rfc8693.html#section-1.1):
-  the acting party can remain distinct from the party it represents.
-- [RFC 9700, access-token privilege restriction](https://www.rfc-editor.org/rfc/rfc9700.html#section-2.3):
-  constrain tokens by application/resource/action and enforce those constraints.
-- [W3C Verifiable Credentials Data Model 2.0](https://www.w3.org/TR/vc-data-model/):
-  issuer, holder and verifier roles; checking a credential does not establish the
-  truth of every claim it contains.
-- [Current connector documentation](../connectors.md) and
-  [launch messaging](../launch-messaging.md): product scope and current claims.
-
-For the next writer: deliver a full first-essay draft with enough context for a new
-reader, the hypothetical email example, an honest introduction to Hauddy, and a
-bounded invitation to participate. Preserve the distinction between shipped product
-and vision. Ask the author to supply personal experience rather than inventing it.
-
-After the author edits the essay, derive one LinkedIn post around the opening
-question and a GitHub Discussion around the narrow connector/grant model. The full
-essay belongs on The Reducing Valve. No essay, post or outreach has been published
-as part of this handoff.
+After author review, a LinkedIn adaptation or Discussion can focus on the existing
+messaging workflow and contributor feedback. Drafting is not permission to publish
+or send outreach; no external publication is performed by this handoff.

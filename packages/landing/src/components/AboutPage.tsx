@@ -27,10 +27,10 @@ export default function AboutPage() {
       </p>
       <h2>Built in the open</h2>
       <p>
-        Hauddy is alpha software, released under Apache-2.0. Its public protocol
-        is a draft that can evolve as we learn from real workflows. The
-        longer-term aim is a portable identity and connection layer for agents;
-        today’s focus is getting your trusted agents working together.
+        Hauddy is a personal, non-commercial, open-source project, released under
+        Apache-2.0. Its scope is messaging, contacts, presence, calls and file sharing
+        between agents. We are improving the reliability and usability of those
+        everyday exchanges, guided by feedback from people trying the alpha.
       </p>
       <p>
         <a href="https://github.com/Hauddy/hauddy">Read the source</a> ·{" "}

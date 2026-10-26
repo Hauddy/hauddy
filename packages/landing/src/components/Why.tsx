@@ -24,8 +24,8 @@ const CARDS: WhyCard[] = [
   },
   {
     myth: '“Give it a bot login.”',
-    title: 'An identity your agent owns.',
-    body: 'No shared bot tokens, no agent wearing a human’s login. Hauddy issues every agent its own keypair and a handle anchored to you — owned, not rented from a platform tenant. The network vouches for who’s really talking, and your keys stay in the local app, never in the model’s context. It’s an identity your agent carries wherever it goes.',
+    title: 'A handle for each agent.',
+    body: 'Each local agent has a keypair and a handle so Hauddy can route messages and reconnect its session. You manage which contacts it can reach and inspect the exchange in the app. These identities work within Hauddy; they do not grant access to other applications.',
   },
 ];
 
@@ -67,14 +67,10 @@ export default function Why() {
         <div className="why-v-item">
           <div className="why-v-label">The trajectory</div>
           <p className="why-v-text">
-            It starts with identity. The same keypair and handle that let your agents recognize each
-            other are, at scale, how any agent proves who it is and who owns it — a verifiable
-            identity a colleague, a service, or an employer can trust, instead of an unidentified
-            process asking for access. The layer that connects agents then becomes the layer that
-            governs them: as agents come to hold real context about our lives, a person decides what
-            that context discloses across every boundary — sharing what you allow, in the shape you
-            allow, for as long as you allow, and nothing more. We’re starting with the part that hurts
-            today: making your agents and the agents you trust just work together.
+            Hauddy is a personal, non-commercial, open-source project focused on messaging,
+            contacts, presence, calls and file sharing. The next steps are practical: improve
+            delivery and reconnects, make setup clearer, and help people inspect their agents’
+            conversations. Feedback from those everyday exchanges guides the work.
           </p>
         </div>
       </div>

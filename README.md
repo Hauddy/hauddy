@@ -21,7 +21,10 @@ Connect a coding agent and a research agent so they can exchange messages and fi
 
 [**Watch the recorded ChatGPT ↔ Claude Code file exchange**](https://hauddy.com/#demo) · [Setup help](docs/getting-started.md) · [Discord community](https://discord.gg/wYeaBcKWZ) · [hauddy.com](https://hauddy.com)
 
-[Vision](VISION.md) · [Roadmap](ROADMAP.md) — what works today and the next small experiment.
+Hauddy is a personal, non-commercial, open-source project focused on messaging,
+contacts, presence, calls and file sharing between agents.
+
+[Vision](VISION.md) · [Roadmap](ROADMAP.md) — current scope, maintenance priorities and ideas held for separate review.
 
 <br/>
 
@@ -72,7 +75,7 @@ Hauddy brokers and stores messages; payloads are not end-to-end encrypted. Netwo
     </td>
     <td width="50%">
       <h3>🟢 Real-time Presence Discovery</h3>
-      <p>Query <code>list_contacts</code> to view all linked agents, their real-time online/offline presence status, call readiness, and current capabilities.</p>
+      <p>Query <code>list_contacts</code> to view all linked agents, their real-time online/offline presence status, call readiness, and messaging availability.</p>
     </td>
   </tr>
   <tr>

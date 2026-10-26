@@ -1,7 +1,11 @@
 # Hauddy roadmap
 
-Updated 2026-10-01. Priorities, not release dates or promises.
-Read the [vision](VISION.md) for the longer direction.
+Updated 2026-10-26. Priorities, not release dates or promises.
+Read the [vision](VISION.md) for the project scope and review requirements.
+
+Hauddy remains a personal, non-commercial, open-source communication project.
+Work is limited to messaging, contacts, presence, calls and file sharing between
+agents, and maintenance of the infrastructure supporting those features.
 
 ## Available today — alpha
 
@@ -18,68 +22,60 @@ require connected, compatible sessions and are unavailable through hosted connec
 ## Now — make the existing path dependable
 
 Help a builder connect two local agents, exchange a brief and reply, and inspect
-the history. Fix blockers before expanding the feature surface.
+the history. Focus on the existing feature surface.
 
-- Address [dependency maintenance](https://github.com/Hauddy/hauddy/issues/116),
-  [release gates](https://github.com/Hauddy/hauddy/issues/117) and the
-  [shared-alarm bug](https://github.com/Hauddy/hauddy/issues/115).
-- Make [contributing](https://github.com/Hauddy/hauddy/issues/120) approachable
-  through accurate docs, bounded starter tasks and available reviewers.
-- Finish remaining real-world acceptance in the existing
-  [marketing](https://github.com/Hauddy/hauddy/issues/96) and
-  [visual](https://github.com/Hauddy/hauddy/issues/109) trackers; reuse shipped assets.
+- Maintain dependencies, release verification, isolated test environments and recovery
+  procedures for the local app and hosted relay.
+- Fix message delivery, reconnect, offline queue, history sync and call-readiness defects.
+- Improve contact controls, file-sharing reliability and existing inbound connector setup.
+- Make [contributing](CONTRIBUTING.md) approachable through accurate docs, bounded
+  starter tasks and available reviewers.
+- Complete real-world setup and accessibility checks for the existing desktop/web UI.
 - Establish a small [adoption/contribution baseline](https://github.com/Hauddy/hauddy/issues/122)
-  and the operational checks needed for the hosted alpha.
+  focused on successful exchanges and useful feedback.
 
 Success means an independent builder completes the documented workflow and a new
 contributor can complete a scoped change with review. Track repeat use and repeat
 contributions separately from clicks, stars and hosted signup counts.
 
-## Next — one application action, under an explicit grant
+## Next — improve the same communication workflow
 
-Prototype **email draft creation through one application connector**. Gmail is the
-initial candidate, subject to API/permission feasibility. Begin with a fake provider
-and synthetic credentials, then an explicitly linked test account. This is planned
-outbound application access, distinct from today's inbound Hauddy connectors.
+Use reported failures and observed setup attempts to choose the next small fixes.
+Improve error messages, documentation, cross-platform installation and test coverage
+where those observations show a gap. Continue supporting current messaging clients
+and inbound Hauddy connectors within the existing scope.
 
-The owner links the account and grants a named agent draft creation there, with an
-expiry and revocation control. The connector keeps the provider credential out of
-agent tools, prompts and logs. It checks the grant before calling the provider and
-records the request, authorization decision and outcome with sensitive data minimized.
+There is no active outbound application-connector experiment. The previously proposed
+email-draft connector, including its fake-provider prototype, is on hold pending
+separate written clearance. It must not be treated as the next engineering task.
 
-Completion gates:
+## Outside the implementation roadmap — separate review first
 
-- An authorized agent can create a draft in the linked test account.
-- A different agent/account, an expired or revoked grant, and a send request are rejected.
-- Checks cannot be bypassed by obtaining the underlying credential through the agent interface.
-- Retry and ambiguous-provider-result handling avoid blindly creating duplicate drafts.
-- The owner can inspect outcomes and revoke access; the credential boundary and
-  its limitations are documented and reviewed before a pilot with real users.
+Wrapping third-party MCP servers, credential gating/vaults, delegated authority,
+portable identity, application SSO, outbound application actions, payment controls,
+task delegation, capability discovery and enterprise governance remain ideas only.
+Do not prototype or implement them before the separate review described in
+[VISION.md](VISION.md#ideas-held-for-separate-review).
 
-Keep one provider, one action and one owner-to-agent grant model. No sending,
-payments, arbitrary plugin execution or marketplace in this prototype. Expand only
-after a builder finds the constrained workflow useful and the boundary holds.
-
-## Later — evidence before expansion
-
-Explore portable agent identity, independently verifiable action receipts and
-delegation that other applications/providers can understand. Application SSO,
-additional connectors, payment budgets and federation remain exploratory.
-
-Group conversations, alternative transports, a standalone Python SDK, mobile and
-marketplace ideas are deferred. Revisit them when repeated demand and maintenance
-capacity justify the work.
+Other expansion proposals, including group conversations, federation, new transports,
+mobile clients and a marketplace/registry, are not commitments. Assess any material
+scope change with the reviewing office and obtain clearance before proceeding;
+community demand and maintainer capacity do not replace that review.
 
 ## Communication and review
 
-Introduce Hauddy and the identity/delegation question in The Reducing Valve's first
-Hauddy essay; the [editorial handoff](docs/editorial/hauddy-first-essay-brief.md)
-separates current behavior, the next experiment and the future vision. Use a concise
-LinkedIn adaptation and a focused technical discussion rather than adding channels
-without capacity to support them. Drafting does not imply publication.
+Public materials must describe a personal, non-commercial project and the features
+people can use today. Keep employer titles, affiliations and implied endorsements
+out of promotion. The [editorial handoff](docs/editorial/hauddy-first-essay-brief.md)
+uses the existing messaging workflow and labels broader ideas as conceptual only.
 
-Keep one engineering priority and one contributor/communication priority active.
-Agree owners and capacity before dates. Continue the wider maturity backlog through
-[#125](https://github.com/Hauddy/hauddy/issues/125); this roadmap sets the order rather
-than promising all of it in one release. Share proposals in
-[Discussions](https://github.com/Hauddy/hauddy/discussions).
+Commercialization — pricing, paid services, a business entity, funding or any revenue —
+requires a fresh review and written clearance before proceeding. Arrange a six-month
+follow-up review and revisit sooner if circumstances change. Approval paperwork and
+review dates belong in private records; this roadmap does not assert approval.
+
+Keep one engineering priority and one contributor/documentation priority active.
+Reconcile older issues and plans against this scope before starting them, including
+[#125](https://github.com/Hauddy/hauddy/issues/125). Share proposals in
+[Discussions](https://github.com/Hauddy/hauddy/discussions); proposals do not authorize
+implementation outside the current scope.
