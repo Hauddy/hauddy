@@ -15,7 +15,7 @@
     "@hauddy/web-tokens": "*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "7.18.4"
+    "react-router-dom": "7.18.5"
   },
   "devDependencies": {
     "@types/react": "^18.3.18",
